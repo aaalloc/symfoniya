@@ -35,7 +35,7 @@ import { useState } from "react"
 import { invoke } from "@tauri-apps/api/tauri"
 import { type } from "os"
 import { ScrollArea } from "@radix-ui/react-scroll-area"
-import { MoreHorizontal, FolderPlus } from "lucide-react"
+import { X, FolderPlus } from "lucide-react"
 
 
 
@@ -43,7 +43,7 @@ export function AddMusic() {
     const [buttonDesc, setButtonDesc] = useState<string>(
         "Waiting to be clicked. This calls 'on_button_clicked' from Rust.",
     )
-    const [arr_path, setPath] = useState<string | string[]>(["test", "test2", "test3"])
+    const [arr_path, setPath] = useState<string | string[]>("None")
     const removePath = (path: string) => {
         console.log(path)
         setPath(arr_path.filter((value) => {
@@ -53,20 +53,21 @@ export function AddMusic() {
     const choose_path = async () => {
         const import_dialog = await import('@tauri-apps/api/dialog');
         const import_path = await import('@tauri-apps/api/path');
-        const arr_path = await import_dialog.open({
+        const paths = await import_dialog.open({
             directory: true,
             multiple: true,
             defaultPath: await import_path.audioDir(),
         });
-        if (typeof arr_path == null) {
+        if (typeof paths == null) {
             setPath("None");
         }
-        else if (arr_path[0] == "None") {
-            setPath(path);
+        else if (arr_path.length == 1 && arr_path[0] == "None") {
+            setPath([...arr_path]);
         }
         else {
             // append
-            setPath(arr_path + path);
+            // TODO: check if path already in arr_path
+            setPath([...arr_path, ...paths]);
         }
     }
 
@@ -89,7 +90,7 @@ export function AddMusic() {
                     <DialogTitle>Add musics</DialogTitle>
                 </DialogHeader>
                 {/* value={path == null ? "Something happened ..." : path} */}
-                {arr_path == 'None' | arr_path.length == 0 ? <div onClick={choose_path} className="cursor-pointer grid h-[200px] items-center justify-center rounded-md border border-dashed text-sm">
+                {arr_path == 'None' || arr_path.length == 0 ? <div onClick={choose_path} className="cursor-pointer grid h-[200px] items-center justify-center rounded-md border border-dashed text-sm">
                     <div className="items-center">
                         <p className="text-sm text-muted-foreground">Select a or multiple folder path </p>
                     </div>
@@ -102,25 +103,25 @@ export function AddMusic() {
                                 </TableRow>
                             </TableHeader>
                             {/* <TableCaption>Path selected</TableCaption> */}
-                            <ScrollArea className="h-36">
+                            {/* patch w-1 when path to big*/}
+                            <ScrollArea className="h-36 w-1">
                                 <TableBody>
                                     {typeof arr_path == "string" ? <TableRow>
                                         <TableCell>{arr_path}</TableCell>
+                                        <TableCell className="w-1/12">
+                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                                <span className="sr-only">Remove path</span>
+                                                <X onClick={() => removePath(value)} className="h-4 w-4" />
+                                            </Button>
+                                        </TableCell>
                                     </TableRow> : arr_path.map((value) => {
                                         return <TableRow>
-                                            <TableCell className="w-auto">{value}</TableCell>
+                                            <TableCell>{value}</TableCell>
                                             <TableCell className="w-1/12">
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" className="h-8 w-8 p-0">
-                                                            <span className="sr-only">Open menu</span>
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem onClick={() => removePath(value)}>Remove path</DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
+                                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                                    <span className="sr-only">Remove path</span>
+                                                    <X onClick={() => removePath(value)} className="h-4 w-4" />
+                                                </Button>
                                             </TableCell>
                                         </TableRow>
                                     })}
@@ -132,7 +133,7 @@ export function AddMusic() {
                 <DialogFooter>
                     {arr_path == 'None' || arr_path.length == 0 ? <></> :
                         <Button variant="outline">
-                            <FolderPlus />
+                            <FolderPlus onClick={choose_path} />
                         </Button>
                     }
                     <DialogClose>
