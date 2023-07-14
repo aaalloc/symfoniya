@@ -1,6 +1,5 @@
 use file_format::{FileFormat, Kind};
 use parse_duration::parse;
-use rodio::source::Buffered;
 use rodio::{Decoder, Source};
 use std::time::Instant;
 use std::{fs::File, io::BufReader, time::Duration};
@@ -74,7 +73,6 @@ impl std::fmt::Display for AudioStatus {
 
 pub struct Audio {
     pub path: String,
-    pub source: Buffered<Decoder<BufReader<File>>>,
     pub duration: Duration,
     pub format: String,
     pub status: AudioStatus,
@@ -90,7 +88,6 @@ impl Clone for Audio {
     fn clone(&self) -> Self {
         Audio {
             path: self.path.clone(),
-            source: self.source.clone(),
             duration: self.duration.clone(),
             format: self.format.clone(),
             status: self.status.clone(),
@@ -112,7 +109,6 @@ impl std::fmt::Display for Audio {
 }
 
 pub fn create_audio(path: &str, format: FileFormat) -> Audio {
-    let source = get_decoder(path.to_string()).buffered();
     let metadata =
         metadata::media_file::MediaFileMetadata::new(&std::path::Path::new(path)).unwrap();
     let duration = metadata._duration;
@@ -126,7 +122,6 @@ pub fn create_audio(path: &str, format: FileFormat) -> Audio {
 
     Audio {
         path: path.to_string(),
-        source: source,
         duration: time,
         format: match format.short_name() {
             Some(name) => name.to_string(),

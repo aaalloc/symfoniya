@@ -3,10 +3,12 @@
     windows_subsystem = "windows"
 )]
 
+use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 mod player;
 use player::{MusicPlayer, Player};
-use tauri::Manager;
+use rodio::OutputStream;
+use tauri::State;
 
 #[tauri::command]
 fn on_button_clicked() -> String {
@@ -19,12 +21,12 @@ fn on_button_clicked() -> String {
 }
 
 #[tauri::command]
-fn import_from_folders(folders: Vec<String>) -> bool {
+fn import_from_folders(folders: Vec<String>, player: State<Arc<Mutex<MusicPlayer>>>) -> bool {
     // display folders for debug
+    let mut player = player.lock().unwrap();
     for folder in &folders {
         println!("{}", folder);
     }
-    let mut player: MusicPlayer = MusicPlayer::new();
     for folder in folders {
         player.import(&folder);
     }
@@ -38,7 +40,14 @@ fn import_from_folders(folders: Vec<String>) -> bool {
 }
 
 fn main() {
+    let (_stream, _stream_handle) = OutputStream::try_default().unwrap();
+    // leak the stream to keep it alive, otherwise it will be dropped and no more audio !!!!
+    // this is not a good thing but I think it is a good workaround for now ...
+    let str = Box::leak(Box::new(_stream));
+    let mut player = MusicPlayer::new(_stream_handle);
+    let arc_player = Arc::new(Mutex::new(player));
     tauri::Builder::default()
+        .manage(arc_player)
         .invoke_handler(tauri::generate_handler![on_button_clicked])
         .invoke_handler(tauri::generate_handler![import_from_folders])
         .run(tauri::generate_context!())

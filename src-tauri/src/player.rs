@@ -9,13 +9,12 @@ pub struct MusicPlayer {
     pub audios: Vec<Audio>,
     pub is_playing: bool,
     sink: Sink,
-    _stream: OutputStream,
     stream_handle: rodio::OutputStreamHandle,
     index: usize,
 }
 
 pub trait Player {
-    fn new() -> Self;
+    fn new(stream_handler: rodio::OutputStreamHandle) -> Self;
     fn add_audio(&mut self, audio: Audio) -> bool;
     fn import(&mut self, path: &str) -> bool;
     fn update_total_time(&mut self);
@@ -32,6 +31,10 @@ pub trait Player {
     //fn stop(&mut self);
 }
 
+//unsafe impl Send for MusicPlayer {}
+
+//unsafe impl Sync for MusicPlayer {}
+
 impl std::fmt::Display for MusicPlayer {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         for audio in &self.audios {
@@ -43,15 +46,13 @@ impl std::fmt::Display for MusicPlayer {
 }
 
 impl Player for MusicPlayer {
-    fn new() -> Self {
-        let (_stream, stream_handle) = OutputStream::try_default().unwrap();
+    fn new(stream_handler: rodio::OutputStreamHandle) -> Self {
         MusicPlayer {
             total_time: Duration::new(0, 0),
             audios: Vec::new(),
-            sink: Sink::try_new(&stream_handle).unwrap(),
+            sink: Sink::try_new(&stream_handler).unwrap(),
             is_playing: false,
-            _stream: _stream,
-            stream_handle: stream_handle,
+            stream_handle: stream_handler,
             index: 0,
         }
     }
@@ -66,7 +67,7 @@ impl Player for MusicPlayer {
         if audios.len() == 0 {
             return false;
         }
-        self.sink.append(audios[0].source.clone());
+        self.sink.append(get_decoder(audios[0].path.clone()));
         for audio in audios {
             self.add_audio(audio);
         }
@@ -84,6 +85,8 @@ impl Player for MusicPlayer {
     }
 
     fn play(&mut self) {
+        self.sink
+            .append(get_decoder(self.audios[self.index].path.clone()));
         self.sink.play();
         let current_audio = self.audios.get_mut(self.index);
         if let Some(item) = current_audio {
@@ -91,7 +94,6 @@ impl Player for MusicPlayer {
             update_status!(status, item.duration);
         }
         self.is_playing = true;
-        // poll every 1sec if the audio is finished
     }
 
     fn pause(&mut self) {
@@ -113,7 +115,7 @@ impl Player for MusicPlayer {
         let next_audio = self.audios.get_mut(index).unwrap();
         let next_audio_status = &mut next_audio.status;
         self.sink = Sink::try_new(&self.stream_handle).unwrap();
-        self.sink.append(next_audio.source.clone());
+        self.sink.append(get_decoder(next_audio.path.clone()));
         update_status!(next_audio_status, next_audio.duration);
     }
 
