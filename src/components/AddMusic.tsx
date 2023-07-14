@@ -17,6 +17,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DialogClose } from "@radix-ui/react-dialog";
@@ -25,6 +26,7 @@ import { appDataDir } from '@tauri-apps/api/path';
 import { useState } from "react"
 import { invoke } from "@tauri-apps/api/tauri"
 import { type } from "os"
+import { ScrollArea } from "@radix-ui/react-scroll-area"
 
 
 
@@ -68,36 +70,39 @@ export function AddMusic() {
                     <DialogTitle>Add musics</DialogTitle>
                 </DialogHeader>
                 {/* value={path == null ? "Something happened ..." : path} */}
-                {path == null || 'None' ? <div onClick={choose_path} className="cursor-pointer grid h-[200px] items-center justify-center rounded-md border border-dashed text-sm">
+                {path == 'None' ? <div onClick={choose_path} className="cursor-pointer grid h-[200px] items-center justify-center rounded-md border border-dashed text-sm">
                     <div className="items-center">
                         <p className="text-sm text-muted-foreground">Select a or multiple folder path </p>
                     </div>
                 </div> :
-                    <div className="grid h-[200px] items-center justify-center rounded-md border text-sm">
+                    <div className="h-[200px] items-center justify-center rounded-md border text">
                         <Table>
-                            <TableCaption>Path selected</TableCaption>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-[100px]">Path</TableHead>
+                                    <TableHead>Path</TableHead>
                                 </TableRow>
                             </TableHeader>
-                            <TableBody>
-                                {typeof path == "string" ? <TableRow>
-                                    <TableCell>{path}</TableCell>
-                                </TableRow> : path.map((value) => {
-                                    return <TableRow>
-                                        <TableCell>{value}</TableCell>
-                                    </TableRow>
-                                })}
-                            </TableBody>
+                            {/* <TableCaption>Path selected</TableCaption> */}
+                            <ScrollArea className="h-36">
+                                <TableBody>
+                                    {typeof path == "string" ? <TableRow>
+                                        <TableCell>{path}</TableCell>
+                                    </TableRow> : path.map((value) => {
+                                        return <TableRow>
+                                            <TableCell className="w-auto">{value}</TableCell>
+                                        </TableRow>
+                                    })}
+                                </TableBody>
+                            </ScrollArea>
                         </Table>
-                    </div>}
+                    </div>
+                }
                 <DialogFooter>
                     <DialogClose>
                         <Button onClick={handle_submit} disabled={path != "None" && (typeof path != null) ? false : true} type="submit">Import musics</Button>
                     </DialogClose>
                 </DialogFooter>
-            </DialogContent>
+            </DialogContent >
         </Dialog >
     )
 }
