@@ -1,6 +1,6 @@
 use file_format::{FileFormat, Kind};
 use parse_duration::parse;
-use rodio::{Decoder, Source};
+use rodio::Decoder;
 use std::time::Instant;
 use std::{fs::File, io::BufReader, time::Duration};
 

@@ -1,4 +1,4 @@
-use rodio::{OutputStream, Sink};
+use rodio::Sink;
 use std::time::Duration;
 mod audio;
 use crate::{player::audio::*, update_status};

@@ -43,9 +43,8 @@ fn main() {
     let (_stream, _stream_handle) = OutputStream::try_default().unwrap();
     // leak the stream to keep it alive, otherwise it will be dropped and no more audio !!!!
     // this is not a good thing but I think it is a good workaround for now ...
-    let str = Box::leak(Box::new(_stream));
-    let mut player = MusicPlayer::new(_stream_handle);
-    let arc_player = Arc::new(Mutex::new(player));
+    let _str = Box::leak(Box::new(_stream));
+    let arc_player = Arc::new(Mutex::new(MusicPlayer::new(_stream_handle)));
     tauri::Builder::default()
         .manage(arc_player)
         .invoke_handler(tauri::generate_handler![on_button_clicked])
