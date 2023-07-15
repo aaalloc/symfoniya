@@ -21,7 +21,7 @@ fn on_button_clicked() -> String {
 }
 
 #[tauri::command]
-fn import_from_folders(folders: Vec<String>, player: State<Arc<Mutex<MusicPlayer>>>) -> bool {
+fn import_from_folders(folders: Vec<String>, player: State<Arc<Mutex<MusicPlayer>>>) -> usize {
     // display folders for debug
     let mut player = player.lock().unwrap();
     for folder in &folders {
@@ -31,7 +31,7 @@ fn import_from_folders(folders: Vec<String>, player: State<Arc<Mutex<MusicPlayer
         player.import(&folder);
     }
     println!("{}", player);
-    return if player.audios.len() > 0 { true } else { false };
+    return player.audios.len();
 }
 
 fn main() {

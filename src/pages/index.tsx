@@ -10,7 +10,6 @@ import { ModeToggle } from "@/components/ModeToggle"
 import { AddMusic } from "@/components/AddMusic"
 import { Sidebar } from "@/components/Sidebar"
 import { playlists } from "@/components/data/playlists"
-import { Notification } from "@/components/Notification"
 import { audiotracks, Music } from "@/components/scene/Music"
 
 const Home: NextPage = () => {
@@ -35,7 +34,6 @@ const Home: NextPage = () => {
                 {/*{mainScreen == "Musics" ? <Music audios={retrieveAudios()} /> : "ok"}*/}
               </div>
               <ModeToggle />
-              <Notification />
             </div>
           </div>
         </div>

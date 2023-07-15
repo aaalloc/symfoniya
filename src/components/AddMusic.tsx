@@ -69,10 +69,7 @@ export function AddMusic() {
             .then((value) => {
                 toast({
                     title: "Musics added",
-                    description: { value },
-                    action: (
-                        <ToastAction altText="Goto schedule to undo">Undo</ToastAction>
-                    ),
+                    description: "Total of music discovered : " + value,
                 })
             })
             .catch(() => {
