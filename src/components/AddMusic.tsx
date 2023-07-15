@@ -69,7 +69,7 @@ export function AddMusic() {
             .then((value) => {
                 toast({
                     title: "Musics added",
-                    description: "Total of music discovered : " + value,
+                    description: value + " musics discovered"
                 })
             })
             .catch(() => {
