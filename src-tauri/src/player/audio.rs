@@ -31,20 +31,6 @@ pub enum AudioStatus {
     Playing(Instant, Duration),
 }
 
-impl Clone for AudioStatus {
-    fn clone(&self) -> Self {
-        match self {
-            AudioStatus::Waiting => AudioStatus::Waiting,
-            AudioStatus::Stopped(instant, duration) => {
-                AudioStatus::Stopped(instant.clone(), duration.clone())
-            }
-            AudioStatus::Playing(instant, duration) => {
-                AudioStatus::Playing(instant.clone(), duration.clone())
-            }
-        }
-    }
-}
-
 pub fn duration_to_string(duration: Duration) -> String {
     //let milliseconds = duration.as_millis();
     let seconds = duration.as_secs() % 60;
@@ -92,30 +78,6 @@ pub fn get_decoder(path: String) -> Decoder<BufReader<File>> {
     let file = BufReader::new(File::open(path).unwrap());
     let source = Decoder::new(file).unwrap();
     source
-}
-
-impl Clone for _Tag {
-    fn clone(&self) -> Self {
-        _Tag {
-            title: self.title.clone(),
-            artist: self.artist.clone(),
-            album: self.album.clone(),
-            genre: self.genre.clone(),
-        }
-    }
-}
-
-impl Clone for _Audio {
-    fn clone(&self) -> Self {
-        _Audio {
-            path: self.path.clone(),
-            duration: self.duration.clone(),
-            format: self.format.clone(),
-            status: self.status.clone(),
-            tag: self.tag.clone(),
-            cover: self.cover.clone(),
-        }
-    }
 }
 
 impl std::fmt::Display for _Audio {
