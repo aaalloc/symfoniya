@@ -36,14 +36,13 @@ import { invoke } from "@tauri-apps/api/tauri"
 import { type } from "os"
 import { ScrollArea } from "@radix-ui/react-scroll-area"
 import { X, FolderPlus } from "lucide-react"
-
+import { ToastAction } from "@/components/ui/toast"
+import { useToast } from "@/components/ui/use-toast"
 
 
 export function AddMusic() {
-    const [buttonDesc, setButtonDesc] = useState<string>(
-        "Waiting to be clicked. This calls 'on_button_clicked' from Rust.",
-    )
-    const [arr_path, setPath] = useState<string | string[]>("None")
+    const { toast } = useToast()
+    const [arr_path, setPath] = useState<string[]>([])
     const removePath = (path: string) => {
         //console.log(path)
         setPath(arr_path.filter((value) => {
@@ -59,19 +58,28 @@ export function AddMusic() {
             defaultPath: await import_path.audioDir(),
         });
         if (new_paths != null) {
-            const path_w_dup = new_paths.filter((path) => !arr_path.includes(path));
-            setPath(arr_path[0] !== 'None' && arr_path.length !== 0 ? [...arr_path, ...path_w_dup] : path_w_dup);
+            const paths_to_add = new_paths.filter((path: string) => !arr_path.includes(path));
+            const updated_paths = [...arr_path, ...paths_to_add];
+            setPath(updated_paths);
         }
-
     }
 
     const handle_submit = () => {
         invoke<string>("import_from_folders", { folders: arr_path })
             .then((value) => {
-                setButtonDesc(value)
+                toast({
+                    title: "Musics added",
+                    description: { value },
+                    action: (
+                        <ToastAction altText="Goto schedule to undo">Undo</ToastAction>
+                    ),
+                })
             })
             .catch(() => {
-                setButtonDesc("Failed to invoke Rust command 'on_button_clicked'")
+                toast({
+                    title: "Musics added",
+                    description: "Something went wrong",
+                })
             })
     }
     return (
@@ -84,7 +92,7 @@ export function AddMusic() {
                     <DialogTitle>Add musics</DialogTitle>
                 </DialogHeader>
                 {/* value={path == null ? "Something happened ..." : path} */}
-                {arr_path == 'None' || arr_path.length == 0 ? <div onClick={choose_path} className="cursor-pointer grid h-[200px] items-center justify-center rounded-md border border-dashed text-sm">
+                {arr_path.length == 0 ? <div onClick={choose_path} className="cursor-pointer grid h-[200px] items-center justify-center rounded-md border border-dashed text-sm">
                     <div className="items-center">
                         <p className="text-sm text-muted-foreground">Select a or multiple folder path </p>
                     </div>
@@ -125,13 +133,16 @@ export function AddMusic() {
                     </div>
                 }
                 <DialogFooter>
-                    {arr_path == 'None' || arr_path.length == 0 ? <></> :
+                    {arr_path.length == 0 ? <></> :
                         <Button variant="outline">
                             <FolderPlus onClick={choose_path} />
                         </Button>
                     }
                     <DialogClose>
-                        <Button onClick={handle_submit} disabled={arr_path != "None" && (typeof arr_path != null) ? false : true} type="submit">Import musics</Button>
+                        <Button onClick={handle_submit} disabled={(typeof arr_path != null && arr_path.length > 0) ? false : true}
+                            type="submit">
+                            Import musics
+                        </Button>
                     </DialogClose>
                 </DialogFooter>
             </DialogContent >

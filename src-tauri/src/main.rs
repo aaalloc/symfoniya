@@ -31,12 +31,7 @@ fn import_from_folders(folders: Vec<String>, player: State<Arc<Mutex<MusicPlayer
         player.import(&folder);
     }
     println!("{}", player);
-    if player.audios.len() > 0 {
-        player.play();
-        true
-    } else {
-        false
-    }
+    return if player.audios.len() > 0 { true } else { false };
 }
 
 fn main() {
@@ -49,6 +44,7 @@ fn main() {
         .manage(arc_player)
         .invoke_handler(tauri::generate_handler![on_button_clicked])
         .invoke_handler(tauri::generate_handler![import_from_folders])
+        //.invoke_handler(tauri::generate_handler![list_audios])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

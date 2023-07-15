@@ -10,21 +10,11 @@ import { ModeToggle } from "@/components/ModeToggle"
 import { AddMusic } from "@/components/AddMusic"
 import { Sidebar } from "@/components/Sidebar"
 import { playlists } from "@/components/data/playlists"
+import { Notification } from "@/components/Notification"
+import { audiotracks, Music } from "@/components/scene/Music"
 
 const Home: NextPage = () => {
-  const [buttonDesc, setButtonDesc] = useState<string>(
-    "Waiting to be clicked. This calls 'on_button_clicked' from Rust.",
-  )
-  const onButtonClick = () => {
-    invoke<string>("on_button_clicked")
-      .then((value) => {
-        setButtonDesc(value)
-      })
-      .catch(() => {
-        setButtonDesc("Failed to invoke Rust command 'on_button_clicked'")
-      })
-  }
-
+  const [scene, setScene] = useState<string>("Home")
   useGlobalShortcut("CommandOrControl+P", () => {
     console.log("Ctrl+P was pressed!")
   })
@@ -38,12 +28,14 @@ const Home: NextPage = () => {
       </Head>
       <main className="flex flex-1 flex-col items-center justify-center py-8">
         <div className="grid lg:grid-cols-5">
-          <Sidebar playlists={playlists} className="hidden lg:block" />
+          <Sidebar playlists={playlists} setScene={setScene} className="hidden lg:block" />
           <div className="col-span-3 lg:col-span-4 lg:border-l">
             <div className="flex justify-between items-center px-4">
               <div className="flex items-center space-x-4">
+                {/*{mainScreen == "Musics" ? <Music audios={retrieveAudios()} /> : "ok"}*/}
               </div>
               <ModeToggle />
+              <Notification />
             </div>
           </div>
         </div>

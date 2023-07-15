@@ -67,7 +67,6 @@ impl Player for MusicPlayer {
         if audios.len() == 0 {
             return false;
         }
-        self.sink.append(get_decoder(audios[0].path.clone()));
         for audio in audios {
             self.add_audio(audio);
         }

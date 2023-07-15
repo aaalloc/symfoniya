@@ -4,12 +4,20 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 
 import { Playlist } from "@/components/data/playlists"
 import { AddMusic } from "@/components/AddMusic"
+import { Children } from "react"
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
     playlists: Playlist[]
+    setScene: Function
 }
 
-export function Sidebar({ className, playlists }: SidebarProps) {
+export function Sidebar({ className, playlists, setScene }: SidebarProps) {
+    // create function to update setter
+    const updateScene = (scene_name: string) => {
+        console.log(scene_name)
+        setScene(scene_name)
+    }
+
     return (
         <div className={cn("pb-12", className)}>
             <div className="space-y-4 py-4">
@@ -21,7 +29,9 @@ export function Sidebar({ className, playlists }: SidebarProps) {
                         Library
                     </h2>
                     <div className="space-y-1">
-                        <Button variant="ghost" className="w-full justify-start">
+                        <Button onClick={() => updateScene("Musics")}
+                            variant="ghost"
+                            className="w-full justify-start">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 24 24"
@@ -124,6 +134,6 @@ export function Sidebar({ className, playlists }: SidebarProps) {
                     </ScrollArea>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
