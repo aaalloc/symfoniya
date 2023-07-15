@@ -1,27 +1,55 @@
 import { ScrollArea } from "@radix-ui/react-scroll-area"
-
-const tracks = {
-    title: "idk",
-    artist: "me",
-    id: 12,
-    total_time: 2301,
-    cover: [0]
-}
-
-export type audiotracks = typeof tracks
-interface AudioTracks {
+import { invoke } from "@tauri-apps/api/tauri"
+import { useState, useEffect } from "react"
+type Audio = {
     title: string
     artist: string
+    album: string
     id: number
-    total_time: number
+    duration: number
     cover: number[] // byte array
 }
+
+export type { Audio };
 interface MusicProps extends React.HTMLAttributes<HTMLDivElement> {
     // array of 
-    audios: AudioTracks[]
+    audios: Audio[]
 }
 
-export function Music({ audios }: MusicProps) {
+async function get_audios(): Promise<Audio[]> {
+    let audios: Audio[] = [];
+    try {
+        const values: any = await invoke("retrieve_audios");
+        console.log(values);
+        return values as Audio[];
+    } catch (error) {
+        console.error(error);
+        return audios;
+    }
+}
+
+function format_duration(duration: number) {
+    // duration is in seconds
+    let minutes = Math.floor(duration / 60);
+    let seconds = duration % 60;
+    return `${minutes}:${seconds}`
+}
+export function Music() {
+    const [audios, setAudios] = useState<Audio[]>([]);
+    useEffect(() => {
+        async function fetchAudios() {
+            try {
+                const response = await get_audios();
+                setAudios(response);
+            } catch (error) {
+                // Gérer l'erreur ici
+                console.error(error);
+            }
+        }
+
+        fetchAudios();
+    }, []);
+
     return (
         <ScrollArea className="h-[300px] px-1">
             <div className="space-y-1">
@@ -31,11 +59,11 @@ export function Music({ audios }: MusicProps) {
                             <img className="h-10 w-10 rounded-md" src={`data:image/png;base64,${value.cover}`} alt="" />
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">{value.title}</p>
-                            <p className="text-sm text-gray-500 truncate">{value.artist}</p>
+                            <p className="text-lg font-semibold">{value.title}</p>
+                            <p className="text-sm text-muted-foreground">{value.artist}</p>
                         </div>
                         <div>
-                            <p className="text-sm text-gray-500 truncate">{value.total_time}</p>
+                            <p>{format_duration(value.duration)}</p>
                         </div>
                     </div>
                 })}

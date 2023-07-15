@@ -2,11 +2,11 @@ use rodio::Sink;
 use std::time::Duration;
 mod audio;
 use crate::{player::audio::*, update_status};
-use audio::{Audio, AudioStatus};
+use audio::{AudioStatus, _Audio};
 use std::time::Instant;
 pub struct MusicPlayer {
     pub total_time: Duration,
-    pub audios: Vec<Audio>,
+    pub audios: Vec<_Audio>,
     pub is_playing: bool,
     sink: Sink,
     stream_handle: rodio::OutputStreamHandle,
@@ -15,7 +15,7 @@ pub struct MusicPlayer {
 
 pub trait Player {
     fn new(stream_handler: rodio::OutputStreamHandle) -> Self;
-    fn add_audio(&mut self, audio: Audio) -> bool;
+    fn add_audio(&mut self, audio: _Audio) -> bool;
     fn import(&mut self, path: &str) -> bool;
     fn update_total_time(&mut self);
     fn play(&mut self);
@@ -24,8 +24,8 @@ pub trait Player {
     fn next(&mut self) -> usize;
     fn previous(&mut self);
     fn is_end_of_audio(&self) -> bool;
-    fn get_audio(&self, index: usize) -> &Audio;
-    fn get_current_audio(&self) -> &Audio;
+    fn get_audio(&self, index: usize) -> &_Audio;
+    fn get_current_audio(&self) -> &_Audio;
     //fn set_volume(&mut self, volume: f32);
     //fn get_volume(&self) -> f32;
     //fn stop(&mut self);
@@ -57,7 +57,7 @@ impl Player for MusicPlayer {
         }
     }
 
-    fn add_audio(&mut self, audio: Audio) -> bool {
+    fn add_audio(&mut self, audio: _Audio) -> bool {
         self.audios.push(audio);
         true
     }
@@ -158,11 +158,11 @@ impl Player for MusicPlayer {
         }
     }
 
-    fn get_audio(&self, index: usize) -> &Audio {
+    fn get_audio(&self, index: usize) -> &_Audio {
         self.audios.get(index).unwrap()
     }
 
-    fn get_current_audio(&self) -> &Audio {
+    fn get_current_audio(&self) -> &_Audio {
         self.audios.get(self.index).unwrap()
     }
 }

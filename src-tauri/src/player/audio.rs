@@ -71,7 +71,7 @@ impl std::fmt::Display for AudioStatus {
     }
 }
 
-pub struct Audio {
+pub struct _Audio {
     pub path: String,
     pub duration: Duration,
     pub format: String,
@@ -84,9 +84,9 @@ pub fn get_decoder(path: String) -> Decoder<BufReader<File>> {
     source
 }
 
-impl Clone for Audio {
+impl Clone for _Audio {
     fn clone(&self) -> Self {
-        Audio {
+        _Audio {
             path: self.path.clone(),
             duration: self.duration.clone(),
             format: self.format.clone(),
@@ -95,7 +95,7 @@ impl Clone for Audio {
     }
 }
 
-impl std::fmt::Display for Audio {
+impl std::fmt::Display for _Audio {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
             f,
@@ -108,10 +108,12 @@ impl std::fmt::Display for Audio {
     }
 }
 
-pub fn create_audio(path: &str, format: FileFormat) -> Audio {
+pub fn create_audio(path: &str, format: FileFormat) -> _Audio {
     let metadata =
         metadata::media_file::MediaFileMetadata::new(&std::path::Path::new(path)).unwrap();
     let duration = metadata._duration;
+    //let cover = metadata.title;
+    //println!("{:?}", cover);
     let time = match duration {
         Some(time) => match parse(&String::from(time.to_string() + "s")) {
             Ok(time) => time,
@@ -120,7 +122,7 @@ pub fn create_audio(path: &str, format: FileFormat) -> Audio {
         None => panic!("No duration"),
     };
 
-    Audio {
+    _Audio {
         path: path.to_string(),
         duration: time,
         format: match format.short_name() {
@@ -131,7 +133,7 @@ pub fn create_audio(path: &str, format: FileFormat) -> Audio {
     }
 }
 
-pub fn get_audios(path: &str) -> Vec<Audio> {
+pub fn get_audios(path: &str) -> Vec<_Audio> {
     let mut audios = Vec::new();
     let paths = std::fs::read_dir(path).unwrap();
     for path in paths {

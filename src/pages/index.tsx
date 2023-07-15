@@ -3,14 +3,16 @@ import { Button } from "@/components/ui/button"
 import type { NextPage } from "next"
 import Head from "next/head"
 import Image from "next/image"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 import { useGlobalShortcut } from "@/hooks/tauri/shortcuts"
 import { ModeToggle } from "@/components/ModeToggle"
 import { AddMusic } from "@/components/AddMusic"
 import { Sidebar } from "@/components/Sidebar"
 import { playlists } from "@/components/data/playlists"
-import { audiotracks, Music } from "@/components/scene/Music"
+import { Audio, Music } from "@/components/scene/Music"
+
+
 
 const Home: NextPage = () => {
   const [scene, setScene] = useState<string>("Home")
@@ -31,7 +33,7 @@ const Home: NextPage = () => {
           <div className="col-span-3 lg:col-span-4 lg:border-l">
             <div className="flex justify-between items-center px-4">
               <div className="flex items-center space-x-4">
-                {/*{mainScreen == "Musics" ? <Music audios={retrieveAudios()} /> : "ok"}*/}
+                {scene == "Musics" ? <Music /> : "WIP"}
               </div>
               <ModeToggle />
             </div>
