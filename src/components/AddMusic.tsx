@@ -45,7 +45,7 @@ export function AddMusic() {
     )
     const [arr_path, setPath] = useState<string | string[]>("None")
     const removePath = (path: string) => {
-        console.log(path)
+        //console.log(path)
         setPath(arr_path.filter((value) => {
             return value != path
         }))
@@ -53,22 +53,16 @@ export function AddMusic() {
     const choose_path = async () => {
         const import_dialog = await import('@tauri-apps/api/dialog');
         const import_path = await import('@tauri-apps/api/path');
-        const paths = await import_dialog.open({
+        const new_paths = await import_dialog.open({
             directory: true,
             multiple: true,
             defaultPath: await import_path.audioDir(),
         });
-        if (typeof paths == null) {
-            setPath("None");
+        if (new_paths != null) {
+            const path_w_dup = new_paths.filter((path) => !arr_path.includes(path));
+            setPath(arr_path[0] !== 'None' && arr_path.length !== 0 ? [...arr_path, ...path_w_dup] : path_w_dup);
         }
-        else if (arr_path.length == 1 && arr_path[0] == "None") {
-            setPath([...arr_path]);
-        }
-        else {
-            // append
-            // TODO: check if path already in arr_path
-            setPath([...arr_path, ...paths]);
-        }
+
     }
 
     const handle_submit = () => {
@@ -111,7 +105,7 @@ export function AddMusic() {
                                         <TableCell className="w-1/12">
                                             <Button variant="ghost" className="h-8 w-8 p-0">
                                                 <span className="sr-only">Remove path</span>
-                                                <X onClick={() => removePath(value)} className="h-4 w-4" />
+                                                <X onClick={() => removePath(arr_path)} className="h-4 w-4" />
                                             </Button>
                                         </TableCell>
                                     </TableRow> : arr_path.map((value) => {
