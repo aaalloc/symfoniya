@@ -35,6 +35,9 @@ dependencies:
   '@tauri-apps/api':
     specifier: ^1.4.0
     version: 1.4.0
+  byte-base64:
+    specifier: ^1.1.0
+    version: 1.1.0
   class-variance-authority:
     specifier: ^0.6.1
     version: 0.6.1
@@ -2745,6 +2748,10 @@ packages:
     engines: {node: '>=10.16.0'}
     dependencies:
       streamsearch: 1.1.0
+    dev: false
+
+  /byte-base64@1.1.0:
+    resolution: {integrity: sha512-56cXelkJrVMdCY9V/3RfDxTh4VfMFCQ5km7B7GkIGfo4bcPL9aACyJLB0Ms3Ezu5rsHmLB2suis96z4fLM03DA==}
     dev: false
 
   /call-bind@1.0.2:

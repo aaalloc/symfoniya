@@ -4,11 +4,19 @@
 )]
 
 use std::sync::{Arc, Mutex};
-use std::time::{SystemTime, UNIX_EPOCH};
+//use std::time::{SystemTime, UNIX_EPOCH};
 mod player;
 use player::{MusicPlayer, Player};
 use rodio::OutputStream;
 use tauri::State;
+
+#[derive(serde::Serialize)]
+struct Tag {
+    title: String,
+    artist: String,
+    album: String,
+    genre: String,
+}
 
 #[derive(serde::Serialize)]
 struct Audio {
@@ -17,16 +25,7 @@ struct Audio {
     album: String,
     id: usize,
     duration: u64,
-}
-
-#[tauri::command]
-fn on_button_clicked() -> String {
-    let start = SystemTime::now();
-    let since_the_epoch = start
-        .duration_since(UNIX_EPOCH)
-        .expect("Time went backwards")
-        .as_millis();
-    format!("on_button_clicked called from Rust! (timestamp: {since_the_epoch}ms)")
+    cover: Vec<u8>,
 }
 
 #[tauri::command]
@@ -53,12 +52,14 @@ async fn retrieve_audios(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<V
     let player = player.lock().unwrap();
     let mut audios = Vec::new();
     for (id, audio) in player.audios.iter().enumerate() {
+        let cover = audio.cover.clone();
         audios.push(Audio {
-            title: audio.path.clone(),
-            artist: "Nilfruits".to_string(),
-            album: "IDK".to_string(),
+            title: audio.tag.title.clone(),
+            artist: audio.tag.artist.clone(),
+            album: audio.tag.album.clone(),
             duration: audio.duration.as_secs(),
             id: id,
+            cover: cover,
         });
     }
     drop(player);

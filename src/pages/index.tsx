@@ -4,7 +4,7 @@ import type { NextPage } from "next"
 import Head from "next/head"
 import Image from "next/image"
 import { useState, useEffect } from "react"
-
+import { ScrollArea } from "@radix-ui/react-scroll-area"
 import { useGlobalShortcut } from "@/hooks/tauri/shortcuts"
 import { ModeToggle } from "@/components/ModeToggle"
 import { AddMusic } from "@/components/AddMusic"
@@ -35,11 +35,11 @@ const Home: NextPage = () => {
               <div className="flex items-center space-x-4">
                 {scene == "Musics" ? <Music /> : "WIP"}
               </div>
-              <ModeToggle />
             </div>
           </div>
         </div>
       </main>
+      <ModeToggle />
     </div>
   )
 }
