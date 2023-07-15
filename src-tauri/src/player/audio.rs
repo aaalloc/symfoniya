@@ -160,7 +160,11 @@ pub fn create_audio(path: &str, format: FileFormat) -> _Audio {
         },
         status: AudioStatus::Waiting,
         tag: _Tag {
-            title: tag.title().as_deref().unwrap_or("Unknown").to_string(),
+            title: tag
+                .title()
+                .as_deref()
+                .unwrap_or(path.split("/").last().unwrap())
+                .to_string(),
             artist: tag.artist().as_deref().unwrap_or("Unknown").to_string(),
             album: tag.album().as_deref().unwrap_or("Unknown").to_string(),
             genre: tag.genre().as_deref().unwrap_or("Unknown").to_string(),

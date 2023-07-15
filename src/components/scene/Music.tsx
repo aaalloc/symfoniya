@@ -81,7 +81,7 @@ export function Music() {
                 Musics
             </h1>
             <div className="py-6">
-                <ScrollArea className="h-[100px] px-1">
+                <ScrollArea className="w-[1000px] px-1">
                     <div className="space-y-6 p-5">
                         {audios.map((value) => {
                             return <div className="flex items-center space-x-8">
