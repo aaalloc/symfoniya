@@ -60,7 +60,7 @@ function format_duration(duration: number) {
     let seconds = duration % 60;
     return `${minutes}:${seconds}`
 }
-export function Music() {
+export function Music(props: { setter: Function }) {
     const [audios, setAudios] = useState<Audio[]>([]);
     useEffect(() => {
         async function fetchAudios() {
@@ -84,7 +84,9 @@ export function Music() {
                 <ScrollArea className="w-[1000px] px-1">
                     <div className="space-y-6 p-5">
                         {audios.map((value) => {
-                            return <div className="flex items-center space-x-8">
+                            return <div onClick={() => {
+                                props.setter(value);
+                            }} className="flex items-center space-x-8">
                                 <div className="flex-shrink-0">
                                     <img className="h-14 w-14 rounded-md" src={byteToImage(value.cover)} alt="" />
                                 </div>

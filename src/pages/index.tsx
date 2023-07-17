@@ -2,9 +2,7 @@ import { invoke } from "@tauri-apps/api/tauri"
 import { Button } from "@/components/ui/button"
 import type { NextPage } from "next"
 import Head from "next/head"
-import Image from "next/image"
-import { useState, useEffect } from "react"
-import { ScrollArea } from "@radix-ui/react-scroll-area"
+import { useState, useCallback } from "react"
 import { useGlobalShortcut } from "@/hooks/tauri/shortcuts"
 
 import { AddMusic } from "@/components/AddMusic"
@@ -15,8 +13,17 @@ import { MenubarDemo } from "@/components/MenubarDemo"
 import { Player } from "@/components/Player"
 import { Searchbar } from "@/components/Searchbar"
 
+
 const Home: NextPage = () => {
   const [scene, setScene] = useState<string>("Home")
+  const [audio, setAudioPlayer] = useState<Audio>({
+    title: "Numb",
+    artist: "Linkin Park",
+    duration: 53,
+    id: 1,
+    cover: [2],
+    album: "Meteora",
+  })
   useGlobalShortcut("CommandOrControl+P", () => {
     console.log("Ctrl+P was pressed!")
   })
@@ -41,12 +48,13 @@ const Home: NextPage = () => {
           <div className="col-span-3 lg:col-span-4 lg:border-l">
             <div className="flex justify-between items-center px-12">
               <div className="flex items-center space-x-4">
-                {scene == "Musics" ? <Music /> : "WIP"}
+                {scene == "Musics" ? <Music setter={setAudioPlayer} /> : null}
               </div>
             </div>
           </div>
         </div>
-        <Player />
+        <Player currentAudio={audio}
+          setter={setAudioPlayer} />
       </main>
     </div>
   )
