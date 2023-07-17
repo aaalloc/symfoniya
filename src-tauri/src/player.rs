@@ -1,6 +1,6 @@
 use rodio::Sink;
 use std::time::Duration;
-mod audio;
+pub mod audio;
 use crate::{player::audio::*, update_status};
 use audio::{AudioStatus, _Audio};
 use std::time::Instant;
@@ -24,12 +24,14 @@ pub trait Player {
     fn update_sink(&mut self, index: usize);
     fn next(&mut self) -> usize;
     fn previous(&mut self);
+    fn current_audio_status(&self) -> AudioStatus;
     fn is_end_of_audio(&self) -> bool;
     fn get_audio(&self, index: usize) -> &_Audio;
     fn get_current_audio(&self) -> &_Audio;
-    //fn set_volume(&mut self, volume: f32);
-    //fn get_volume(&self) -> f32;
+    fn set_volume(&mut self, volume: f32);
+    fn get_volume(&self) -> f32;
     //fn stop(&mut self);
+    fn get_index(&self) -> usize;
 }
 
 //unsafe impl Send for MusicPlayer {}
@@ -47,6 +49,10 @@ impl std::fmt::Display for MusicPlayer {
 }
 
 impl Player for MusicPlayer {
+    fn get_index(&self) -> usize {
+        self.index
+    }
+
     fn new(stream_handler: rodio::OutputStreamHandle) -> Self {
         MusicPlayer {
             total_time: Duration::new(0, 0),
@@ -151,6 +157,11 @@ impl Player for MusicPlayer {
         }
     }
 
+    fn current_audio_status(&self) -> AudioStatus {
+        let current_audio = self.audios.get(self.index).unwrap();
+        return current_audio.status.clone();
+    }
+
     fn is_end_of_audio(&self) -> bool {
         let current_audio = self.audios.get(self.index).unwrap();
         let current_audio_status = &current_audio.status;
@@ -173,5 +184,13 @@ impl Player for MusicPlayer {
 
     fn get_current_audio(&self) -> &_Audio {
         self.audios.get(self.index).unwrap()
+    }
+
+    fn set_volume(&mut self, volume: f32) {
+        self.sink.set_volume(volume);
+    }
+
+    fn get_volume(&self) -> f32 {
+        self.sink.volume()
     }
 }

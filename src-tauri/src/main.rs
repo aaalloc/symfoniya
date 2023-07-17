@@ -6,7 +6,7 @@
 use std::sync::{Arc, Mutex};
 //use std::time::{SystemTime, UNIX_EPOCH};
 mod player;
-use player::{MusicPlayer, Player};
+use crate::player::*;
 use rodio::OutputStream;
 use tauri::State;
 
@@ -84,6 +84,17 @@ async fn pause(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<bool, Strin
     Ok(true)
 }
 
+#[tauri::command]
+fn current_audio_status(
+    player: State<'_, Arc<Mutex<MusicPlayer>>>,
+) -> Result<(String, u64, u64), String> {
+    let player = player.lock().unwrap();
+    let current_audio = player.audios.get(player.get_index()).unwrap();
+    let status = &current_audio.status;
+    let formated = status.get_status();
+    Ok(formated)
+}
+
 fn main() {
     let (_stream, _stream_handle) = OutputStream::try_default().unwrap();
     // leak the stream to keep it alive, otherwise it will be dropped and no more audio !!!!
@@ -96,7 +107,8 @@ fn main() {
             import_from_folders,
             retrieve_audios,
             play_from_id,
-            pause
+            pause,
+            current_audio_status
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -39,20 +39,41 @@ pub fn duration_to_string(duration: Duration) -> String {
     format!("{:02}:{:02}:{:02}", hours, minutes, seconds)
 }
 
+impl AudioStatus {
+    pub fn get_status(&self) -> (String, u64, u64) {
+        match self {
+            AudioStatus::Waiting => (self.to_string(), 0, 0),
+            AudioStatus::Stopped(instant, duration) => {
+                (self.to_string(), instant.as_secs(), duration.as_secs())
+            }
+            AudioStatus::Playing(instant, duration) => (
+                self.to_string(),
+                instant.elapsed().as_secs(),
+                duration.as_secs(),
+            ),
+        }
+    }
+}
+
+impl Clone for AudioStatus {
+    fn clone(&self) -> Self {
+        match self {
+            AudioStatus::Waiting => AudioStatus::Waiting,
+            AudioStatus::Stopped(instant, duration) => AudioStatus::Stopped(*instant, *duration),
+            AudioStatus::Playing(instant, duration) => AudioStatus::Playing(*instant, *duration),
+        }
+    }
+}
+
 impl std::fmt::Display for AudioStatus {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             AudioStatus::Waiting => write!(f, "Waiting"),
-            AudioStatus::Stopped(instant, duration) => {
-                write!(f, "Stopped {} {}", instant.as_secs(), duration.as_secs())
+            AudioStatus::Stopped(_, _) => {
+                write!(f, "Stopped")
             }
-            AudioStatus::Playing(instant, duration) => {
-                write!(
-                    f,
-                    "Playing {} {}",
-                    instant.elapsed().as_secs(),
-                    duration.as_secs()
-                )
+            AudioStatus::Playing(_, _) => {
+                write!(f, "Playing")
             }
         }
     }
