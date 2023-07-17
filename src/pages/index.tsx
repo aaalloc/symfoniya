@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/tauri"
-import { Button } from "@/components/ui/button"
+
 import type { NextPage } from "next"
 import Head from "next/head"
 import { useState, useCallback } from "react"
@@ -11,8 +11,7 @@ import { playlists } from "@/components/data/playlists"
 import { Audio, Music } from "@/components/scene/Music"
 import { MenubarDemo } from "@/components/MenubarDemo"
 import { Player } from "@/components/Player"
-import { Searchbar } from "@/components/Searchbar"
-
+import { Search } from "@/components/scene/Search"
 
 const Home: NextPage = () => {
   const [scene, setScene] = useState<string>("Home")
@@ -37,11 +36,7 @@ const Home: NextPage = () => {
       </Head>
       <MenubarDemo />
       <main className="flex flex-1 flex-col items-center justify-center py-8">
-        <Button variant="outline">
-          <p className="text-sm text-muted-foreground">
-            Search musics, playlists...
-          </p>
-        </Button>
+        <Search />
         <div className="grid lg:grid-cols-5">
           <Sidebar playlists={playlists} setScene={setScene} className="hidden lg:block" />
 
@@ -55,8 +50,8 @@ const Home: NextPage = () => {
         </div>
         <Player currentAudio={audio}
           setter={setAudioPlayer} />
-      </main>
-    </div>
+      </main >
+    </div >
   )
 }
 
