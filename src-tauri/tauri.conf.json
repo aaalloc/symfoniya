@@ -20,6 +20,17 @@
         "message": true,
         "open": true,
         "save": true
+      },
+      "window": {
+        "all": false,
+        "close": true,
+        "hide": true,
+        "show": true,
+        "maximize": true,
+        "minimize": true,
+        "unmaximize": true,
+        "unminimize": true,
+        "startDragging": true
       }
     },
     "bundle": {
@@ -67,7 +78,8 @@
         "resizable": true,
         "title": "Symfoniya",
         "width": 1500,
-        "height": 950
+        "height": 950,
+        "decorations": false
       }
     ]
   }

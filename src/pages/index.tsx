@@ -12,6 +12,8 @@ import { Sidebar } from "@/components/Sidebar"
 import { playlists } from "@/components/data/playlists"
 import { Audio, Music } from "@/components/scene/Music"
 import { MenubarDemo } from "@/components/MenubarDemo"
+import { Player } from "@/components/Player"
+import { Searchbar } from "@/components/Searchbar"
 
 const Home: NextPage = () => {
   const [scene, setScene] = useState<string>("Home")
@@ -28,6 +30,11 @@ const Home: NextPage = () => {
       </Head>
       <MenubarDemo />
       <main className="flex flex-1 flex-col items-center justify-center py-8">
+        <Button variant="outline">
+          <p className="text-sm text-muted-foreground">
+            Search musics, playlists...
+          </p>
+        </Button>
         <div className="grid lg:grid-cols-5">
           <Sidebar playlists={playlists} setScene={setScene} className="hidden lg:block" />
 
@@ -39,6 +46,7 @@ const Home: NextPage = () => {
             </div>
           </div>
         </div>
+        <Player />
       </main>
     </div>
   )

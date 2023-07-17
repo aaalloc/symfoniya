@@ -14,11 +14,49 @@ import {
   MenubarTrigger,
 } from "@/components/ui/menubar"
 import { ModeToggle } from "@/components/ModeToggle"
+import { Button } from "@/components/ui/button"
+import { X, Minus, Moon, Sun } from "lucide-react"
+import { useTheme } from "next-themes"
 
 export function MenubarDemo() {
+  const { setTheme } = useTheme()
+  const close = async () => {
+    const import_window = import('@tauri-apps/api/window');
+    const zz = (await import_window).appWindow;
+    zz.close();
+  }
+  const minimised = async () => {
+    const import_window = import('@tauri-apps/api/window');
+    const zz = (await import_window).appWindow;
+    zz.minimize();
+  }
+
+  const drag = async () => {
+    const import_window = import('@tauri-apps/api/window');
+    const zz = (await import_window).appWindow;
+    zz.startDragging();
+  }
+
   return (
     <Menubar>
-      <ModeToggle />
+      <MenubarMenu>
+        <MenubarTrigger>
+          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          <span className="sr-only">Toggle theme</span>
+        </MenubarTrigger>
+        <MenubarContent>
+          <MenubarItem onClick={() => setTheme("light")}>
+            Light
+          </MenubarItem>
+          <MenubarItem onClick={() => setTheme("dark")}>
+            Dark
+          </MenubarItem>
+          <MenubarItem onClick={() => setTheme("system")}>
+            System
+          </MenubarItem>
+        </MenubarContent>
+      </MenubarMenu>
       <MenubarMenu>
         <MenubarTrigger>File</MenubarTrigger>
         <MenubarContent>
@@ -104,6 +142,15 @@ export function MenubarDemo() {
           <MenubarItem inset>Add Profile...</MenubarItem>
         </MenubarContent>
       </MenubarMenu>
+      {/* Space */}
+      <div className="flex-1" onMouseDown={drag}>
+      </div>
+      <Button variant="ghost" className="h-8 w-8 p-0" onClick={minimised}>
+        <Minus />
+      </Button>
+      <Button variant="ghost" className="h-8 w-8 p-0" onClick={close}>
+        <X />
+      </Button>
     </Menubar>
   )
 }
