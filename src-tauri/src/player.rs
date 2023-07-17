@@ -89,11 +89,14 @@ impl Player for MusicPlayer {
     }
 
     fn play(&mut self) {
-        self.sink
-            .append(get_decoder(self.audios[self.index].path.clone()));
-        println!("{}", self.sink.len());
-        self.sink.play();
-        let current_audio = self.audios.get_mut(self.index);
+        let current_audio;
+        if !self.sink.empty() {
+            self.sink.play();
+        } else {
+            self.sink
+                .append(get_decoder(self.audios[self.index].path.clone()));
+        }
+        current_audio = self.audios.get_mut(self.index);
         if let Some(item) = current_audio {
             let status = &mut item.status;
             update_status!(status, item.duration);
