@@ -9,8 +9,20 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import { Separator } from "@/components/ui/separator"
 import { DialogOverlay, DialogPortal } from "@radix-ui/react-dialog"
 import { Button } from "@/components/ui/button"
+
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+    CommandSeparator,
+    CommandShortcut,
+} from "@/components/ui/command"
 
 export function Search() {
     return (
@@ -19,11 +31,11 @@ export function Search() {
                 className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
             />
             <DialogTrigger asChild>
-                <Button variant="outline">
-                    <p className="text-sm text-muted-foreground">
-                        Search musics, playlists...
-                    </p>
-                </Button>
+                <div className="flex items-center justify-center">
+                    <Command className="rounded-lg border shadow-md">
+                        <CommandInput placeholder="Type a command or search..." />
+                    </Command>
+                </div>
             </DialogTrigger>
             <DialogPortal>
                 <DialogOverlay />
