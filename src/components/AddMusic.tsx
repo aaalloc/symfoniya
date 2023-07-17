@@ -131,8 +131,8 @@ export function AddMusic() {
                 }
                 <DialogFooter>
                     {arr_path.length == 0 ? <></> :
-                        <Button variant="outline">
-                            <FolderPlus onClick={choose_path} />
+                        <Button variant="outline" onClick={choose_path}>
+                            <FolderPlus />
                         </Button>
                     }
                     <DialogClose>

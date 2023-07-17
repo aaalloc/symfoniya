@@ -1,30 +1,35 @@
 import { Progress } from "@/components/ui/progress"
 import { Audio } from "@/components/scene/Music"
 import { Play, Pause, SkipBack, SkipForward, Volume2, Repeat, Shuffle } from "lucide-react"
-import { useEffect } from "react"
+import { useState, useEffect } from "react"
 import { invoke } from "@tauri-apps/api/tauri"
 import { Button } from "./ui/button"
 
 
 
 export function Player(props: { currentAudio: Audio, setter: Function }) {
+    const [isPlaying, setIsPlaying] = useState(false)
+
     const play = async () => {
         await invoke("play_from_id", { id: props.currentAudio.id })
+        setIsPlaying(true)
     }
     const pause = async () => {
         await invoke("pause")
+        setIsPlaying(false)
     }
 
 
     return (
         <div className="flex items-center justify-center w-full h-full">
             <SkipBack />
-            <Button variant="ghost" onClick={play}>
-                <Play />
-            </Button>
-            <Button variant="ghost" onClick={pause}>
-                <Pause />
-            </Button>
+            {isPlaying ?
+                <Button variant="ghost" size="icon" onClick={pause}>
+                    <Pause />
+                </Button> :
+                <Button variant="ghost" size="icon" onClick={play}>
+                    <Play />
+                </Button>}
             <SkipForward />
             <h1>{props.currentAudio.title}</h1>
             <h2>{props.currentAudio.artist}</h2>

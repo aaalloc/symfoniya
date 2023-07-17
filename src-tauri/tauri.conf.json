@@ -79,7 +79,7 @@
         "title": "Symfoniya",
         "width": 1500,
         "height": 950,
-        "decorations": false
+        "decorations": true
       }
     ]
   }
