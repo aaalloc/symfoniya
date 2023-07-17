@@ -23,13 +23,15 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
     return (
         <div className="flex items-center justify-center w-full h-full">
             <SkipBack />
-            {isPlaying ?
-                <Button variant="ghost" size="icon" onClick={pause}>
-                    <Pause />
-                </Button> :
-                <Button variant="ghost" size="icon" onClick={play}>
-                    <Play />
-                </Button>}
+            {
+                isPlaying ?
+                    <Button variant="ghost" size="icon" onClick={pause}>
+                        <Pause />
+                    </Button> :
+                    <Button variant="ghost" size="icon" onClick={play}>
+                        <Play />
+                    </Button>
+            }
             <SkipForward />
             <h1>{props.currentAudio.title}</h1>
             <h2>{props.currentAudio.artist}</h2>
