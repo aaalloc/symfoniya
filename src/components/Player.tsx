@@ -13,8 +13,14 @@ type AudioStatus = {
 }
 
 function format_duration(duration: number) {
-    const minutes = Math.floor(duration / 60)
-    const seconds = Math.floor(duration % 60)
+    let minutes: any = Math.floor(duration / 60)
+    if (minutes < 10) {
+        minutes = `0${minutes}`
+    }
+    let seconds: any = Math.floor(duration % 60)
+    if (seconds < 10) {
+        seconds = `0${seconds}`
+    }
     return `${minutes}:${seconds}`
 }
 
