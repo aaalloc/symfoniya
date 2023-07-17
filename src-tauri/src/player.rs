@@ -17,6 +17,7 @@ pub trait Player {
     fn new(stream_handler: rodio::OutputStreamHandle) -> Self;
     fn add_audio(&mut self, audio: _Audio) -> bool;
     fn import(&mut self, path: &str) -> bool;
+    fn set_index(&mut self, index: usize);
     fn update_total_time(&mut self);
     fn play(&mut self);
     fn pause(&mut self);
@@ -74,6 +75,10 @@ impl Player for MusicPlayer {
         true
     }
 
+    fn set_index(&mut self, index: usize) {
+        self.index = index;
+    }
+
     fn update_total_time(&mut self) {
         // TODO: This works but not optimal, to be improved
         let mut total_time = Duration::new(0, 0);
@@ -86,6 +91,7 @@ impl Player for MusicPlayer {
     fn play(&mut self) {
         self.sink
             .append(get_decoder(self.audios[self.index].path.clone()));
+        println!("{}", self.sink.len());
         self.sink.play();
         let current_audio = self.audios.get_mut(self.index);
         if let Some(item) = current_audio {

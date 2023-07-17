@@ -66,6 +66,24 @@ async fn retrieve_audios(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<V
     Ok(audios)
 }
 
+#[tauri::command]
+async fn play_from_id(
+    id: usize,
+    player: State<'_, Arc<Mutex<MusicPlayer>>>,
+) -> Result<bool, String> {
+    let mut player = player.lock().unwrap();
+    player.set_index(id);
+    player.play();
+    Ok(true)
+}
+
+#[tauri::command]
+async fn pause(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<bool, String> {
+    let mut player = player.lock().unwrap();
+    player.pause();
+    Ok(true)
+}
+
 fn main() {
     let (_stream, _stream_handle) = OutputStream::try_default().unwrap();
     // leak the stream to keep it alive, otherwise it will be dropped and no more audio !!!!
@@ -76,7 +94,9 @@ fn main() {
         .manage(arc_player)
         .invoke_handler(tauri::generate_handler![
             import_from_folders,
-            retrieve_audios
+            retrieve_audios,
+            play_from_id,
+            pause
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
