@@ -2,6 +2,9 @@ import { ScrollArea } from "@radix-ui/react-scroll-area"
 import { invoke } from "@tauri-apps/api/tauri"
 import { useState, useEffect } from "react"
 import * as base64 from "byte-base64";
+import { Button } from "../ui/button";
+import { Toggle } from "@/components/ui/toggle"
+
 type Audio = {
     title: string
     artist: string
@@ -86,7 +89,7 @@ export function Music(props: { setter: Function }) {
                         {audios.map((value) => {
                             return <div onClick={() => {
                                 props.setter(value);
-                            }} className="flex items-center space-x-8">
+                            }} className="p-6 rounded-lg transition ease-in-out delay-150 hover:bg-gray-50 duration-150 .. flex items-center space-x-8">
                                 <div className="flex-shrink-0">
                                     <img className="h-14 w-14 rounded-md" src={byteToImage(value.cover)} alt="" />
                                 </div>
