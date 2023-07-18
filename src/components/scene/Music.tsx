@@ -89,7 +89,7 @@ export function Music(props: { setter: Function }) {
                         {audios.map((value) => {
                             return <div onClick={() => {
                                 props.setter(value);
-                            }} className="p-6 rounded-lg transition ease-in-out delay-150 hover:bg-gray-50 duration-150 .. flex items-center space-x-8">
+                            }} className="p-6 rounded-lg transition ease-in-out delay-150 dark:hover:bg-gray-900 hover:bg-gray-50 duration-150 .. flex items-center space-x-8">
                                 <div className="flex-shrink-0">
                                     <img className="h-14 w-14 rounded-md" src={byteToImage(value.cover)} alt="" />
                                 </div>
