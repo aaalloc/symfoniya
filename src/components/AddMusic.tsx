@@ -38,8 +38,7 @@ import { ScrollArea } from "@radix-ui/react-scroll-area"
 import { X, FolderPlus } from "lucide-react"
 import { ToastAction } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
-
-
+import "@/../app/gradient.css"
 export function AddMusic() {
     const { toast } = useToast()
     const [arr_path, setPath] = useState<string[]>([])
@@ -82,7 +81,10 @@ export function AddMusic() {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button className="w-full space-y-4" variant="outline">Add musics</Button>
+                <Button className="grad w-full 
+                 space-y-4" variant="outline">
+                    Add musics
+                </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>

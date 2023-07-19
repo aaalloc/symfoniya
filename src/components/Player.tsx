@@ -57,23 +57,30 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
     }, [poll_status, currentTime])
 
     return (
-        <div className="flex items-center justify-center w-full h-full">
-            <SkipBack />
-            {
-                isPlaying ?
-                    <Button variant="ghost" size="icon" onClick={pause}>
-                        <Pause />
-                    </Button> :
-                    <Button variant="ghost" size="icon" onClick={play}>
-                        <Play />
-                    </Button>
-            }
-            <SkipForward />
-            <h1>{props.currentAudio.title}</h1>
-            <h2>{props.currentAudio.artist}</h2>
-            <p>{format_duration(currentTime)}</p>
-            <p>{format_duration(props.currentAudio.duration)}</p>
-            {/* <Progress /> 
+        <div>
+            <Progress value={currentTime} max={props.currentAudio.duration} />
+            <div className="flex items-center justify-center w-full h-full">
+                <Button variant="ghost" size="icon">
+                    <SkipBack />
+                </Button>
+                {
+                    isPlaying ?
+                        <Button variant="ghost" size="icon" onClick={pause}>
+                            <Pause />
+                        </Button> :
+                        <Button variant="ghost" size="icon" onClick={play}>
+                            <Play />
+                        </Button>
+                }
+                <Button variant="ghost" size="icon">
+                    <SkipForward />
+                </Button>
+                <h1>{props.currentAudio.title}</h1>
+                <h2>{props.currentAudio.artist}</h2>
+                <p>{format_duration(currentTime)}</p>
+                <p>{format_duration(props.currentAudio.duration)}</p>
+
+                {/*  
             <div className="flex items-center justify-center w-full">
                 <Volume2 className="w-8 h-8" />
             </div>
@@ -82,6 +89,7 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
                 <Shuffle className="w-8 h-8" />
             </div>
             */}
+            </div>
         </div>
     )
 }
