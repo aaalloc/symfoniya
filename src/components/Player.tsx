@@ -4,7 +4,7 @@ import { Play, Pause, SkipBack, SkipForward, Volume2, Repeat, Shuffle } from "lu
 import { useState, useEffect } from "react"
 import { invoke } from "@tauri-apps/api/tauri"
 import { Button } from "./ui/button"
-
+import { Slider } from "@/components/ui/slider"
 
 type AudioStatus = {
     status: string
@@ -27,6 +27,7 @@ function format_duration(duration: number) {
 export function Player(props: { currentAudio: Audio, setter: Function }) {
     const [isPlaying, setIsPlaying] = useState(false)
     const [status, setStatus] = useState({} as AudioStatus)
+
     const play = async () => {
         await invoke("play_from_id", { id: props.currentAudio.id })
         setIsPlaying(true)
@@ -34,6 +35,12 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
     const pause = async () => {
         await invoke("pause")
         setIsPlaying(false)
+    }
+
+    const set_volume = async (volume: number[]) => {
+        await invoke("set_volume", { volume: volume[0] / 100 })
+        console.log(volume)
+        return volume
     }
 
     const poll_status = async () => {
@@ -83,12 +90,15 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
                         <p>{format_duration(status.current_time)}</p>
                         <p>{format_duration(props.currentAudio.duration)}</p>
                     </div>
+                    <div className="flex items-center justify-center w-full">
+                        <Volume2 className="w-8 h-8" />
+                        <Slider defaultValue={[100]} max={100} step={1} onValueChange={(value) => set_volume(value)} />
+
+                    </div>
                 </div>
 
                 {/*  
-            <div className="flex items-center justify-center w-full">
-                <Volume2 className="w-8 h-8" />
-            </div>
+        
             <div className="flex items-center justify-center w-full">
                 <Repeat className="w-8 h-8" />
                 <Shuffle className="w-8 h-8" />

@@ -19,7 +19,7 @@ import { X, Minus, Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 
 export function MenubarDemo() {
-  const { setTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
   const close = async () => {
     const import_window = import('@tauri-apps/api/window');
     const zz = (await import_window).appWindow;
@@ -40,22 +40,14 @@ export function MenubarDemo() {
   return (
     <Menubar>
       <MenubarMenu>
-        <MenubarTrigger>
+        {/* button is a temporary fix*/}
+        <Button onClick={() => setTheme(theme == "dark" ? "light" : "dark")}
+          variant="ghost"
+        >
           <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           <span className="sr-only">Toggle theme</span>
-        </MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem onClick={() => setTheme("light")}>
-            Light
-          </MenubarItem>
-          <MenubarItem onClick={() => setTheme("dark")}>
-            Dark
-          </MenubarItem>
-          <MenubarItem onClick={() => setTheme("system")}>
-            System
-          </MenubarItem>
-        </MenubarContent>
+        </Button>
       </MenubarMenu>
       <MenubarMenu>
         <MenubarTrigger>File</MenubarTrigger>
@@ -151,6 +143,6 @@ export function MenubarDemo() {
       <Button variant="ghost" className="h-8 w-8 p-0" onClick={close}>
         <X />
       </Button>
-    </Menubar>
+    </Menubar >
   )
 }

@@ -95,6 +95,13 @@ fn current_audio_status(
     Ok(formated)
 }
 
+#[tauri::command]
+fn set_volume(volume: f32, player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<bool, String> {
+    let mut player = player.lock().unwrap();
+    player.set_volume(volume);
+    Ok(true)
+}
+
 fn main() {
     let (_stream, _stream_handle) = OutputStream::try_default().unwrap();
     // leak the stream to keep it alive, otherwise it will be dropped and no more audio !!!!
@@ -108,7 +115,8 @@ fn main() {
             retrieve_audios,
             play_from_id,
             pause,
-            current_audio_status
+            current_audio_status,
+            set_volume
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
