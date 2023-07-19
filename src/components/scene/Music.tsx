@@ -63,8 +63,9 @@ function format_duration(duration: number) {
     let seconds = duration % 60;
     return `${minutes}:${seconds}`
 }
-export function Music(props: { setter: Function }) {
-    const [audios, setAudios] = useState<Audio[]>([]);
+export function Music(props: { audioList: Audio[], setter: Function }) {
+    //const [audios, setAudios] = useState<Audio[]>([]);
+    /*
     useEffect(() => {
         async function fetchAudios() {
             try {
@@ -76,7 +77,7 @@ export function Music(props: { setter: Function }) {
         }
 
         fetchAudios();
-    }, []);
+    }, []);*/
 
     return (
         <div>
@@ -86,7 +87,7 @@ export function Music(props: { setter: Function }) {
             <div className="py-6">
                 <ScrollArea className="w-[1000px] px-1">
                     <div className="space-y-6 p-5">
-                        {audios.map((value) => {
+                        {props.audioList.map((value) => {
                             return <div onClick={() => {
                                 props.setter(value);
                             }} className="p-6 rounded-lg transition ease-in-out delay-90 dark:hover:bg-gray-900 hover:bg-gray-50 duration-150 .. flex items-center space-x-8">

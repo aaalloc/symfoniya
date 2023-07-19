@@ -39,7 +39,31 @@ import { X, FolderPlus } from "lucide-react"
 import { ToastAction } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
 import "@/../app/gradient.css"
-export function AddMusic() {
+import { Audio } from "@/components/scene/Music"
+
+async function get_audios(): Promise<Audio[]> {
+    let audios: Audio[] = [];
+    try {
+        const values: any = await invoke("retrieve_audios");
+        //console.log(values);
+        return values as Audio[];
+    } catch (error) {
+        console.error(error);
+        return audios;
+    }
+}
+
+async function wrapper_setter_audio(setter: Function) {
+    try {
+        const response = await get_audios();
+        console.log(response);
+        setter(response);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+export function AddMusic(props: { setter: Function }) {
     const { toast } = useToast()
     const [arr_path, setPath] = useState<string[]>([])
     const removePath = (path: string) => {
@@ -70,6 +94,7 @@ export function AddMusic() {
                     title: "Musics added",
                     description: value + " musics discovered"
                 })
+                wrapper_setter_audio(props.setter);
             })
             .catch(() => {
                 toast({
