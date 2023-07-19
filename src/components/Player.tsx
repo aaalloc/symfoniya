@@ -26,7 +26,7 @@ function format_duration(duration: number) {
 
 export function Player(props: { currentAudio: Audio, setter: Function }) {
     const [isPlaying, setIsPlaying] = useState(false)
-    const [status, setStatus] = useState({} as AudioStatus)
+    const [status, setStatus] = useState({ current_time: 0 } as AudioStatus)
 
     const play = async () => {
         await invoke("play_from_id", { id: props.currentAudio.id })
@@ -61,7 +61,6 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
         const timeoutFunction = setInterval(poll_status, 1000)
         return () => clearInterval(timeoutFunction)
     }, [poll_status, status])
-
     return (
         <div>
             <Progress value={(status.current_time / status.duration) * 100} />

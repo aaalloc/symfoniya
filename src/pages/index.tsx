@@ -13,16 +13,14 @@ import { MenubarDemo } from "@/components/MenubarDemo"
 import { Player } from "@/components/Player"
 import { Search } from "@/components/scene/Search"
 
+function isObjectEmpty(objectName: any) {
+  return Object.keys(objectName).length === 0
+}
+
+
 const Home: NextPage = () => {
   const [scene, setScene] = useState<string>("Home")
-  const [audio, setAudioPlayer] = useState<Audio>({
-    title: "Numb",
-    artist: "Linkin Park",
-    duration: 53,
-    id: 1,
-    cover: [2],
-    album: "Meteora",
-  })
+  const [audio, setAudioPlayer] = useState<Audio>({} as Audio)
   useGlobalShortcut("CommandOrControl+P", () => {
     console.log("Ctrl+P was pressed!")
   })
@@ -48,8 +46,8 @@ const Home: NextPage = () => {
             </div>
           </div>
         </div>
-        <Player currentAudio={audio}
-          setter={setAudioPlayer} />
+        {!isObjectEmpty(audio) ? <Player currentAudio={audio}
+          setter={setAudioPlayer} /> : null}
       </main >
     </div >
   )
