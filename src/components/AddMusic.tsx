@@ -81,8 +81,11 @@ export function AddMusic() {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button className="bg-[conic-gradient(at_top_left,_var(--tw-gradient-stops))] from-purple-400 via-emerald-200 to-teal-600 w-full 
-                 space-y-4" variant="outline">
+                <Button className=" 
+                w-full 
+                space-y-4
+                transition ease-in-out delay-90 hover:opacity-90 duration-150"
+                    variant="outline">
                     Add musics
                 </Button>
             </DialogTrigger>
