@@ -26,7 +26,7 @@ function format_duration(duration: number) {
 
 export function Player(props: { currentAudio: Audio, setter: Function }) {
     const [isPlaying, setIsPlaying] = useState(false)
-    const [currentTime, setCurrentTime] = useState(0)
+    const [status, setStatus] = useState({} as AudioStatus)
     const play = async () => {
         await invoke("play_from_id", { id: props.currentAudio.id })
         setIsPlaying(true)
@@ -43,22 +43,21 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
             current_time: tmp[1],
             duration: tmp[2]
         }
-        setCurrentTime(status.current_time);
+        setStatus(status);
         console.log(status);
     }
 
-    let intervalid: any
     useEffect(() => {
         if (!isPlaying) {
             return
         }
         const timeoutFunction = setInterval(poll_status, 1000)
         return () => clearInterval(timeoutFunction)
-    }, [poll_status, currentTime])
+    }, [poll_status, status])
 
     return (
         <div>
-            <Progress value={currentTime} max={props.currentAudio.duration} />
+            <Progress value={(status.current_time / status.duration) * 100} />
             <div className="flex items-center justify-center w-full h-full">
                 <Button variant="ghost" size="icon">
                     <SkipBack />
@@ -75,10 +74,16 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
                 <Button variant="ghost" size="icon">
                     <SkipForward />
                 </Button>
-                <h1>{props.currentAudio.title}</h1>
-                <h2>{props.currentAudio.artist}</h2>
-                <p>{format_duration(currentTime)}</p>
-                <p>{format_duration(props.currentAudio.duration)}</p>
+                <div className="flex items-center justify-center w-full">
+                    <div className="flex flex-col items-center justify-center w-full">
+                        <h1>{props.currentAudio.title}</h1>
+                        <h2>{props.currentAudio.artist}</h2>
+                    </div>
+                    <div>
+                        <p>{format_duration(status.current_time)}</p>
+                        <p>{format_duration(props.currentAudio.duration)}</p>
+                    </div>
+                </div>
 
                 {/*  
             <div className="flex items-center justify-center w-full">
