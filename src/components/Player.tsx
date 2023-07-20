@@ -58,8 +58,10 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
         if (!isPlaying) {
             return
         }
-        const timeoutFunction = setInterval(poll_status, 1000)
-        return () => clearInterval(timeoutFunction)
+        if (props.currentAudio.duration != status.current_time) {
+            const timeoutFunction = setInterval(poll_status, 1000)
+            return () => clearInterval(timeoutFunction)
+        }
     }, [poll_status, status])
     return (
         <div>
