@@ -66,46 +66,43 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
     return (
         <div className="sticky bottom-0 w-full bg-slate-50 dark:bg-slate-950">
             <Progress className="w-full" value={(status.current_time / status.duration) * 100} />
-            <div className="container py-3">
-                <div className="flex items-center justify-center w-full h-full">
-                    <Button variant="ghost" size="icon">
-                        <SkipBack />
-                    </Button>
-                    {
-                        isPlaying ?
-                            <Button variant="ghost" size="icon" onClick={pause}>
-                                <Pause />
-                            </Button> :
-                            <Button variant="ghost" size="icon" onClick={play}>
-                                <Play />
-                            </Button>
-                    }
-                    <Button variant="ghost" size="icon">
-                        <SkipForward />
-                    </Button>
-                    <div className="flex items-center justify-center w-full">
-                        <div className="flex flex-col items-center justify-center w-full">
-                            <h1>{props.currentAudio.title}</h1>
-                            <h2>{props.currentAudio.artist}</h2>
-                        </div>
-                        <div>
-                            <p>{format_duration(status.current_time)}</p>
-                            <p>{format_duration(props.currentAudio.duration)}</p>
-                        </div>
-                        <div className="flex items-center justify-center w-full">
-                            <Volume2 className="w-8 h-8" />
-                            <Slider defaultValue={[100]} max={100} step={1} onValueChange={(value) => set_volume(value)} />
+            <div className="container py-4">
 
-                        </div>
+                <div className="flex justify-start items-center w-full h-full">
+
+                    <div className="flex gap-2 items-center">
+                        <Button variant="ghost" size="icon">
+                            <SkipBack />
+                        </Button>
+                        {
+                            isPlaying ?
+                                <Button variant="ghost" size="icon" onClick={pause}>
+                                    <Pause />
+                                </Button> :
+                                <Button variant="ghost" size="icon" onClick={play}>
+                                    <Play />
+                                </Button>
+                        }
+                        <Button variant="ghost" size="icon">
+                            <SkipForward />
+                        </Button>
+
+                        <p className="text-sm text-muted-foreground ml-2">{format_duration(status.current_time)} / {format_duration(props.currentAudio.duration)}</p>
+
                     </div>
 
-                    {/*  
-            
-                <div className="flex items-center justify-center w-full">
-                    <Repeat className="w-8 h-8" />
-                    <Shuffle className="w-8 h-8" />
-                </div>
-                */}
+                    <div className="flex flex-col items-center justify-center flex-1">
+                        <p className="font-semibold leading-tight">{props.currentAudio.title}</p>
+                        <p className="text-sm text-muted-foreground">{props.currentAudio.artist}</p>
+                    </div>
+
+                    <div className="flex items-center justify-center">
+                        <Volume2 className="w-8 h-8" />
+                        <Slider defaultValue={[100]} max={100} step={1} onValueChange={(value) => set_volume(value)} />
+                        <Repeat className="w-8 h-8" />
+                        <Shuffle className="w-8 h-8" />
+                    </div>
+
                 </div>
             </div>
         </div>
