@@ -31,8 +31,8 @@ export function Search() {
                 className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
             />
             <DialogTrigger asChild>
-                <div className="flex items-center justify-center">
-                    <Command className="rounded-lg border shadow-md">
+                <div className="flex items-center justify-center py-8">
+                    <Command className="rounded-lg border shadow-md w-96">
                         <CommandInput placeholder="Type a command or search..." />
                     </Command>
                 </div>

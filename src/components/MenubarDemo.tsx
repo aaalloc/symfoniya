@@ -38,7 +38,7 @@ export function MenubarDemo() {
   }
 
   return (
-    <Menubar>
+    <Menubar className="sticky top-0">
       <MenubarMenu>
         {/* button is a temporary fix*/}
         <Button onClick={() => setTheme(theme == "dark" ? "light" : "dark")}

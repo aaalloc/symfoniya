@@ -40,6 +40,7 @@ import { ToastAction } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
 import "@/../app/gradient.css"
 import { Audio } from "@/components/scene/Music"
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 
 async function get_audios(): Promise<Audio[]> {
     let audios: Audio[] = [];
@@ -61,6 +62,30 @@ async function wrapper_setter_audio(setter: Function) {
     } catch (error) {
         console.error(error);
     }
+}
+
+export function MusicPath(props: { value: string, onRemove: Function }) {
+
+    return (
+        <TableRow>
+            <TableCell>
+                <Tooltip>
+                    <TooltipTrigger className="w-full">
+                        <p className="truncate max-w-[250px] text-left">{props.value}</p>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>{props.value}</p>
+                    </TooltipContent>
+                </Tooltip>
+            </TableCell>
+            <TableCell className="w-1/12">
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Remove path</span>
+                    <X onClick={() => props.onRemove(props.value)} className="h-4 w-4" />
+                </Button>
+            </TableCell>
+        </TableRow>
+    )
 }
 
 export function AddMusic(props: { setter: Function }) {
@@ -124,7 +149,7 @@ export function AddMusic(props: { setter: Function }) {
                         <p className="text-sm text-muted-foreground">Select a or multiple folder path </p>
                     </div>
                 </div> :
-                    <div className="h-[200px] items-center justify-center rounded-md border text">
+                    <div className="rounded-md border">
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -133,27 +158,11 @@ export function AddMusic(props: { setter: Function }) {
                             </TableHeader>
                             {/* <TableCaption>Path selected</TableCaption> */}
                             {/* patch w-1 when path to big*/}
-                            <ScrollArea className="h-36 w-1">
+                            <ScrollArea className="h-36">
                                 <TableBody>
-                                    {typeof arr_path == "string" ? <TableRow>
-                                        <TableCell>{arr_path}</TableCell>
-                                        <TableCell className="w-1/12">
-                                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                                <span className="sr-only">Remove path</span>
-                                                <X onClick={() => removePath(arr_path)} className="h-4 w-4" />
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow> : arr_path.map((value) => {
-                                        return <TableRow>
-                                            <TableCell>{value}</TableCell>
-                                            <TableCell className="w-1/12">
-                                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                                    <span className="sr-only">Remove path</span>
-                                                    <X onClick={() => removePath(value)} className="h-4 w-4" />
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    })}
+                                    {typeof arr_path == "string"
+                                        ? <MusicPath value={arr_path} onRemove={removePath} />
+                                        : arr_path.map((value) => <MusicPath value={value} onRemove={removePath} />)}
                                 </TableBody>
                             </ScrollArea>
                         </Table>
