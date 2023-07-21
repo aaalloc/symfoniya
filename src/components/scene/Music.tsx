@@ -1,11 +1,5 @@
-import { ScrollArea } from "@radix-ui/react-scroll-area"
 import { invoke } from "@tauri-apps/api/tauri"
 import * as base64 from "byte-base64"
-import { useEffect, useState } from "react"
-
-import { Toggle } from "@/components/ui/toggle"
-
-import { Button } from "../ui/button"
 
 interface Audio {
     title: string

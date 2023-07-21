@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button"
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -11,32 +10,16 @@ import {
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
     TableHead,
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { DialogClose } from "@radix-ui/react-dialog";
-import { open } from '@tauri-apps/api/dialog';
-import { appDataDir } from '@tauri-apps/api/path';
 import { useState } from "react"
 import { invoke } from "@tauri-apps/api/tauri"
-import { type } from "os"
 import { ScrollArea } from "@radix-ui/react-scroll-area"
 import { X, FolderPlus } from "lucide-react"
-import { ToastAction } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
 import "@/../app/gradient.css"
 import { Audio } from "@/components/scene/Music"

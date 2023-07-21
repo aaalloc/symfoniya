@@ -4,7 +4,7 @@ import { Play, Pause, SkipBack, SkipForward, Volume2, Repeat, Shuffle } from "lu
 import { useState, useEffect } from "react"
 import { invoke } from "@tauri-apps/api/tauri"
 import { Button } from "./ui/button"
-import { Slider } from "@/components/ui/slider"
+import VolumeButton from "./Volume"
 
 type AudioStatus = {
     status: string
@@ -37,12 +37,6 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
         setIsPlaying(false)
     }
 
-    const set_volume = async (volume: number[]) => {
-        await invoke("set_volume", { volume: volume[0] / 100 })
-        console.log(volume)
-        return volume
-    }
-
     const poll_status = async () => {
         const tmp: any = await invoke("current_audio_status");
         const status: AudioStatus = {
@@ -66,7 +60,7 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
     return (
         <div className="sticky bottom-0 w-full bg-slate-50 dark:bg-slate-950">
             <Progress className="w-full" value={(status.current_time / status.duration) * 100} />
-            <div className="container py-4">
+            <div className="px-8 py-4">
 
                 <div className="flex justify-start items-center w-full h-full">
 
@@ -77,10 +71,10 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
                         {
                             isPlaying ?
                                 <Button variant="ghost" size="icon" onClick={pause}>
-                                    <Pause />
+                                    <Pause className="w-8 h-8" />
                                 </Button> :
                                 <Button variant="ghost" size="icon" onClick={play}>
-                                    <Play />
+                                    <Play className="w-8 h-8" />
                                 </Button>
                         }
                         <Button variant="ghost" size="icon">
@@ -96,11 +90,14 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
                         <p className="text-sm text-muted-foreground">{props.currentAudio.artist}</p>
                     </div>
 
-                    <div className="flex items-center justify-center">
-                        <Volume2 className="w-8 h-8" />
-                        <Slider defaultValue={[100]} max={100} step={1} onValueChange={(value) => set_volume(value)} />
-                        <Repeat className="w-8 h-8" />
-                        <Shuffle className="w-8 h-8" />
+                    <div className="flex items-center justify-center gap-4">
+                        <VolumeButton />
+                        <Button variant="ghost" size="icon">
+                            <Repeat />
+                        </Button>
+                        <Button variant="ghost" size="icon">
+                            <Shuffle />
+                        </Button>
                     </div>
 
                 </div>
