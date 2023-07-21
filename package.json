@@ -1,10 +1,10 @@
 {
-  "name": "tauri-nextjs-template",
+  "name": "symfoniya",
   "version": "0.1.0",
   "private": true,
   "author": {
-    "name": "Your Name Here",
-    "email": "your-email-here@example.com"
+    "name": "Alexander Yanovskyy",
+    "email": "contact@yanovskyy.com"
   },
   "scripts": {
     "next-start": "cross-env BROWSER=none next dev",
