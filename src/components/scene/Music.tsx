@@ -88,15 +88,13 @@ export function Music(props: { audioList: Audio[]; setter: Function }) {
             <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
                 Musics
             </h1>
-            <div className="h-full overflow-y-auto">
+            <div className="h-3/4 overflow-y-auto">
                 <div className="container flex flex-col gap-2 items-stretch">
                     {props.audioList.map((value) => {
                         return (
                             <div
                                 key={value.id}
-                                onClick={() => {
-                                    props.setter(value)
-                                }}
+                                onClick={() => { props.setter(value) }}
                                 className="p-6 rounded-lg transition ease-in-out delay-90 dark:hover:bg-gray-900 hover:bg-gray-50 duration-150 flex items-center space-x-8"
                             >
                                 <div className="flex-shrink-0">

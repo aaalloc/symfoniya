@@ -4,7 +4,6 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 
 import { Playlist } from "@/components/data/playlists"
 import { AddMusic } from "@/components/AddMusic"
-import { Children } from "react"
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
     playlists: Playlist[]

@@ -2,7 +2,6 @@ import * as React from "react"
 import * as ProgressPrimitive from "@radix-ui/react-progress"
 
 import { cn } from "@/lib/utils"
-import "@/../app/gradient.css"
 const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>
@@ -16,9 +15,11 @@ const Progress = React.forwardRef<
     {...props}
   >
     <ProgressPrimitive.Indicator
-      className="h-full w-full flex-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 transition-all"
+      className="h-full w-full flex-1 bg-gradient-to-r to-[#00C5DF] via-[#FFC700] from-[#F2371F] transition-all
+      shadow-xl shadow-red-500"
       style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
     />
+
   </ProgressPrimitive.Root>
 ))
 Progress.displayName = ProgressPrimitive.Root.displayName

@@ -21,7 +21,6 @@ import { invoke } from "@tauri-apps/api/tauri"
 import { ScrollArea } from "@radix-ui/react-scroll-area"
 import { X, FolderPlus } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
-import "@/../app/gradient.css"
 import { Audio } from "@/components/scene/Music"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 

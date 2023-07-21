@@ -5,11 +5,16 @@ import { useState, useEffect } from "react"
 import { invoke } from "@tauri-apps/api/tauri"
 import { Button } from "./ui/button"
 import VolumeButton from "./Volume"
+import { cn } from "@/lib/utils"
 
 type AudioStatus = {
     status: string
     current_time: number
     duration: number
+}
+
+function isObjectEmpty(objectName: any) {
+    return Object.keys(objectName).length === 0
 }
 
 function format_duration(duration: number) {
@@ -57,14 +62,19 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
             return () => clearInterval(timeoutFunction)
         }
     }, [poll_status, status])
+    console.log(props.currentAudio);
+    console.log("class ?", "sticky bottom-0 w-full bg-slate-50 dark:bg-slate-950 transition-all " +
+        isObjectEmpty(props.currentAudio) ? 'translate-y-full' : '');
     return (
-        <div className="sticky bottom-0 w-full bg-slate-50 dark:bg-slate-950">
+        <div className={cn(
+            "sticky bottom-0 w-full bg-slate-50 dark:bg-slate-950 transition-all duration-300 ease-out",
+            isObjectEmpty(props.currentAudio) ? 'translate-y-full' : '')}>
             <Progress className="w-full" value={(status.current_time / status.duration) * 100} />
             <div className="px-8 py-4">
 
                 <div className="flex justify-start items-center w-full h-full">
 
-                    <div className="flex gap-2 items-center">
+                    <div className="flex items-center">
                         <Button variant="ghost" size="icon">
                             <SkipBack />
                         </Button>

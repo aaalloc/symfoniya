@@ -12,10 +12,6 @@ import { Search } from "@/components/scene/Search"
 import { Sidebar } from "@/components/Sidebar"
 import { useGlobalShortcut } from "@/hooks/tauri/shortcuts"
 
-function isObjectEmpty(objectName: any) {
-  return Object.keys(objectName).length === 0
-}
-
 const Home: NextPage = () => {
   const [scene, setScene] = useState<string>("Home")
   const [audio, setAudioPlayer] = useState<Audio>({} as Audio)
@@ -47,9 +43,7 @@ const Home: NextPage = () => {
             ) : null}
           </div>
         </div>
-        {!isObjectEmpty(audio) ? (
-          <Player currentAudio={audio} setter={setAudioPlayer} />
-        ) : null}
+        <Player currentAudio={audio} setter={setAudioPlayer} />
       </main>
     </>
   )
