@@ -58,11 +58,17 @@ function byteToImage(byteArray: number[]) {
 }
 
 function format_duration(duration: number) {
-    // duration is in seconds
-    let minutes = Math.floor(duration / 60);
-    let seconds = duration % 60;
+    let minutes: any = Math.floor(duration / 60)
+    if (minutes < 10) {
+        minutes = `0${minutes}`
+    }
+    let seconds: any = Math.floor(duration % 60)
+    if (seconds < 10) {
+        seconds = `0${seconds}`
+    }
     return `${minutes}:${seconds}`
 }
+
 export function Music(props: { audioList: Audio[], setter: Function }) {
     //const [audios, setAudios] = useState<Audio[]>([]);
     /*
