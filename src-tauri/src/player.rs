@@ -112,14 +112,10 @@ impl Player for MusicPlayer {
 
     fn pause(&mut self) {
         self.sink.pause();
-        if let Some(item) = self.audios.first_mut() {
+        if let Some(item) = self.audios.get_mut(self.index) {
             let status = &mut item.status;
-            match status {
-                AudioStatus::Waiting => {}
-                AudioStatus::Stopped(_, _) => {}
-                AudioStatus::Playing(instant, duration) => {
-                    *status = AudioStatus::Stopped(instant.elapsed(), *duration);
-                }
+            if let AudioStatus::Playing(instant, _) = status {
+                *status = AudioStatus::Stopped(instant.elapsed(), item.duration);
             }
             self.is_playing = false;
         }
