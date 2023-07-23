@@ -50,7 +50,6 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
             duration: tmp[2]
         }
         setStatus(status);
-        console.log(status);
     }
 
     useEffect(() => {
@@ -62,9 +61,6 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
             return () => clearInterval(timeoutFunction)
         }
     }, [poll_status, status])
-    console.log(props.currentAudio);
-    console.log("class ?", "sticky bottom-0 w-full bg-slate-50 dark:bg-slate-950 transition-all " +
-        isObjectEmpty(props.currentAudio) ? 'translate-y-full' : '');
     return (
         <div className={cn(
             "sticky bottom-0 w-full bg-slate-50 dark:bg-slate-950 transition-all duration-300 ease-out",
