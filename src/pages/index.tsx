@@ -27,7 +27,7 @@ const Home: NextPage = () => {
         <meta name="description" content="Music player" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="p-0 m-0 h-screen w-screen select-none overflow-hidden">
+      <main className="p-0 m-0 h-screen w-screen select-none overflow-hidden" >
         <MenubarDemo />
         <div className="flex divide-x h-full pb-24">
           <Sidebar
