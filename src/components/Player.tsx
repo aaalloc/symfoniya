@@ -1,5 +1,5 @@
 import { Progress } from "@/components/ui/progress"
-import { Audio } from "@/components/scene/Music"
+import { Audio } from "@/components/types/audio"
 import { Play, Pause, SkipBack, SkipForward, Volume2, Repeat, Shuffle } from "lucide-react"
 import { useState, useEffect } from "react"
 import { invoke } from "@tauri-apps/api/tauri"

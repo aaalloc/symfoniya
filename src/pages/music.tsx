@@ -1,16 +1,6 @@
 import { invoke } from "@tauri-apps/api/tauri"
 import * as base64 from "byte-base64"
-
-interface Audio {
-    title: string
-    artist: string
-    album: string
-    id: number
-    duration: number
-    cover: number[] // byte array
-}
-
-export type { Audio }
+import { Audio } from "@/components/types/audio"
 
 async function get_audios(): Promise<Audio[]> {
     const audios: Audio[] = []
