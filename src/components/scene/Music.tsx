@@ -11,10 +11,6 @@ interface Audio {
 }
 
 export type { Audio }
-interface MusicProps extends React.HTMLAttributes<HTMLDivElement> {
-    // array of
-    audios: Audio[]
-}
 
 async function get_audios(): Promise<Audio[]> {
     const audios: Audio[] = []
@@ -68,21 +64,6 @@ function format_duration(duration: number) {
 }
 
 export function Music(props: { audioList: Audio[]; setter: Function }) {
-    //const [audios, setAudios] = useState<Audio[]>([]);
-    /*
-        useEffect(() => {
-            async function fetchAudios() {
-                try {
-                    const response = await get_audios();
-                    setAudios(response);
-                } catch (error) {
-                    console.error(error);
-                }
-            }
-    
-            fetchAudios();
-        }, []);*/
-
     return (
         <div className="h-full flex-1 flex flex-col gap-6">
             <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
@@ -95,7 +76,7 @@ export function Music(props: { audioList: Audio[]; setter: Function }) {
                             <div
                                 key={value.id}
                                 onClick={() => { props.setter(value) }}
-                                className="p-6 rounded-lg transition ease-in-out delay-90 dark:hover:bg-gray-900 hover:bg-gray-50 duration-150 flex items-center space-x-8"
+                                className="hover:cursor-pointer p-6 rounded-lg transition ease-in-out delay-90 dark:hover:bg-gray-900 hover:bg-gray-50 duration-150 flex items-center space-x-8"
                             >
                                 <div className="flex-shrink-0">
                                     <img
@@ -108,9 +89,7 @@ export function Music(props: { audioList: Audio[]; setter: Function }) {
                                     <p className="text-lg font-semibold">{value.title}</p>
                                     <p className="text-sm text-muted-foreground">{value.artist}</p>
                                 </div>
-                                <div>
-                                    <p className="">{format_duration(value.duration)}</p>
-                                </div>
+                                <p className="">{format_duration(value.duration)}</p>
                             </div>
                         )
                     })}
