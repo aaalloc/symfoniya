@@ -21,7 +21,7 @@ import { invoke } from "@tauri-apps/api/tauri"
 import { ScrollArea } from "@radix-ui/react-scroll-area"
 import { X, FolderPlus } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
-import { Audio } from "@/components/scene/Music"
+import { Audio } from "@/components/types/audio"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 
 async function get_audios(): Promise<Audio[]> {
@@ -88,7 +88,7 @@ export function AddMusic(props: { setter: Function }) {
             defaultPath: await import_path.audioDir(),
         });
         if (new_paths != null) {
-            const paths_to_add = new_paths.filter((path: string) => !arr_path.includes(path));
+            const paths_to_add = (new_paths as string[]).filter((path: string) => !arr_path.includes(path));
             const updated_paths = [...arr_path, ...paths_to_add];
             setPath(updated_paths);
         }
