@@ -123,10 +123,10 @@ impl Player for MusicPlayer {
 
     fn update_sink(&mut self, index: usize) {
         let next_audio = self.audios.get_mut(index).unwrap();
-        let next_audio_status = &mut next_audio.status;
+        next_audio.status = AudioStatus::Waiting;
+        let previous_volume = self.sink.volume();
         self.sink = Sink::try_new(&self.stream_handle).unwrap();
-        self.sink.append(get_decoder(next_audio.path.clone()));
-        update_status!(next_audio_status, next_audio.duration);
+        self.sink.set_volume(previous_volume);
     }
 
     fn next(&mut self) -> usize {

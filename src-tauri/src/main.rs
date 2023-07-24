@@ -72,9 +72,15 @@ async fn play_from_id(
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
 ) -> Result<bool, String> {
     let mut player = player.lock().unwrap();
-    player.set_index(id);
-    player.play();
-    Ok(true)
+    if player.get_index() == id {
+        player.play();
+        Ok(true)
+    } else {
+        player.update_sink(id);
+        player.set_index(id);
+        player.play();
+        Ok(true)
+    }
 }
 
 #[tauri::command]
@@ -102,6 +108,12 @@ fn set_volume(volume: f32, player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result
     Ok(true)
 }
 
+#[tauri::command]
+fn get_volume(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<f32, String> {
+    let player = player.lock().unwrap();
+    Ok(player.get_volume())
+}
+
 fn main() {
     let (_stream, _stream_handle) = OutputStream::try_default().unwrap();
     // leak the stream to keep it alive, otherwise it will be dropped and no more audio !!!!
@@ -116,7 +128,8 @@ fn main() {
             play_from_id,
             pause,
             current_audio_status,
-            set_volume
+            set_volume,
+            get_volume
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

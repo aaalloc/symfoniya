@@ -61,6 +61,19 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
             return () => clearInterval(timeoutFunction)
         }
     }, [poll_status, status])
+
+    useEffect(() => {
+        if (isObjectEmpty(props.currentAudio)) {
+            return
+        }
+        if (!isPlaying) {
+            play()
+        } else {
+            pause()
+            play()
+        }
+    }, [props.currentAudio])
+
     return (
         <div className={cn(
             "sticky bottom-0 w-full bg-slate-50 dark:bg-slate-950 transition-all duration-300 ease-out",
