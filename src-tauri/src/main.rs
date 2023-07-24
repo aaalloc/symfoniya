@@ -35,16 +35,13 @@ async fn import_from_folders(
 ) -> Result<usize, String> {
     // display folders for debug
     let mut player = player.lock().unwrap();
-    for folder in &folders {
-        println!("{}", folder);
-    }
+    let mut total_imported = 0;
     for folder in folders {
-        player.import(&folder);
+        total_imported += player.import(&folder);
     }
     println!("{}", player);
-    let len = player.audios.len();
     drop(player);
-    return Ok(len);
+    return Ok(total_imported);
 }
 
 #[tauri::command]

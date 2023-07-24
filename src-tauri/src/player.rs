@@ -16,7 +16,7 @@ pub struct MusicPlayer {
 pub trait Player {
     fn new(stream_handler: rodio::OutputStreamHandle) -> Self;
     fn add_audio(&mut self, audio: _Audio) -> bool;
-    fn import(&mut self, path: &str) -> bool;
+    fn import(&mut self, path: &str) -> usize;
     fn set_index(&mut self, index: usize);
     fn update_total_time(&mut self);
     fn play(&mut self);
@@ -69,16 +69,10 @@ impl Player for MusicPlayer {
         true
     }
 
-    fn import(&mut self, path: &str) -> bool {
-        let audios = get_audios(path);
-        if audios.len() == 0 {
-            return false;
-        }
-        for audio in audios {
-            self.add_audio(audio);
-        }
+    fn import(&mut self, path: &str) -> usize {
+        let value = get_audios(self.audios.as_mut(), path);
         self.update_total_time();
-        true
+        value
     }
 
     fn set_index(&mut self, index: usize) {

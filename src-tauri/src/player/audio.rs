@@ -156,11 +156,17 @@ pub fn create_audio(path: &str, format: FileFormat) -> _Audio {
     }
 }
 
-pub fn get_audios(path: &str) -> Vec<_Audio> {
-    let mut audios = Vec::new();
+pub fn get_audios(audios: &mut Vec<_Audio>, path: &str) -> usize {
+    let mut count = 0;
     let paths = std::fs::read_dir(path).unwrap();
     for path in paths {
         let p = &path.unwrap().path().to_str().unwrap().to_string();
+        if audios
+            .iter()
+            .any(|audio| audio.path.split("/").last().unwrap() == p.split("/").last().unwrap())
+        {
+            continue;
+        }
         let format = FileFormat::from_file(p);
         let format = match format {
             Ok(format) => format,
@@ -169,14 +175,16 @@ pub fn get_audios(path: &str) -> Vec<_Audio> {
         if match format.kind() {
             Kind::Audio => {
                 audios.push(create_audio(p, format));
+                count += 1;
                 true
             }
             Kind::Video => {
                 audios.push(create_audio(p, format));
+                count += 1;
                 true
             }
             _ => false,
         } {}
     }
-    audios
+    count
 }
