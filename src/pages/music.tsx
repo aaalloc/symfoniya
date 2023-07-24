@@ -53,7 +53,7 @@ function format_duration(duration: number) {
     return `${minutes}:${seconds}`
 }
 
-export function Music(props: { audioList: Audio[]; setter: Function }) {
+export default function Music(props: { audioList: Audio[]; setter: Function }) {
     return (
         <div className="h-full flex-1 flex flex-col gap-6">
             <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
