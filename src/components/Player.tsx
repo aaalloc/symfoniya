@@ -6,6 +6,7 @@ import { invoke } from "@tauri-apps/api/tauri"
 import { Button } from "./ui/button"
 import VolumeButton from "./Volume"
 import { cn } from "@/lib/utils"
+import { log } from "console"
 
 type AudioStatus = {
     status: string
@@ -29,7 +30,7 @@ function format_duration(duration: number) {
     return `${minutes}:${seconds}`
 }
 
-export function Player(props: { currentAudio: Audio, setter: Function }) {
+export function Player(props: { currentAudio: Audio, setter: Function, audioList: Audio[] }) {
     const [isPlaying, setIsPlaying] = useState(false)
     const [status, setStatus] = useState({ current_time: 0 } as AudioStatus)
 
@@ -42,6 +43,18 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
         setIsPlaying(false)
     }
 
+    const next = async () => {
+        const id: number = await invoke("goto_next")
+        await invoke("play_from_id", { id: id })
+        props.setter(props.audioList[id])
+    }
+
+    const previous = async () => {
+        const id: number = await invoke("goto_previous")
+        await invoke("play_from_id", { id: id })
+        props.setter(props.audioList[id])
+    }
+
     const poll_status = async () => {
         const tmp: any = await invoke("current_audio_status");
         const status: AudioStatus = {
@@ -49,6 +62,7 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
             current_time: tmp[1],
             duration: tmp[2]
         }
+        console.log(status);
         setStatus(status);
     }
 
@@ -84,7 +98,7 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
                 <div className="flex justify-start items-center w-full h-full">
 
                     <div className="flex items-center">
-                        <Button variant="ghost" size="icon">
+                        <Button variant="ghost" size="icon" onClick={previous}>
                             <SkipBack />
                         </Button>
                         {
@@ -96,7 +110,7 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
                                     <Play className="w-8 h-8" />
                                 </Button>
                         }
-                        <Button variant="ghost" size="icon">
+                        <Button variant="ghost" size="icon" onClick={next}>
                             <SkipForward />
                         </Button>
 

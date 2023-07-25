@@ -41,7 +41,7 @@ const Home: NextPage = () => {
             ) : null}
           </div>
         </div>
-        <Player currentAudio={audio} setter={setAudioPlayer} />
+        <Player currentAudio={audio} audioList={audioList} setter={setAudioPlayer} />
       </main>
     </>
   )

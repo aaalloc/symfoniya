@@ -92,7 +92,7 @@ fn current_audio_status(
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
 ) -> Result<(String, u64, u64), String> {
     let player = player.lock().unwrap();
-    let current_audio = player.audios.get(player.get_index()).unwrap();
+    let current_audio = player.get_current_audio();
     let status = &current_audio.status;
     let formated = status.get_status();
     Ok(formated)
@@ -111,6 +111,20 @@ fn get_volume(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<f32, String>
     Ok(player.get_volume())
 }
 
+#[tauri::command]
+fn goto_next(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<usize, String> {
+    let mut player = player.lock().unwrap();
+    let index = player.next();
+    Ok(index)
+}
+
+#[tauri::command]
+fn goto_previous(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<usize, String> {
+    let mut player = player.lock().unwrap();
+    player.previous();
+    Ok(player.get_index())
+}
+
 fn main() {
     let (_stream, _stream_handle) = OutputStream::try_default().unwrap();
     // leak the stream to keep it alive, otherwise it will be dropped and no more audio !!!!
@@ -126,7 +140,9 @@ fn main() {
             pause,
             current_audio_status,
             set_volume,
-            get_volume
+            get_volume,
+            goto_next,
+            goto_previous
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

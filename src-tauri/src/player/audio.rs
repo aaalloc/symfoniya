@@ -95,7 +95,7 @@ pub struct _Audio {
     pub cover: Vec<u8>,
 }
 
-pub fn get_decoder(path: String) -> Decoder<BufReader<File>> {
+pub fn get_decoder(path: &String) -> Decoder<BufReader<File>> {
     let file = BufReader::new(File::open(path).unwrap());
     let source = Decoder::new(file).unwrap();
     source

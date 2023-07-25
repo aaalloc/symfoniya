@@ -93,8 +93,7 @@ impl Player for MusicPlayer {
         if !self.sink.empty() {
             self.sink.play();
         } else {
-            self.sink
-                .append(get_decoder(self.audios[self.index].path.clone()));
+            self.sink.append(get_decoder(&self.audios[self.index].path));
         }
         current_audio = self.audios.get_mut(self.index);
         if let Some(item) = current_audio {
@@ -130,20 +129,17 @@ impl Player for MusicPlayer {
         } else {
             self.audios.get_mut(self.index).unwrap().status = AudioStatus::Waiting;
             self.index += 1;
-            self.sink.stop();
-            if self.index < len {
-                self.update_sink(self.index);
-            }
+            self.sink = Sink::try_new(&self.stream_handle).unwrap();
+            println!("{}", self.sink.empty());
+            return self.index;
         }
-        len - self.index
     }
 
     fn previous(&mut self) {
         if self.index > 0 {
             self.audios.get_mut(self.index).unwrap().status = AudioStatus::Waiting;
             self.index -= 1;
-            self.sink.stop();
-            self.update_sink(self.index);
+            self.sink = Sink::try_new(&self.stream_handle).unwrap();
         }
     }
 
