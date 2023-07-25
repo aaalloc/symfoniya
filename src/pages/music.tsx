@@ -2,42 +2,10 @@ import { invoke } from "@tauri-apps/api/tauri"
 import * as base64 from "byte-base64"
 import { Audio } from "@/components/types/audio"
 
-async function get_audios(): Promise<Audio[]> {
-    const audios: Audio[] = []
-    try {
-        const values: any = await invoke("retrieve_audios")
-        //console.log(values);
-        return values as Audio[]
-    } catch (error) {
-        console.error(error)
-        return audios
-    }
-}
-
-function Uint8ToString(u8a: number[]) {
-    const CHUNK_SZ = 0x8000
-    const c = []
-    for (let i = 0; i < u8a.length; i += CHUNK_SZ) {
-        c.push(String.fromCharCode.apply(null, u8a.slice(i, i + CHUNK_SZ)))
-    }
-    return c.join("")
-}
-
-function grayByteArr() {
-    const grayByteArray: number[] = []
-    for (let i = 0; i < 256; i++) {
-        grayByteArray.push(i)
-        grayByteArray.push(i)
-        grayByteArray.push(i)
-        grayByteArray.push(255)
-    }
-    return grayByteArray
-}
+const grayb64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mO8Ww8AAj8BXkQ+xPEAAAAASUVORK5CYII="
 
 function byteToImage(byteArray: number[]) {
-    const base64String = base64.bytesToBase64(
-        byteArray.length > 0 ? byteArray : grayByteArr(),
-    )
+    const base64String = byteArray.length > 0 ? base64.bytesToBase64(byteArray) : grayb64
     return `data:image/png;base64,${base64String}`
 }
 
