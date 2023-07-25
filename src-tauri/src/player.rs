@@ -25,7 +25,6 @@ pub trait Player {
     fn next(&mut self) -> usize;
     fn previous(&mut self);
     fn current_audio_status(&self) -> AudioStatus;
-    fn is_end_of_audio(&self) -> bool;
     fn get_audio(&self, index: usize) -> &_Audio;
     fn get_current_audio(&self) -> &_Audio;
     fn set_volume(&mut self, volume: f32);
@@ -123,45 +122,23 @@ impl Player for MusicPlayer {
     }
 
     fn next(&mut self) -> usize {
-        let len = self.audios.len() - 1;
-        if len == self.index {
-            return 0;
-        } else {
-            self.audios.get_mut(self.index).unwrap().status = AudioStatus::Waiting;
-            self.index += 1;
-            // sink.clear() or skip_one() doesn't work
-            self.sink = Sink::try_new(&self.stream_handle).unwrap();
-            return self.index;
-        }
+        self.index = (self.index + 1) % self.audios.len();
+        self.update_sink(self.index);
+        return self.index;
     }
 
     fn previous(&mut self) {
-        if self.index > 0 {
-            self.audios.get_mut(self.index).unwrap().status = AudioStatus::Waiting;
-            self.index -= 1;
-            self.sink = Sink::try_new(&self.stream_handle).unwrap();
-        }
+        self.index = (self.index + self.audios.len() - 1) % self.audios.len();
+        self.update_sink(self.index);
     }
 
     fn current_audio_status(&self) -> AudioStatus {
         let current_audio = self.audios.get(self.index).unwrap();
+        println!(
+            "status for index {} is {}",
+            self.index, current_audio.status
+        );
         return current_audio.status.clone();
-    }
-
-    fn is_end_of_audio(&self) -> bool {
-        let current_audio = self.audios.get(self.index).unwrap();
-        let current_audio_status = &current_audio.status;
-        match current_audio_status {
-            AudioStatus::Waiting => false,
-            AudioStatus::Stopped(_, _) => false,
-            AudioStatus::Playing(instant, duration) => {
-                if instant.elapsed() >= *duration {
-                    true
-                } else {
-                    false
-                }
-            }
-        }
     }
 
     fn get_audio(&self, index: usize) -> &_Audio {

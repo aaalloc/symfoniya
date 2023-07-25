@@ -91,10 +91,13 @@ async fn pause(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<bool, Strin
 fn current_audio_status(
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
 ) -> Result<(String, u64, u64), String> {
-    let player = player.lock().unwrap();
-    let current_audio = player.get_current_audio();
-    let status = &current_audio.status;
+    let mut player = player.lock().unwrap();
+    let status = player.current_audio_status();
     let formated = status.get_status();
+    let index = player.get_index();
+    if formated.1 == formated.2 && formated.0 == "Playing" {
+        player.update_sink(index);
+    }
     Ok(formated)
 }
 

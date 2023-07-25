@@ -6,7 +6,6 @@ import { invoke } from "@tauri-apps/api/tauri"
 import { Button } from "./ui/button"
 import VolumeButton from "./Volume"
 import { cn } from "@/lib/utils"
-import { log } from "console"
 
 type AudioStatus = {
     status: string
@@ -35,6 +34,10 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
     const [status, setStatus] = useState({ current_time: 0 } as AudioStatus)
 
     const play = async () => {
+        if (status.current_time == props.currentAudio.duration) {
+            status.current_time = 0
+            //props.setter(props.currentAudio.id)
+        }
         await invoke("play_from_id", { id: props.currentAudio.id })
         setIsPlaying(true)
     }
@@ -46,13 +49,20 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
     const next = async () => {
         const id: number = await invoke("goto_next")
         await invoke("play_from_id", { id: id })
+        console.debug(id);
         props.setter(id)
+        if (!isPlaying) {
+            setIsPlaying(true)
+        }
     }
 
     const previous = async () => {
         const id: number = await invoke("goto_previous")
         await invoke("play_from_id", { id: id })
         props.setter(id)
+        if (!isPlaying) {
+            setIsPlaying(true)
+        }
     }
 
     const poll_status = async () => {
@@ -62,7 +72,7 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
             current_time: tmp[1],
             duration: tmp[2]
         }
-        console.log(status);
+        console.debug(status)
         setStatus(status);
     }
 
@@ -73,6 +83,9 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
         if (props.currentAudio.duration != status.current_time) {
             const timeoutFunction = setInterval(poll_status, 1000)
             return () => clearInterval(timeoutFunction)
+
+        } else if (props.currentAudio.duration == status.current_time) {
+            setIsPlaying(false)
         }
     }, [poll_status, status])
 
@@ -80,12 +93,13 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
         if (isObjectEmpty(props.currentAudio)) {
             return
         }
-        if (!isPlaying) {
+        else if (!isPlaying) {
             play()
         } else {
             pause()
             play()
         }
+
     }, [props.currentAudio])
 
     return (
@@ -94,9 +108,7 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
             isObjectEmpty(props.currentAudio) ? 'translate-y-full' : '')}>
             <Progress className="w-full" value={(status.current_time / status.duration) * 100} />
             <div className="px-8 py-4">
-
                 <div className="flex justify-start items-center w-full h-full">
-
                     <div className="flex items-center">
                         <Button variant="ghost" size="icon" onClick={previous}>
                             <SkipBack />
@@ -113,16 +125,12 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
                         <Button variant="ghost" size="icon" onClick={next}>
                             <SkipForward />
                         </Button>
-
                         <p className="text-sm text-muted-foreground ml-2">{format_duration(status.current_time)} / {format_duration(props.currentAudio.duration)}</p>
-
                     </div>
-
                     <div className="flex flex-col items-center justify-center flex-1">
                         <p className="font-semibold leading-tight">{props.currentAudio.title}</p>
                         <p className="text-sm text-muted-foreground">{props.currentAudio.artist}</p>
                     </div>
-
                     <div className="flex items-center justify-center gap-4">
                         <VolumeButton />
                         <Button variant="ghost" size="icon">
@@ -132,7 +140,6 @@ export function Player(props: { currentAudio: Audio, setter: Function }) {
                             <Shuffle />
                         </Button>
                     </div>
-
                 </div>
             </div>
         </div>
