@@ -129,8 +129,8 @@ impl Player for MusicPlayer {
         } else {
             self.audios.get_mut(self.index).unwrap().status = AudioStatus::Waiting;
             self.index += 1;
+            // sink.clear() or skip_one() doesn't work
             self.sink = Sink::try_new(&self.stream_handle).unwrap();
-            println!("{}", self.sink.empty());
             return self.index;
         }
     }

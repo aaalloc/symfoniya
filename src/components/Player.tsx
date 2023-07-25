@@ -30,7 +30,7 @@ function format_duration(duration: number) {
     return `${minutes}:${seconds}`
 }
 
-export function Player(props: { currentAudio: Audio, setter: Function, audioList: Audio[] }) {
+export function Player(props: { currentAudio: Audio, setter: Function }) {
     const [isPlaying, setIsPlaying] = useState(false)
     const [status, setStatus] = useState({ current_time: 0 } as AudioStatus)
 
@@ -46,13 +46,13 @@ export function Player(props: { currentAudio: Audio, setter: Function, audioList
     const next = async () => {
         const id: number = await invoke("goto_next")
         await invoke("play_from_id", { id: id })
-        props.setter(props.audioList[id])
+        props.setter(id)
     }
 
     const previous = async () => {
         const id: number = await invoke("goto_previous")
         await invoke("play_from_id", { id: id })
-        props.setter(props.audioList[id])
+        props.setter(id)
     }
 
     const poll_status = async () => {

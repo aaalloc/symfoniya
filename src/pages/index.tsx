@@ -18,6 +18,10 @@ const Home: NextPage = () => {
     console.log("Ctrl+P was pressed!")
   })
 
+  const setAudioById = (id: number) => {
+    setAudioPlayer(audioList[id])
+  }
+
   return (
     <>
       <Head>
@@ -41,7 +45,7 @@ const Home: NextPage = () => {
             ) : null}
           </div>
         </div>
-        <Player currentAudio={audio} audioList={audioList} setter={setAudioPlayer} />
+        <Player currentAudio={audio} setter={setAudioById} />
       </main>
     </>
   )
