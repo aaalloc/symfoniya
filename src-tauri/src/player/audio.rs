@@ -1,6 +1,6 @@
+use duration_str::parse;
 use file_format::{FileFormat, Kind};
 use lofty::{Accessor, AudioFile, Probe, Tag, TagType, TaggedFileExt};
-use parse_duration::parse;
 use rodio::Decoder;
 use std::time::Instant;
 use std::{fs::File, io::BufReader, time::Duration};
