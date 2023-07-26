@@ -177,11 +177,6 @@ pub fn get_audios(audios: &mut Vec<_Audio>, path: &str) -> usize {
                 count += 1;
                 true
             }
-            Kind::Video => {
-                audios.push(create_audio(p, format));
-                count += 1;
-                true
-            }
             _ => false,
         } {}
     }
