@@ -3,15 +3,22 @@
 </p>
 <h1 align="center">Symfoniya</h1>
 <p align="center"><strong>Music player written in Next.js and Rust.</strong></p>
+<p align="center">
+    <img src=public/symfoniya_logo.png width=138/>
+</p>
 
 ## Note
 This projet is still in heavy developpement and is not ready for production.
 
+## Interface
+Music section
+![Music section](public/music_section.png)
 ## Features
 - Create playlists
 - Import multiple source folder
-
-and so on ..
+- Download music from YouTube and Spotify
+- Import playlists from YouTube and Spotify
+- System queue (play next, play later, shuffle, repeat)
 
 ## Getting Started
 
