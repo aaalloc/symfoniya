@@ -76,7 +76,7 @@ export function MusicPath(props: { value: string; onRemove: (value: string) => v
   )
 }
 
-export function AddMusic(props: { setter: () => void }) {
+export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
   const { toast } = useToast()
   const [arr_path, setPath] = useState<string[]>([])
   const removePath = (path: string) => {
