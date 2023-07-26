@@ -40,7 +40,7 @@ pub trait Player {
 impl std::fmt::Display for MusicPlayer {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         for audio in &self.audios {
-            write!(f, "{}\n", audio)?;
+            writeln!(f, "{}", audio)?;
         }
         write!(f, "Total time {}", duration_to_string(self.total_time))?;
         Ok(())
@@ -88,13 +88,12 @@ impl Player for MusicPlayer {
     }
 
     fn play(&mut self) {
-        let current_audio;
         if !self.sink.empty() {
             self.sink.play();
         } else {
             self.sink.append(get_decoder(&self.audios[self.index].path));
         }
-        current_audio = self.audios.get_mut(self.index);
+        let current_audio = self.audios.get_mut(self.index);
         if let Some(item) = current_audio {
             let status = &mut item.status;
             update_status!(status, item.duration);
@@ -124,7 +123,7 @@ impl Player for MusicPlayer {
     fn next(&mut self) -> usize {
         self.index = (self.index + 1) % self.audios.len();
         self.update_sink(self.index);
-        return self.index;
+        self.index
     }
 
     fn previous(&mut self) {
@@ -138,7 +137,7 @@ impl Player for MusicPlayer {
             "status for index {} is {}",
             self.index, current_audio.status
         );
-        return current_audio.status.clone();
+        current_audio.status.clone()
     }
 
     fn get_audio(&self, index: usize) -> &_Audio {

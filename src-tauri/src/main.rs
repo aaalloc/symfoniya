@@ -41,7 +41,7 @@ async fn import_from_folders(
     }
     println!("{}", player);
     drop(player);
-    return Ok(total_imported);
+    Ok(total_imported)
 }
 
 #[tauri::command]
@@ -55,8 +55,8 @@ async fn retrieve_audios(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<V
             artist: audio.tag.artist.clone(),
             album: audio.tag.album.clone(),
             duration: audio.duration.as_secs(),
-            id: id,
-            cover: cover,
+            id,
+            cover,
         });
     }
     drop(player);

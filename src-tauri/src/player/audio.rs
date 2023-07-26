@@ -97,8 +97,7 @@ pub struct _Audio {
 
 pub fn get_decoder(path: &String) -> Decoder<BufReader<File>> {
     let file = BufReader::new(File::open(path).unwrap());
-    let source = Decoder::new(file).unwrap();
-    source
+    Decoder::new(file).unwrap()
 }
 
 impl std::fmt::Display for _Audio {
@@ -121,7 +120,7 @@ pub fn create_audio(path: &str, format: FileFormat) -> _Audio {
         .expect("ERROR: Failed to read file!");
     let properties = tagged_file.properties();
     let duration = properties.duration();
-    let time = parse(&String::from(duration.as_secs().to_string() + "s")).unwrap();
+    let time = parse(&(duration.as_secs().to_string() + "s")).unwrap();
     let tmp = Tag::new(TagType::Id3v2);
     let tag = match tagged_file.primary_tag() {
         Some(tag) => tag,
@@ -146,13 +145,13 @@ pub fn create_audio(path: &str, format: FileFormat) -> _Audio {
             title: tag
                 .title()
                 .as_deref()
-                .unwrap_or(path.split("/").last().unwrap())
+                .unwrap_or(path.split('/').last().unwrap())
                 .to_string(),
             artist: tag.artist().as_deref().unwrap_or("Unknown").to_string(),
             album: tag.album().as_deref().unwrap_or("Unknown").to_string(),
             genre: tag.genre().as_deref().unwrap_or("Unknown").to_string(),
         },
-        cover: cover,
+        cover,
     }
 }
 
@@ -163,7 +162,7 @@ pub fn get_audios(audios: &mut Vec<_Audio>, path: &str) -> usize {
         let p = &path.unwrap().path().to_str().unwrap().to_string();
         if audios
             .iter()
-            .any(|audio| audio.path.split("/").last().unwrap() == p.split("/").last().unwrap())
+            .any(|audio| audio.path.split('/').last().unwrap() == p.split('/').last().unwrap())
         {
             continue;
         }
