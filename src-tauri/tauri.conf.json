@@ -12,7 +12,26 @@
   },
   "tauri": {
     "allowlist": {
-      "all": true
+      "all": true,
+      "dialog": {
+        "all": true,
+        "ask": true,
+        "confirm": true,
+        "message": true,
+        "open": true,
+        "save": true
+      },
+      "window": {
+        "all": false,
+        "close": true,
+        "hide": true,
+        "show": true,
+        "maximize": true,
+        "minimize": true,
+        "unmaximize": true,
+        "unminimize": true,
+        "startDragging": true
+      }
     },
     "bundle": {
       "active": true,
@@ -29,7 +48,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.tauri.deve",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -59,7 +78,8 @@
         "resizable": true,
         "title": "Symfoniya",
         "width": 1500,
-        "height": 950
+        "height": 950,
+        "decorations": true
       }
     ]
   }
