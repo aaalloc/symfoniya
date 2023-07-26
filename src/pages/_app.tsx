@@ -2,9 +2,10 @@ import "@/styles/globals.scss"
 
 import type { AppProps } from "next/app"
 import { ThemeProvider } from 'next-themes'
-import { Toaster } from "@/components/ui/toaster"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import { AppContextProvider } from "@/components/AppContext"
 import NoSSR from "@/components/NoSSR";
+import Layout from "@/components/Layout";
 
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -13,11 +14,14 @@ function MyApp({ Component, pageProps }: AppProps) {
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <TooltipProvider>
         <NoSSR>
-          <Component {...pageProps} />
-          <Toaster />
+          <AppContextProvider>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </AppContextProvider>
         </NoSSR>
       </TooltipProvider>
-    </ThemeProvider>
+    </ThemeProvider >
   )
 }
 

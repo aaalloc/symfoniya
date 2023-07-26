@@ -1,6 +1,6 @@
-import { invoke } from "@tauri-apps/api/tauri"
 import * as base64 from "byte-base64"
-import { Audio } from "@/components/types/audio"
+import { useContext } from "react";
+import { AppContext } from "@/components/AppContext";
 
 const grayb64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mO8Ww8AAj8BXkQ+xPEAAAAASUVORK5CYII="
 
@@ -21,7 +21,8 @@ function format_duration(duration: number) {
     return `${minutes}:${seconds}`
 }
 
-export default function Music(props: { audioList: Audio[]; setter: Function }) {
+export default function Music() {
+    const { setAudioPlayer, audioList } = useContext(AppContext)
     return (
         <div className="h-full flex-1 flex flex-col gap-6">
             <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
@@ -29,11 +30,11 @@ export default function Music(props: { audioList: Audio[]; setter: Function }) {
             </h1>
             <div className="h-3/4 overflow-y-auto">
                 <div className="container flex flex-col gap-2 items-stretch">
-                    {props.audioList.map((value) => {
+                    {audioList.map((value) => {
                         return (
                             <div
                                 key={value.id}
-                                onClick={() => { props.setter(value) }}
+                                onClick={() => { setAudioPlayer(value) }}
                                 className="hover:cursor-pointer p-6 rounded-lg transition ease-in-out delay-90 dark:hover:bg-gray-900 hover:bg-gray-50 duration-150 flex items-center space-x-8"
                             >
                                 <div className="flex-shrink-0">
