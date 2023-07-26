@@ -1,16 +1,15 @@
 import "@/styles/globals.scss"
 
 import type { AppProps } from "next/app"
-import { ThemeProvider } from 'next-themes'
-import { TooltipProvider } from "@/components/ui/tooltip"
-import { AppContextProvider } from "@/components/AppContext"
-import NoSSR from "@/components/NoSSR";
-import Layout from "@/components/Layout";
+import { ThemeProvider } from "next-themes"
 
+import { AppContextProvider } from "@/components/AppContext"
+import Layout from "@/components/Layout"
+import NoSSR from "@/components/NoSSR"
+import { TooltipProvider } from "@/components/ui/tooltip"
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <TooltipProvider>
         <NoSSR>
@@ -21,7 +20,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           </AppContextProvider>
         </NoSSR>
       </TooltipProvider>
-    </ThemeProvider >
+    </ThemeProvider>
   )
 }
 
