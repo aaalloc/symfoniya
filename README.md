@@ -3,9 +3,6 @@
 </p>
 <h1 align="center">Symfoniya</h1>
 <p align="center"><strong>Music player written in Next.js and Rust.</strong></p>
-<p align="center">
-    <img src=public/symfoniya_logo.png width=138/>
-</p>
 
 ## Note
 This projet is still in heavy developpement and is not ready for production.
