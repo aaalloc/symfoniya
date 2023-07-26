@@ -9,7 +9,7 @@ This projet is still in heavy developpement and is not ready for production.
 
 ## User interface
 Note: UI may vary in final production, but here are a few screenshots
-# Music section
+### Music section
 ![Music section](public/music_section.png)
 
 ## Features
