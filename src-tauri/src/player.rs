@@ -133,10 +133,6 @@ impl Player for MusicPlayer {
 
     fn current_audio_status(&self) -> AudioStatus {
         let current_audio = self.audios.get(self.index).unwrap();
-        println!(
-            "status for index {} is {}",
-            self.index, current_audio.status
-        );
         current_audio.status.clone()
     }
 

@@ -8,8 +8,12 @@ use std::sync::{Arc, Mutex};
 mod player;
 use crate::player::*;
 use rodio::OutputStream;
-use tauri::State;
+use tauri::{AppHandle, Manager, State};
 
+mod state;
+use state::{DbAccess, DbState};
+
+mod database;
 #[derive(serde::Serialize)]
 struct Tag {
     title: String,
@@ -128,6 +132,15 @@ fn goto_previous(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<usize, St
     Ok(player.get_index())
 }
 
+#[tauri::command]
+fn greet(app_handle: AppHandle, name: &str) -> String {
+    // Should handle errors instead of unwrapping here
+    app_handle.db(|db| database::add_item(name, db)).unwrap();
+    let items = app_handle.db(database::get_all).unwrap();
+    let items_string = items.join(" | ");
+    format!("Your name log: {}", items_string)
+}
+
 fn main() {
     let (_stream, _stream_handle) = OutputStream::try_default().unwrap();
     // leak the stream to keep it alive, otherwise it will be dropped and no more audio !!!!
@@ -136,6 +149,9 @@ fn main() {
     let arc_player = Arc::new(Mutex::new(MusicPlayer::new(_stream_handle)));
     tauri::Builder::default()
         .manage(arc_player)
+        .manage(DbState {
+            db: Default::default(),
+        })
         .invoke_handler(tauri::generate_handler![
             import_from_folders,
             retrieve_audios,
@@ -145,8 +161,17 @@ fn main() {
             set_volume,
             get_volume,
             goto_next,
-            goto_previous
+            goto_previous,
+            greet
         ])
+        .setup(|app| {
+            let handle = app.handle();
+            let app_state: State<DbState> = handle.state();
+            let db =
+                database::initialize_database(&handle).expect("Database initialize should succeed");
+            *app_state.db.lock().unwrap() = Some(db);
+            Ok(())
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
