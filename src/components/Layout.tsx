@@ -1,17 +1,21 @@
+import { Moon, Sun } from "lucide-react"
 import Head from "next/head"
+import { useTheme } from "next-themes"
 import { useContext } from "react"
 
 import { AppContext } from "@/components/AppContext"
 import { playlists } from "@/components/data/playlists"
-import { MenubarDemo } from "@/components/MenubarDemo"
+//import { MenubarDemo } from "@/components/MenubarDemo"
 import { Player } from "@/components/Player"
 import { Search } from "@/components/Search"
 import { Sidebar } from "@/components/Sidebar"
+import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/toaster"
 import { useGlobalShortcut } from "@/hooks/tauri/shortcuts"
 
 export default function Layout({ children }: { children: React.ReactElement }) {
   const { audio, setAudioPlayer, audioList } = useContext(AppContext)
+  const { theme, setTheme } = useTheme()
   useGlobalShortcut("CommandOrControl+P", () => {
     console.log("Ctrl+P was pressed!")
   })
@@ -29,11 +33,24 @@ export default function Layout({ children }: { children: React.ReactElement }) {
       </Head>
       <main className="p-0 m-0 h-screen w-screen select-none overflow-hidden">
         <Toaster />
-        <MenubarDemo />
+        {/*<MenubarDemo />*/}
         <div className="flex divide-x h-full pb-12">
           <Sidebar playlists={playlists} className="basis-1/5" />
           <div className="flex-1 flex flex-col gap-4 h-full items-stretch">
-            <Search />
+            <div className="flex justify-normal items-center px-[18rem]">
+              <Search />
+              <Button
+                onClick={() => {
+                  setTheme(theme === "dark" ? "light" : "dark")
+                }}
+                variant="ghost"
+                className="h-10 w-10 p-0"
+              >
+                <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                <span className="sr-only">Toggle theme</span>
+              </Button>
+            </div>
             {children}
           </div>
         </div>
