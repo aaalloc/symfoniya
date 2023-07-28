@@ -19,7 +19,7 @@ pub struct MusicPlayer {
 pub trait Player {
     fn new(stream_handler: rodio::OutputStreamHandle) -> Self;
     fn add_audio(&mut self, audio: _Audio) -> bool;
-    fn import_from_folders(&mut self, path: &str) -> usize;
+    fn import_from_folders(&mut self, path: &str, app_handle: &AppHandle) -> usize;
     fn import_from_db(&mut self, app_handle: &AppHandle) -> Result<usize, rusqlite::Error>;
     fn set_index(&mut self, index: usize);
     fn update_total_time(&mut self);
@@ -73,8 +73,8 @@ impl Player for MusicPlayer {
         true
     }
 
-    fn import_from_folders(&mut self, path: &str) -> usize {
-        let value = get_audios(self.audios.as_mut(), path);
+    fn import_from_folders(&mut self, path: &str, app_handle: &AppHandle) -> usize {
+        let value = get_audios(self.audios.as_mut(), path, app_handle);
         self.update_total_time();
         value
     }

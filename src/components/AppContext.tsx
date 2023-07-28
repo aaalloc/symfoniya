@@ -1,4 +1,5 @@
-import { createContext, useState } from "react"
+import { invoke } from "@tauri-apps/api/tauri"
+import { createContext, useEffect, useState } from "react"
 
 import { Audio } from "@/components/types/audio"
 
@@ -10,6 +11,20 @@ const AppContext = createContext({
 })
 
 const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
+  useEffect(() => {
+    invoke<number>("startup_audios_init")
+      .then(async (response) => {
+        if (response === 0) {
+          return
+        }
+        const values = await invoke<Audio[]>("retrieve_audios")
+        setAudioList(values)
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+  }, [])
+
   const [audio, setAudioPlayer] = useState<Audio>({} as Audio)
   const [audioList, setAudioList] = useState<Audio[]>([] as Audio[])
   return (

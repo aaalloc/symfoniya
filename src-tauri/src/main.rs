@@ -4,7 +4,6 @@
 )]
 
 use std::sync::{Arc, Mutex};
-//use std::time::{SystemTime, UNIX_EPOCH};
 mod player;
 use crate::player::*;
 use rodio::OutputStream;
@@ -55,26 +54,11 @@ async fn import_from_folders(
     app_handle: AppHandle,
 ) -> Result<usize, String> {
     let mut player = player.lock().unwrap();
-    let total_from_db = player.import_from_db(&app_handle);
     let mut total_imported = 0;
-    match total_from_db {
-        Ok(total) => match total {
-            0 => {
-                for folder in folders {
-                    total_imported += player.import_from_folders(&folder);
-                }
-                player.write_to_db(app_handle);
-            }
-            _ => total_imported = total,
-        },
-        Err(e) => {
-            println!("{}", e);
-            for folder in folders {
-                total_imported += player.import_from_folders(&folder);
-            }
-            player.write_to_db(app_handle);
-        }
+    for folder in folders {
+        total_imported += player.import_from_folders(&folder, &app_handle);
     }
+    player.write_to_db(app_handle);
     println!("{}", player);
     drop(player);
     Ok(total_imported)

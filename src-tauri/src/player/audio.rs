@@ -1,9 +1,12 @@
+use crate::database;
+use crate::state::DbAccess;
 use duration_str::parse;
 use file_format::{FileFormat, Kind};
 use lofty::{Accessor, AudioFile, Probe, Tag, TagType, TaggedFileExt};
 use rodio::Decoder;
 use std::time::Instant;
 use std::{fs::File, io::BufReader, time::Duration};
+use tauri::AppHandle;
 
 #[macro_export]
 macro_rules! update_status {
@@ -155,7 +158,7 @@ pub fn create_audio(path: &str, format: FileFormat) -> _Audio {
     }
 }
 
-pub fn get_audios(audios: &mut Vec<_Audio>, path: &str) -> usize {
+pub fn get_audios(audios: &mut Vec<_Audio>, path: &str, app_handle: &AppHandle) -> usize {
     let mut count = 0;
     let paths = std::fs::read_dir(path).unwrap();
     for path in paths {
@@ -173,8 +176,21 @@ pub fn get_audios(audios: &mut Vec<_Audio>, path: &str) -> usize {
         };
         if match format.kind() {
             Kind::Audio => {
-                audios.push(create_audio(p, format));
-                count += 1;
+                match app_handle.db(|db| database::is_audio_in_db(db, p)) {
+                    Ok(true) => {
+                        println!("Audio already in db");
+                    }
+                    Ok(false) => {
+                        let audio = create_audio(p, format);
+                        app_handle.db(|db| database::add_audio(&audio, db)).unwrap();
+                        audios.push(audio);
+                        count += 1;
+                    }
+                    Err(e) => {
+                        println!("Error: {}", e);
+                        return 0;
+                    }
+                }
                 true
             }
             _ => false,

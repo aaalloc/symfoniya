@@ -63,9 +63,14 @@ pub fn add_audio(audio: &_Audio, db: &Connection) -> Result<(), rusqlite::Error>
         "@album": audio.tag.album,
         "@genre": audio.tag.genre,
     })?;
+    let folder = audio.path.rsplit_once('/').unwrap().0;
+    let mut folder_statement = db.prepare(sql_requests::FOLDER_INSERT)?;
+    folder_statement.execute(named_params! { "@path": folder })?;
+
     let mut audio_statement = db.prepare(sql_requests::AUDIO_INSERT)?;
     audio_statement.execute(named_params! {
         "@path": audio.path,
+        "@folder": folder,
         "@duration": audio.duration.as_secs(),
         "@title": audio.tag.title,
         "@cover": audio.cover,
@@ -103,6 +108,18 @@ pub fn get_audios(db: &Connection, audios: &mut Vec<_Audio>) -> Result<usize, ru
     Ok(audios.len())
 }
 
+pub fn is_audio_in_db(db: &Connection, path: &str) -> Result<bool, rusqlite::Error> {
+    let mut statement = db.prepare(sql_requests::AUDIO_IN_FOLDER_SELECT)?;
+    let mut results = statement.query(&[(":path", &path)])?;
+    while let Some(result) = results.next()? {
+        let result: i16 = result.get(0)?;
+        if result == 0 {
+            return Ok(false);
+        }
+    }
+    Ok(true)
+}
+
 const DB_SCHEMA: &str = "
 CREATE TABLE artists (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -121,12 +138,18 @@ CREATE TABLE genres (
 
 CREATE TABLE tags (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    artist_id INTEGER NOT NULL UNIQUE,
+    artist_id INTEGER NOT NULL,
     album_id INTEGER NOT NULL,
     genre_id INTEGER NOT NULL,
     FOREIGN KEY (artist_id) REFERENCES artists (id),
     FOREIGN KEY (album_id) REFERENCES albums (id),
     FOREIGN KEY (genre_id) REFERENCES genres (id)
+    UNIQUE (artist_id, album_id, genre_id)
+);
+
+CREATE TABLE folders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    path TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE audios (
@@ -135,7 +158,9 @@ CREATE TABLE audios (
     duration INTEGER NOT NULL,
     title TEXT NOT NULL,
     tag_id INTEGER NOT NULL,
+    folder_id INTEGER NOT NULL,
     cover BLOB,
     FOREIGN KEY (tag_id) REFERENCES tags (id)
+    FOREIGN KEY (folder_id) REFERENCES folders (id)
 );
 ";
