@@ -1,10 +1,11 @@
 // thx to https://github.com/RandomEngy/tauri-sqlite/tree/main
-use crate::audio::_Audio;
 #[path = "./sql_requests.rs"]
 mod sql_requests;
 use rusqlite::{named_params, Connection};
 use std::fs;
 use tauri::AppHandle;
+
+use crate::music::audio::{_Audio, _Tag};
 
 const CURRENT_DB_VERSION: u32 = 1;
 
@@ -88,7 +89,7 @@ pub fn get_audios(db: &Connection, audios: &mut Vec<_Audio>) -> Result<usize, ru
         Ok(_Audio {
             path: row.get(0)?,
             duration: std::time::Duration::from_secs(row.get(1)?),
-            tag: crate::audio::_Tag {
+            tag: _Tag {
                 title: row.get(2)?,
                 artist: row.get(3)?,
                 album: row.get(4)?,
@@ -96,7 +97,7 @@ pub fn get_audios(db: &Connection, audios: &mut Vec<_Audio>) -> Result<usize, ru
             },
             cover: row.get(6)?,
             format: String::from("mp3"),
-            status: crate::player::audio::AudioStatus::Waiting,
+            status: crate::music::audio::AudioStatus::Waiting,
         })
     })?;
     audios_iter

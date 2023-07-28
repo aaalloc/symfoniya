@@ -1,12 +1,9 @@
-use crate::state::DbAccess;
 use rodio::Sink;
 use std::time::Duration;
 
-use tauri::AppHandle;
-pub mod audio;
-use crate::{database, player::audio::*, update_status};
-use audio::{AudioStatus, _Audio};
+use crate::{database, db::state::DbAccess, music::audio::*, update_status};
 use std::time::Instant;
+use tauri::AppHandle;
 pub struct MusicPlayer {
     pub total_time: Duration,
     pub audios: Vec<_Audio>,

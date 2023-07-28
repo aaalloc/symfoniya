@@ -1,5 +1,3 @@
-use crate::database;
-use crate::state::DbAccess;
 use duration_str::parse;
 use file_format::{FileFormat, Kind};
 use lofty::{Accessor, AudioFile, Probe, Tag, TagType, TaggedFileExt};
@@ -7,6 +5,9 @@ use rodio::Decoder;
 use std::time::Instant;
 use std::{fs::File, io::BufReader, time::Duration};
 use tauri::AppHandle;
+
+use crate::db::database;
+use crate::db::state::DbAccess;
 
 #[macro_export]
 macro_rules! update_status {

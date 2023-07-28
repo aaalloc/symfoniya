@@ -4,15 +4,14 @@
 )]
 
 use std::sync::{Arc, Mutex};
-mod player;
-use crate::player::*;
+mod db;
+mod music;
+use crate::music::player::Player;
+use db::{database, state::DbState};
+use music::player::MusicPlayer;
 use rodio::OutputStream;
 use tauri::{AppHandle, Manager, State};
 
-mod state;
-use state::DbState;
-
-mod database;
 #[derive(serde::Serialize)]
 struct Tag {
     title: String,
