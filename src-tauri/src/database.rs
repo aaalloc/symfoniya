@@ -1,4 +1,7 @@
 // thx to https://github.com/RandomEngy/tauri-sqlite/tree/main
+use crate::audio::_Audio;
+#[path = "./sql_requests.rs"]
+mod sql_requests;
 use rusqlite::{named_params, Connection};
 use std::fs;
 use tauri::AppHandle;
@@ -36,33 +39,77 @@ pub fn upgrade_database_if_needed(
         db.pragma_update(None, "journal_mode", "WAL")?;
         let tx = db.transaction()?;
         tx.pragma_update(None, "user_version", CURRENT_DB_VERSION)?;
-        tx.execute_batch(
-            "
-      CREATE TABLE items (
-        title TEXT NOT NULL
-      );",
-        )?;
+        tx.pragma_update(None, "foreign_keys", 1)?;
+        tx.execute_batch(DB_SCHEMA)?;
         tx.commit()?;
     }
 
     Ok(())
 }
 
-pub fn add_item(title: &str, db: &Connection) -> Result<(), rusqlite::Error> {
-    let mut statement = db.prepare("INSERT INTO items (title) VALUES (@title)")?;
-    statement.execute(named_params! { "@title": title })?;
+pub fn add_audio(audio: &_Audio, db: &Connection) -> Result<(), rusqlite::Error> {
+    let mut artist_statement = db.prepare(sql_requests::ARTIST_INSERT)?;
+    artist_statement.execute(named_params! { "@name": audio.tag.artist })?;
+
+    let mut album_statement = db.prepare(sql_requests::ALBUM_INSERT)?;
+    album_statement.execute(named_params! { "@name": audio.tag.album })?;
+
+    let mut genre_statement = db.prepare(sql_requests::GENRE_INSERT)?;
+    genre_statement.execute(named_params! { "@name": audio.tag.genre })?;
+
+    let mut tag_statement = db.prepare(sql_requests::TAG_INSERT)?;
+    tag_statement.execute(named_params! {
+        "@artist": audio.tag.artist,
+        "@album": audio.tag.album,
+        "@genre": audio.tag.genre,
+    })?;
+    let mut audio_statement = db.prepare(sql_requests::AUDIO_INSERT)?;
+    audio_statement.execute(named_params! {
+        "@path": audio.path,
+        "@duration": audio.duration.as_secs(),
+        "@title": audio.tag.title,
+        "@cover": audio.cover,
+        "@artist": audio.tag.artist,
+        "@album": audio.tag.album,
+        "@genre": audio.tag.genre,
+    })?;
 
     Ok(())
 }
 
-pub fn get_all(db: &Connection) -> Result<Vec<String>, rusqlite::Error> {
-    let mut statement = db.prepare("SELECT * FROM items")?;
-    let mut rows = statement.query([])?;
-    let mut items = Vec::new();
-    while let Some(row) = rows.next()? {
-        let title: String = row.get("title")?;
-        items.push(title);
-    }
+const DB_SCHEMA: &str = "
+CREATE TABLE artists (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE DEFAULT 'Unknown'
+);
 
-    Ok(items)
-}
+CREATE TABLE albums (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE DEFAULT 'Unknown'
+);
+
+CREATE TABLE genres (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE DEFAULT 'Unknown'
+);
+
+CREATE TABLE tags (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    artist_id INTEGER NOT NULL UNIQUE,
+    album_id INTEGER NOT NULL,
+    genre_id INTEGER NOT NULL,
+    FOREIGN KEY (artist_id) REFERENCES artists (id),
+    FOREIGN KEY (album_id) REFERENCES albums (id),
+    FOREIGN KEY (genre_id) REFERENCES genres (id)
+);
+
+CREATE TABLE audios (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    path TEXT NOT NULL UNIQUE,
+    duration INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    tag_id INTEGER NOT NULL,
+    cover BLOB,
+    FOREIGN KEY (tag_id) REFERENCES tags (id)
+);
+";

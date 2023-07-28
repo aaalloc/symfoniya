@@ -133,12 +133,13 @@ fn goto_previous(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<usize, St
 }
 
 #[tauri::command]
-fn greet(app_handle: AppHandle, name: &str) -> String {
+fn add_audios_to_db(player: State<'_, Arc<Mutex<MusicPlayer>>>, app_handle: AppHandle) -> String {
     // Should handle errors instead of unwrapping here
-    app_handle.db(|db| database::add_item(name, db)).unwrap();
-    let items = app_handle.db(database::get_all).unwrap();
-    let items_string = items.join(" | ");
-    format!("Your name log: {}", items_string)
+    let player = player.lock().unwrap();
+    for audio in player.audios.iter() {
+        app_handle.db(|db| database::add_audio(audio, db)).unwrap();
+    }
+    format!("{} audios added", player.audios.len())
 }
 
 fn main() {
@@ -162,7 +163,7 @@ fn main() {
             get_volume,
             goto_next,
             goto_previous,
-            greet
+            add_audios_to_db
         ])
         .setup(|app| {
             let handle = app.handle();

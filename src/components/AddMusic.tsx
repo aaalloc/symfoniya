@@ -119,6 +119,13 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
           description: "Something went wrong",
         })
       })
+    invoke<string>("add_audios_to_db")
+      .then((value) => {
+        console.log(value)
+      })
+      .catch((error) => {
+        console.error(error)
+      })
   }
   return (
     <Dialog>
