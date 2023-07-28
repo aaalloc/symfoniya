@@ -77,6 +77,32 @@ pub fn add_audio(audio: &_Audio, db: &Connection) -> Result<(), rusqlite::Error>
     Ok(())
 }
 
+pub fn get_audios(db: &Connection, audios: &mut Vec<_Audio>) -> Result<usize, rusqlite::Error> {
+    let mut statement = db.prepare(sql_requests::AUDIO_SELECT)?;
+    let audios_iter = statement.query_map([], |row| {
+        Ok(_Audio {
+            path: row.get(0)?,
+            duration: std::time::Duration::from_secs(row.get(1)?),
+            tag: crate::audio::_Tag {
+                title: row.get(2)?,
+                artist: row.get(3)?,
+                album: row.get(4)?,
+                genre: row.get(5)?,
+            },
+            cover: row.get(6)?,
+            format: String::from("mp3"),
+            status: crate::player::audio::AudioStatus::Waiting,
+        })
+    })?;
+    audios_iter
+        .filter(|a| a.is_ok())
+        .for_each(|a| audios.push(a.unwrap()));
+
+    audios.sort_by(|a, b| a.path.cmp(&b.path));
+    audios.dedup_by(|a, b| a.path == b.path);
+    Ok(audios.len())
+}
+
 const DB_SCHEMA: &str = "
 CREATE TABLE artists (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

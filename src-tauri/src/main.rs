@@ -11,7 +11,7 @@ use rodio::OutputStream;
 use tauri::{AppHandle, Manager, State};
 
 mod state;
-use state::{DbAccess, DbState};
+use state::DbState;
 
 mod database;
 #[derive(serde::Serialize)]
@@ -33,15 +33,47 @@ struct Audio {
 }
 
 #[tauri::command]
+async fn startup_audios_init(
+    player: State<'_, Arc<Mutex<MusicPlayer>>>,
+    app_handle: AppHandle,
+) -> Result<usize, String> {
+    let mut player = player.lock().unwrap();
+    let total_from_db = player.import_from_db(&app_handle);
+    match total_from_db {
+        Ok(total) => Ok(total),
+        Err(e) => {
+            println!("{}", e);
+            Ok(0)
+        }
+    }
+}
+
+#[tauri::command]
 async fn import_from_folders(
     folders: Vec<String>,
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
+    app_handle: AppHandle,
 ) -> Result<usize, String> {
-    // display folders for debug
     let mut player = player.lock().unwrap();
+    let total_from_db = player.import_from_db(&app_handle);
     let mut total_imported = 0;
-    for folder in folders {
-        total_imported += player.import(&folder);
+    match total_from_db {
+        Ok(total) => match total {
+            0 => {
+                for folder in folders {
+                    total_imported += player.import_from_folders(&folder);
+                }
+                player.write_to_db(app_handle);
+            }
+            _ => total_imported = total,
+        },
+        Err(e) => {
+            println!("{}", e);
+            for folder in folders {
+                total_imported += player.import_from_folders(&folder);
+            }
+            player.write_to_db(app_handle);
+        }
     }
     println!("{}", player);
     drop(player);
@@ -132,16 +164,6 @@ fn goto_previous(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<usize, St
     Ok(player.get_index())
 }
 
-#[tauri::command]
-fn add_audios_to_db(player: State<'_, Arc<Mutex<MusicPlayer>>>, app_handle: AppHandle) -> String {
-    // Should handle errors instead of unwrapping here
-    let player = player.lock().unwrap();
-    for audio in player.audios.iter() {
-        app_handle.db(|db| database::add_audio(audio, db)).unwrap();
-    }
-    format!("{} audios added", player.audios.len())
-}
-
 fn main() {
     let (_stream, _stream_handle) = OutputStream::try_default().unwrap();
     // leak the stream to keep it alive, otherwise it will be dropped and no more audio !!!!
@@ -163,7 +185,7 @@ fn main() {
             get_volume,
             goto_next,
             goto_previous,
-            add_audios_to_db
+            startup_audios_init
         ])
         .setup(|app| {
             let handle = app.handle();
