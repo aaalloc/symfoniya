@@ -28,11 +28,6 @@ INSERT OR IGNORE INTO folders (path)
 VALUES (@path)
 ";
 
-pub const FOLDER_SELECT: &str = "
-SELECT path
-FROM folders
-";
-
 pub const AUDIO_INSERT: &str = "
 INSERT OR IGNORE INTO audios (path, duration, title, cover, folder_id, tag_id)
 VALUES (
