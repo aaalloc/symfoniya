@@ -122,6 +122,57 @@ pub fn is_audio_in_db(db: &Connection, path: &str) -> Result<bool, rusqlite::Err
     Ok(true)
 }
 
+pub fn add_playlist(db: &Connection, playlist_name: &str) -> Result<(), rusqlite::Error> {
+    let mut statement = db.prepare(sql_requests::PLAYLIST_INSERT)?;
+    statement.execute(named_params! {
+        "@name": playlist_name
+    })?;
+    Ok(())
+}
+
+pub fn insert_audio_in_playlist(
+    db: &Connection,
+    playlist_name: &str,
+    audio_id: i32,
+) -> Result<(), rusqlite::Error> {
+    let mut statement = db.prepare(sql_requests::PLAYLIST_AUDIO_INSERT)?;
+    statement.execute(named_params! {
+        "@playlist_name": playlist_name,
+        "@audio_id": audio_id
+    })?;
+    Ok(())
+}
+
+pub fn get_audios_from_playlist(
+    db: &Connection,
+    playlist_name: &str,
+    audios: &mut Vec<_Audio>,
+) -> Result<usize, rusqlite::Error> {
+    let mut statement = db.prepare(sql_requests::PLAYLIST_AUDIO_SELECT)?;
+    let audios_iter = statement.query_map(&[(":playlist_name", &playlist_name)], |row| {
+        Ok(_Audio {
+            path: row.get(0)?,
+            duration: std::time::Duration::from_secs(row.get(1)?),
+            tag: _Tag {
+                title: row.get(2)?,
+                artist: row.get(3)?,
+                album: row.get(4)?,
+                genre: row.get(5)?,
+            },
+            cover: row.get(6)?,
+            format: String::from("mp3"),
+            status: crate::music::audio::AudioStatus::Waiting,
+        })
+    })?;
+    audios_iter
+        .filter(|a| a.is_ok())
+        .for_each(|a| audios.push(a.unwrap()));
+
+    audios.sort_by(|a, b| a.path.cmp(&b.path));
+    audios.dedup_by(|a, b| a.path == b.path);
+    Ok(audios.len())
+}
+
 const DB_SCHEMA: &str = "
 CREATE TABLE artists (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -152,6 +203,13 @@ CREATE TABLE tags (
 CREATE TABLE folders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     path TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE playlists (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    audio_id INTEGER
+    FOREIGN KEY (audio_id) REFERENCES audios (id)
 );
 
 CREATE TABLE audios (

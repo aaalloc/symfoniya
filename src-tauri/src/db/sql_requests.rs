@@ -42,6 +42,30 @@ VALUES (
 )
 ";
 
+pub const PLAYLIST_INSERT: &str = "
+INSERT OR IGNORE INTO playlists (name)
+VALUES (@name)
+";
+
+pub const PLAYLIST_AUDIO_INSERT: &str = "
+INSERT OR IGNORE INTO playlists (name, audio_id)
+VALUES (
+    @name,
+    @audio_id
+)
+";
+
+pub const PLAYLIST_AUDIO_SELECT: &str = "
+SELECT path, duration, title, artists.name, albums.name, genres.name, cover
+FROM audios
+INNER JOIN tags ON audios.tag_id = tags.id
+INNER JOIN artists ON tags.artist_id = artists.id
+INNER JOIN albums ON tags.album_id = albums.id
+INNER JOIN genres ON tags.genre_id = genres.id
+INNER JOIN playlists ON audios.id = playlists.audio_id
+WHERE playlists.name = @name
+";
+
 pub const AUDIO_SELECT: &str = "
 SELECT path, duration, title, artists.name, albums.name, genres.name, cover
 FROM audios
