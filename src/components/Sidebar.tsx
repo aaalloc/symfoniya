@@ -4,17 +4,15 @@ import { useContext } from "react"
 
 import { AddMusic } from "@/components/AddMusic"
 import { AppContext } from "@/components/AppContext"
-import { Playlist } from "@/components/data/playlists"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
+import { CreatePlaylist } from "./CreatePlaylist"
 
-interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
-  playlists: Playlist[]
-}
 
-export function Sidebar({ className, playlists }: SidebarProps) {
+export function Sidebar({ className: className }: { className?: string }) {
   const { setAudioList } = useContext(AppContext)
+  const { playlists } = useContext(AppContext)
   return (
     <div className={cn("pb-12", className)}>
       <div className="space-y-4 py-4">
@@ -64,12 +62,22 @@ export function Sidebar({ className, playlists }: SidebarProps) {
           <h2 className="relative px-7 text-lg font-semibold tracking-tight">
             Playlists
           </h2>
+          <div className="px-3 py-2">
+            <CreatePlaylist />
+          </div>
           <ScrollArea className="h-[450px] px-1">
             <div className="space-y-1 p-2">
               {playlists.map((playlist, i) => (
                 <Button
                   key={`${playlist}-${i}`}
                   variant="ghost"
+                  onClick={() => {
+                    console.log("playlist", playlist)
+                    Router.push({
+                      pathname: "/playlist",
+                      query: { playlist: playlist },
+                    })
+                  }}
                   className="w-full justify-start font-normal"
                 >
                   <ListMusic className="mr-2 h-4 w-4" />
@@ -79,7 +87,7 @@ export function Sidebar({ className, playlists }: SidebarProps) {
             </div>
           </ScrollArea>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   )
 }

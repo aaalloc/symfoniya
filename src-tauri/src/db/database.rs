@@ -112,6 +112,7 @@ pub fn get_audios(db: &Connection, audios: &mut Vec<_Audio>) -> Result<usize, ru
 pub fn is_audio_in_db(db: &Connection, path: &str) -> Result<bool, rusqlite::Error> {
     let mut statement = db.prepare(sql_requests::AUDIO_IN_FOLDER_SELECT)?;
     let mut results = statement.query(&[(":path", &path)])?;
+    // needs to simplify, one result is attended
     while let Some(result) = results.next()? {
         let result: i16 = result.get(0)?;
         if result == 0 {

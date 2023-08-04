@@ -8,6 +8,8 @@ const AppContext = createContext({
   setAudioPlayer: {} as (audio: Audio) => void,
   audioList: [] as Audio[],
   setAudioList: {} as (audioList: Audio[]) => void,
+  playlists: [] as string[],
+  setPlaylist: {} as (playlist: string[]) => void,
 })
 
 const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
@@ -23,12 +25,14 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
       .catch((error) => {
         console.error(error)
       })
+    // TODO: fill playlists
   }, [])
 
   const [audio, setAudioPlayer] = useState<Audio>({} as Audio)
   const [audioList, setAudioList] = useState<Audio[]>([] as Audio[])
+  const [playlists, setPlaylist] = useState<string[]>([] as string[])
   return (
-    <AppContext.Provider value={{ audio, setAudioPlayer, audioList, setAudioList }}>
+    <AppContext.Provider value={{ audio, setAudioPlayer, audioList, setAudioList, playlists, setPlaylist }}>
       {children}
     </AppContext.Provider>
   )
