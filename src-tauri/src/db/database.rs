@@ -130,15 +130,51 @@ pub fn add_playlist(db: &Connection, playlist_name: &str) -> Result<(), rusqlite
     Ok(())
 }
 
-pub fn insert_audio_in_playlist(
+pub fn retrieve_playlist(db: &Connection) -> Result<Vec<String>, rusqlite::Error> {
+    let mut statement = db.prepare(sql_requests::PLAYLIST_SELECT)?;
+    let mut results = statement.query([])?;
+    let mut playlists = Vec::new();
+    while let Some(result) = results.next()? {
+        let result: String = result.get(0)?;
+        if playlists.contains(&result) {
+            continue;
+        }
+        playlists.push(result);
+    }
+    Ok(playlists)
+}
+
+pub fn is_in_playlist(
     db: &Connection,
     playlist_name: &str,
-    audio_id: i32,
+    path: &str,
+) -> Result<bool, rusqlite::Error> {
+    let mut statement = db.prepare(sql_requests::AUDIO_IN_PLAYLIST_SELECT)?;
+    let mut results = statement.query(&[(":name", &playlist_name), (":path", &path)])?;
+    while let Some(result) = results.next()? {
+        let result: i16 = result.get(0)?;
+        if result == 1 {
+            return Ok(true);
+        }
+    }
+    Ok(false)
+}
+
+pub fn insert_audio_in_playlist(
+    db: &Connection,
+    state: bool,
+    playlist_name: &str,
+    path: &str,
 ) -> Result<(), rusqlite::Error> {
-    let mut statement = db.prepare(sql_requests::PLAYLIST_AUDIO_INSERT)?;
+    let mut statement;
+    if state {
+        statement = db.prepare(sql_requests::PLAYLIST_AUDIO_INSERT)?;
+    } else {
+        statement = db.prepare(sql_requests::PLAYLIST_AUDIO_DELETE)?;
+    }
     statement.execute(named_params! {
-        "@playlist_name": playlist_name,
-        "@audio_id": audio_id
+        "@name": playlist_name,
+        "@path": path
     })?;
     Ok(())
 }
@@ -207,9 +243,10 @@ CREATE TABLE folders (
 
 CREATE TABLE playlists (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE,
-    audio_id INTEGER
+    name TEXT NOT NULL,
+    audio_id INTEGER,
     FOREIGN KEY (audio_id) REFERENCES audios (id)
+    UNIQUE (name, audio_id)
 );
 
 CREATE TABLE audios (

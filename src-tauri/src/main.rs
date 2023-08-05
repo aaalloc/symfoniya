@@ -7,7 +7,10 @@ use std::sync::{Arc, Mutex};
 mod db;
 mod music;
 use crate::music::player::Player;
-use db::{database, state::DbState};
+use db::{
+    database,
+    state::{DbAccess, DbState},
+};
 use music::player::MusicPlayer;
 use rodio::OutputStream;
 use tauri::{AppHandle, Manager, State};
@@ -25,6 +28,7 @@ struct Audio {
     title: String,
     artist: String,
     album: String,
+    path: String,
     id: usize,
     duration: u64,
     cover: Vec<u8>,
@@ -70,6 +74,7 @@ async fn retrieve_audios(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<V
     for (id, audio) in player.audios.iter().enumerate() {
         let cover = audio.cover.clone();
         audios.push(Audio {
+            path: audio.path.clone(),
             title: audio.tag.title.clone(),
             artist: audio.tag.artist.clone(),
             album: audio.tag.album.clone(),
@@ -147,6 +152,84 @@ fn goto_previous(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<usize, St
     Ok(player.get_index())
 }
 
+#[tauri::command]
+fn create_playlist(name: String, app_handle: AppHandle) -> Result<(), String> {
+    let result = app_handle.db(|db| database::add_playlist(db, &name));
+    match result {
+        Ok(_) => Ok(()),
+        Err(e) => Err(e.to_string()),
+    }
+}
+
+#[tauri::command]
+fn add_audio_to_playlist(
+    state: bool,
+    playlist: String,
+    path: String,
+    app_handle: AppHandle,
+) -> Result<(), String> {
+    let result =
+        app_handle.db(|db| database::insert_audio_in_playlist(db, state, &playlist, &path));
+    match result {
+        Ok(_) => Ok(()),
+        Err(e) => Err(e.to_string()),
+    }
+}
+
+#[tauri::command]
+fn is_in_playlist(playlist: String, path: String, app_handle: AppHandle) -> Result<bool, String> {
+    let result = app_handle.db(|db| database::is_in_playlist(db, &playlist, &path));
+    match result {
+        Ok(state) => Ok(state),
+        Err(e) => Err(e.to_string()),
+    }
+}
+
+#[tauri::command]
+fn get_playlists(app_handle: AppHandle) -> Result<Vec<String>, String> {
+    let result = app_handle.db(database::retrieve_playlist);
+    match result {
+        Ok(playlists) => match playlists.len() {
+            0 => Err("No playlists found".to_string()),
+            _ => match playlists[0].as_str() {
+                "" => Err("No playlists".to_string()),
+                _ => Ok(playlists),
+            },
+        },
+        Err(e) => Err(e.to_string()),
+    }
+}
+
+#[tauri::command]
+fn get_audio_playlist(
+    playlist_name: String,
+    app_handle: AppHandle,
+    player: State<'_, Arc<Mutex<MusicPlayer>>>,
+) -> Result<Vec<Audio>, String> {
+    let mut player = player.lock().unwrap();
+    let mut audios = Vec::new();
+    let result = app_handle
+        .db(|db| database::get_audios_from_playlist(db, &playlist_name, player.audios.as_mut()));
+    match result {
+        Ok(_) => {
+            for (id, audio) in player.audios.iter().enumerate() {
+                let cover = audio.cover.clone();
+                audios.push(Audio {
+                    title: audio.tag.title.clone(),
+                    artist: audio.tag.artist.clone(),
+                    album: audio.tag.album.clone(),
+                    duration: audio.duration.as_secs(),
+                    path: audio.path.clone(),
+                    id,
+                    cover,
+                });
+            }
+            Ok(audios)
+        }
+        Err(e) => Err(e.to_string()),
+    }
+}
+
 fn main() {
     let (_stream, _stream_handle) = OutputStream::try_default().unwrap();
     // leak the stream to keep it alive, otherwise it will be dropped and no more audio !!!!
@@ -168,7 +251,12 @@ fn main() {
             get_volume,
             goto_next,
             goto_previous,
-            startup_audios_init
+            startup_audios_init,
+            create_playlist,
+            add_audio_to_playlist,
+            get_audio_playlist,
+            get_playlists,
+            is_in_playlist
         ])
         .setup(|app| {
             let handle = app.handle();

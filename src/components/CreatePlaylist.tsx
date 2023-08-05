@@ -1,16 +1,13 @@
 "use client"
 
 import { DialogClose } from "@radix-ui/react-dialog"
-import { Audio } from "@/components/types/audio"
-
+import { invoke } from "@tauri-apps/api/tauri"
 import { Button } from "@/components/ui/button"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
-    FormLabel,
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -46,14 +43,20 @@ export function CreatePlaylist() {
     })
 
     // 2. Define a submit handler.
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        toast({
-            title: "Playlist",
-            description: `${values.playlist_name} created !`,
-        })
-        setPlaylist([...playlists, values.playlist_name])
-        // TODO: save playlist db
-        // clear form
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        await invoke("create_playlist", { name: values.playlist_name })
+        if (!playlists.includes(values.playlist_name)) {
+            setPlaylist([...playlists, values.playlist_name])
+            toast({
+                title: "Playlist",
+                description: `${values.playlist_name} created !`,
+            })
+        } else {
+            toast({
+                title: "Playlist",
+                description: `${values.playlist_name} already exist !`,
+            })
+        }
         form.reset()
     }
 

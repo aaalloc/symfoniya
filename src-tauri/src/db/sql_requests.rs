@@ -51,8 +51,14 @@ pub const PLAYLIST_AUDIO_INSERT: &str = "
 INSERT OR IGNORE INTO playlists (name, audio_id)
 VALUES (
     @name,
-    @audio_id
+    (SELECT id FROM audios WHERE path = @path)
 )
+";
+
+pub const PLAYLIST_AUDIO_DELETE: &str = "
+DELETE FROM playlists
+WHERE name = @name
+AND audio_id = (SELECT id FROM audios WHERE path = @path)
 ";
 
 pub const PLAYLIST_AUDIO_SELECT: &str = "
@@ -64,6 +70,18 @@ INNER JOIN albums ON tags.album_id = albums.id
 INNER JOIN genres ON tags.genre_id = genres.id
 INNER JOIN playlists ON audios.id = playlists.audio_id
 WHERE playlists.name = @name
+";
+
+pub const AUDIO_IN_PLAYLIST_SELECT: &str = "
+SELECT COUNT(1)
+FROM playlists
+WHERE name = :name
+AND audio_id = (SELECT id FROM audios WHERE path = :path)
+";
+
+pub const PLAYLIST_SELECT: &str = "
+SELECT name
+FROM playlists
 ";
 
 pub const AUDIO_SELECT: &str = "

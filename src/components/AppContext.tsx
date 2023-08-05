@@ -25,7 +25,16 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
       .catch((error) => {
         console.error(error)
       })
-    // TODO: fill playlists
+    invoke<string[]>("get_playlists").then((response) => {
+      console.log(response)
+      if (response === null) {
+        return
+      }
+      setPlaylist(response)
+    })
+      .catch((error) => {
+        console.error(error)
+      })
   }, [])
 
   const [audio, setAudioPlayer] = useState<Audio>({} as Audio)
