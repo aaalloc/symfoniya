@@ -100,17 +100,12 @@ async fn play_from_id(
     id: usize,
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
 ) -> Result<bool, String> {
-    println!("Playing from id {}", id);
     let mut player = player.lock().unwrap();
-    if player.get_index() == id {
-        player.play();
-        Ok(true)
-    } else {
-        player.update_sink(id);
-        player.set_index(id);
-        player.play();
-        Ok(true)
-    }
+    // TODO FIX: When the user click on the same audio, there is a bug
+    player.update_sink(id);
+    player.set_index(id);
+    player.play();
+    Ok(true)
 }
 
 #[tauri::command]
