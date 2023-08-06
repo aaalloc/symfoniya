@@ -21,10 +21,6 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
         if (response === 0) {
           return
         }
-        const values = await invoke<Audio[]>("retrieve_audios", {
-          playlists: "all"
-        })
-        setAudioList(values)
       })
       .catch((error) => {
         console.error(error)
