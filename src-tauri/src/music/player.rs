@@ -1,5 +1,5 @@
 use rodio::Sink;
-use std::time::Duration;
+use std::{collections::HashMap, time::Duration};
 
 use crate::{database, db::state::DbAccess, music::audio::*, update_status};
 use std::time::Instant;
@@ -8,6 +8,7 @@ pub struct MusicPlayer {
     pub total_time: Duration,
     pub audios: Vec<_Audio>,
     pub is_playing: bool,
+    pub playlists: HashMap<String, Vec<_Audio>>,
     sink: Sink,
     stream_handle: rodio::OutputStreamHandle,
     index: usize,
@@ -62,6 +63,7 @@ impl Player for MusicPlayer {
             is_playing: false,
             stream_handle: stream_handler,
             index: 0,
+            playlists: HashMap::new(),
         }
     }
 
@@ -78,6 +80,8 @@ impl Player for MusicPlayer {
 
     fn import_from_db(&mut self, app_handle: &AppHandle) -> Result<usize, rusqlite::Error> {
         let value = app_handle.db(|db| database::get_audios(db, self.audios.as_mut()));
+        self.playlists
+            .insert("all".to_string(), self.audios.clone());
         self.update_total_time();
         value
     }

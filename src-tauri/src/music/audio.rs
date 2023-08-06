@@ -83,13 +83,14 @@ impl std::fmt::Display for AudioStatus {
     }
 }
 
+#[derive(Clone)]
 pub struct _Tag {
     pub title: String,
     pub artist: String,
     pub album: String,
     pub genre: String,
 }
-
+#[derive(Clone)]
 pub struct _Audio {
     pub path: String,
     pub duration: Duration,

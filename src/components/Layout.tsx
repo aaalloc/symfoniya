@@ -13,14 +13,18 @@ import { Toaster } from "@/components/ui/toaster"
 import { useGlobalShortcut } from "@/hooks/tauri/shortcuts"
 
 export default function Layout({ children }: { children: React.ReactElement }) {
-  const { audio, setAudioPlayer, audioList } = useContext(AppContext)
+  const { audio, setAudioPlayer, audioList, oldAudioList } = useContext(AppContext)
   const { theme, setTheme } = useTheme()
   useGlobalShortcut("CommandOrControl+P", () => {
     console.log("Ctrl+P was pressed!")
   })
 
   const setAudioById = (id: number) => {
-    setAudioPlayer(audioList[id])
+    if (audioList[id] != undefined) {
+      setAudioPlayer(audioList[id])
+    } else {
+      setAudioPlayer(oldAudioList[id])
+    }
   }
 
   return (

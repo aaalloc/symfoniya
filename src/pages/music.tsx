@@ -22,7 +22,6 @@ import {
 import {
   ContextMenu,
   ContextMenuContent,
-  ContextMenuItem,
   ContextMenuTrigger,
   ContextMenuSub,
   ContextMenuSubContent,
@@ -32,7 +31,6 @@ import {
 import { Checkbox } from "@/components/ui/checkbox"
 import { CreatePlaylist } from "@/components/CreatePlaylist"
 import { CheckedState } from "@radix-ui/react-checkbox"
-import { u } from "@tauri-apps/api/globalShortcut-003b7421"
 
 interface PlaylistCheckedState {
   [playlist: string]: {
@@ -58,9 +56,10 @@ async function isInPlaylist(value: Audio, playlist: string) {
   return res
 }
 
-export default function Music() {
-  const { setAudioPlayer, audioList } = useContext(AppContext)
-  const { playlists } = useContext(AppContext)
+
+export default function Music({ name }: { name: string }) {
+  const { setAudioPlayer, audioList, setAudioList } = useContext(AppContext)
+  const { playlists, setOldAudioList } = useContext(AppContext)
 
   // State to manage the checked status of each playlist
   const [playlistCheckedState, setPlaylistCheckedState] = useState({} as PlaylistCheckedState);
@@ -80,14 +79,29 @@ export default function Music() {
 
   useEffect(() => {
     fetchPlaylistCheckedState();
-    console.log(playlistCheckedState);
   }, [audioList, playlists]);
 
+  useEffect(() => {
+    if (name === undefined) {
+      setAudiosFromPlaylist("all")
+    } else {
+      setAudiosFromPlaylist(name)
+    }
+  }, [name])
+
+
+  const setAudiosFromPlaylist = async (playlist: string) => {
+    setOldAudioList(audioList)
+    const res = await invoke<Audio[]>("get_audio_playlist", {
+      playlist: playlist,
+    })
+    setAudioList(res)
+  }
 
   return (
     <div className="h-full flex-1 flex flex-col gap-6">
       <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
-        Musics
+        {name ?? "Music"}
       </h1>
       <div className="h-3/4 overflow-y-auto">
         <div className="container flex flex-col gap-2 items-stretch">
@@ -97,9 +111,13 @@ export default function Music() {
                 <ContextMenuTrigger>
                   <div
                     key={value.id}
-                    onClick={() => {
+                    onClick={async () => {
+                      await invoke("update_player", {
+                        playlist: name ?? "all"
+                      })
                       setAudioPlayer(value)
                     }}
+                    id={`audio-${value?.id}`}
                     className="hover:cursor-pointer p-6 rounded-lg transition ease-in-out delay-90 dark:hover:bg-gray-900 hover:bg-gray-50 duration-150 flex items-center space-x-8"
                   >
                     <div className="flex-shrink-0">
@@ -170,6 +188,6 @@ export default function Music() {
           })}
         </div>
       </div>
-    </div>
+    </div >
   )
 }

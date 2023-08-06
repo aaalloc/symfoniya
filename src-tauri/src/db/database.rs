@@ -182,10 +182,9 @@ pub fn insert_audio_in_playlist(
 pub fn get_audios_from_playlist(
     db: &Connection,
     playlist_name: &str,
-    audios: &mut Vec<_Audio>,
-) -> Result<usize, rusqlite::Error> {
+) -> Result<Vec<_Audio>, rusqlite::Error> {
     let mut statement = db.prepare(sql_requests::PLAYLIST_AUDIO_SELECT)?;
-    let audios_iter = statement.query_map(&[(":playlist_name", &playlist_name)], |row| {
+    let audios_iter = statement.query_map(&[("@name", &playlist_name)], |row| {
         Ok(_Audio {
             path: row.get(0)?,
             duration: std::time::Duration::from_secs(row.get(1)?),
@@ -200,13 +199,15 @@ pub fn get_audios_from_playlist(
             status: crate::music::audio::AudioStatus::Waiting,
         })
     })?;
+    let mut audios = Vec::new();
     audios_iter
         .filter(|a| a.is_ok())
         .for_each(|a| audios.push(a.unwrap()));
 
     audios.sort_by(|a, b| a.path.cmp(&b.path));
     audios.dedup_by(|a, b| a.path == b.path);
-    Ok(audios.len())
+    println!("audios len {}", audios.len());
+    Ok(audios)
 }
 
 const DB_SCHEMA: &str = "

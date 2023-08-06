@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, MutexGuard};
 mod db;
 mod music;
 use crate::music::player::Player;
@@ -32,6 +32,24 @@ struct Audio {
     id: usize,
     duration: u64,
     cover: Vec<u8>,
+}
+
+fn create_audio_list(player: MutexGuard<'_, MusicPlayer>, str: &str) -> Vec<Audio> {
+    let mut audios = Vec::new();
+    for (id, audio) in player.playlists[str].iter().enumerate() {
+        let cover = audio.cover.clone();
+        audios.push(Audio {
+            path: audio.path.clone(),
+            title: audio.tag.title.clone(),
+            artist: audio.tag.artist.clone(),
+            album: audio.tag.album.clone(),
+            duration: audio.duration.as_secs(),
+            id,
+            cover,
+        });
+    }
+
+    audios
 }
 
 #[tauri::command]
@@ -68,23 +86,13 @@ async fn import_from_folders(
 }
 
 #[tauri::command]
-async fn retrieve_audios(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<Vec<Audio>, String> {
+fn retrieve_audios(
+    playlist: String,
+    player: State<'_, Arc<Mutex<MusicPlayer>>>,
+) -> Result<Vec<Audio>, String> {
+    let str = playlist.as_str();
     let player = player.lock().unwrap();
-    let mut audios = Vec::new();
-    for (id, audio) in player.audios.iter().enumerate() {
-        let cover = audio.cover.clone();
-        audios.push(Audio {
-            path: audio.path.clone(),
-            title: audio.tag.title.clone(),
-            artist: audio.tag.artist.clone(),
-            album: audio.tag.album.clone(),
-            duration: audio.duration.as_secs(),
-            id,
-            cover,
-        });
-    }
-    drop(player);
-    Ok(audios)
+    Ok(create_audio_list(player, str))
 }
 
 #[tauri::command]
@@ -92,6 +100,7 @@ async fn play_from_id(
     id: usize,
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
 ) -> Result<bool, String> {
+    println!("Playing from id {}", id);
     let mut player = player.lock().unwrap();
     if player.get_index() == id {
         player.play();
@@ -202,32 +211,34 @@ fn get_playlists(app_handle: AppHandle) -> Result<Vec<String>, String> {
 
 #[tauri::command]
 fn get_audio_playlist(
-    playlist_name: String,
+    playlist: String,
     app_handle: AppHandle,
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
 ) -> Result<Vec<Audio>, String> {
     let mut player = player.lock().unwrap();
-    let mut audios = Vec::new();
-    let result = app_handle
-        .db(|db| database::get_audios_from_playlist(db, &playlist_name, player.audios.as_mut()));
-    match result {
-        Ok(_) => {
-            for (id, audio) in player.audios.iter().enumerate() {
-                let cover = audio.cover.clone();
-                audios.push(Audio {
-                    title: audio.tag.title.clone(),
-                    artist: audio.tag.artist.clone(),
-                    album: audio.tag.album.clone(),
-                    duration: audio.duration.as_secs(),
-                    path: audio.path.clone(),
-                    id,
-                    cover,
-                });
+    let str = &playlist;
+    if str == "all" {
+        Ok(create_audio_list(player, str))
+    } else {
+        let result = app_handle.db(|db| database::get_audios_from_playlist(db, str));
+        match result {
+            Ok(list) => {
+                player.playlists.insert(str.to_string(), list);
+                Ok(create_audio_list(player, str))
             }
-            Ok(audios)
+            Err(e) => Err(e.to_string()),
         }
-        Err(e) => Err(e.to_string()),
     }
+}
+
+#[tauri::command]
+fn update_player(
+    playlist: String,
+    player: State<'_, Arc<Mutex<MusicPlayer>>>,
+) -> Result<(), String> {
+    let mut player = player.lock().unwrap();
+    player.audios = player.playlists[&playlist].clone();
+    Ok(())
 }
 
 fn main() {
@@ -256,7 +267,8 @@ fn main() {
             add_audio_to_playlist,
             get_audio_playlist,
             get_playlists,
-            is_in_playlist
+            is_in_playlist,
+            update_player
         ])
         .setup(|app| {
             let handle = app.handle();
