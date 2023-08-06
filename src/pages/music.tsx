@@ -61,8 +61,10 @@ export default function Music({ name }: { name: string }) {
   const { setAudioPlayer, audioList, setAudioList } = useContext(AppContext)
   const { playlists, setOldAudioList } = useContext(AppContext)
 
-  // State to manage the checked status of each playlist
   const [playlistCheckedState, setPlaylistCheckedState] = useState({} as PlaylistCheckedState);
+  useEffect(() => {
+    fetchPlaylistCheckedState();
+  }, [audioList]);
 
   const fetchPlaylistCheckedState = async () => {
     const playlistCheckedState: PlaylistCheckedState = {};
@@ -73,13 +75,8 @@ export default function Music({ name }: { name: string }) {
         playlistCheckedState[playlist][audio.id] = res as boolean;
       }
     }
-    console.log(playlistCheckedState);
     setPlaylistCheckedState(playlistCheckedState);
   };
-
-  useEffect(() => {
-    fetchPlaylistCheckedState();
-  }, [audioList, playlists]);
 
   useEffect(() => {
     if (name === undefined) {
