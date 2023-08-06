@@ -166,7 +166,9 @@ export default function Music({ name }: { name: string }) {
                                         path: value.path,
                                       })
                                       await fetchPlaylistCheckedState();
-                                      await setAudiosFromPlaylist(playlist);
+                                      if (name === playlist) {
+                                        await setAudiosFromPlaylist(playlist);
+                                      }
                                     }}
                                   />
                                   <label

@@ -87,10 +87,10 @@ async fn import_from_folders(
 
 #[tauri::command]
 fn retrieve_audios(
-    playlist: String,
+    playlists: String,
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
 ) -> Result<Vec<Audio>, String> {
-    let str = playlist.as_str();
+    let str = playlists.as_str();
     let player = player.lock().unwrap();
     Ok(create_audio_list(player, str))
 }

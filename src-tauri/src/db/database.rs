@@ -206,7 +206,6 @@ pub fn get_audios_from_playlist(
 
     audios.sort_by(|a, b| a.path.cmp(&b.path));
     audios.dedup_by(|a, b| a.path == b.path);
-    println!("audios len {}", audios.len());
     Ok(audios)
 }
 
