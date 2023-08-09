@@ -74,6 +74,9 @@ impl Player for MusicPlayer {
 
     fn import_from_folders(&mut self, path: &str, app_handle: &AppHandle) -> usize {
         let value = get_audios(self.audios.as_mut(), path, app_handle);
+        self.audios.sort_by(|a, b| a.path.cmp(&b.path));
+        self.playlists
+            .insert("all".to_string(), self.audios.clone());
         self.update_total_time();
         value
     }

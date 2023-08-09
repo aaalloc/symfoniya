@@ -150,7 +150,7 @@ pub fn is_in_playlist(
     path: &str,
 ) -> Result<bool, rusqlite::Error> {
     let mut statement = db.prepare(sql_requests::AUDIO_IN_PLAYLIST_SELECT)?;
-    let mut results = statement.query(&[(":name", &playlist_name), (":path", &path)])?;
+    let mut results = statement.query(&[("@name", &playlist_name), ("@path", &path)])?;
     while let Some(result) = results.next()? {
         let result: i16 = result.get(0)?;
         if result == 1 {
@@ -241,12 +241,18 @@ CREATE TABLE folders (
     path TEXT NOT NULL UNIQUE
 );
 
+CREATE TABLE playlists_audio (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    playlist_id INTEGER NOT NULL,
+    audio_id INTEGER NOT NULL,
+    FOREIGN KEY (playlist_id) REFERENCES playlists (id),
+    FOREIGN KEY (audio_id) REFERENCES audios (id)
+    UNIQUE (playlist_id, audio_id)
+);
+
 CREATE TABLE playlists (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    audio_id INTEGER,
-    FOREIGN KEY (audio_id) REFERENCES audios (id)
-    UNIQUE (name, audio_id)
+    name TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE audios (

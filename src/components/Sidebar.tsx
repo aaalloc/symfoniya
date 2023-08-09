@@ -32,7 +32,10 @@ export function Sidebar({ className: className }: { className?: string }) {
             </Button>
             <Button
               // eslint-disable-next-line @typescript-eslint/no-misused-promises
-              onClick={() => Router.push("/music")}
+              onClick={() => Router.push({
+                pathname: "/playlist",
+                query: { playlist: "all" },
+              })}
               variant="ghost"
               className="w-full justify-start"
             >

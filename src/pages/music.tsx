@@ -8,7 +8,7 @@ import { format_duration } from "@/lib/utils"
 
 import { ListPlus } from "lucide-react"
 import { invoke } from "@tauri-apps/api/tauri"
-import { useState } from "react"
+import { useState, useRef } from "react"
 
 import {
   Command,
@@ -56,49 +56,42 @@ async function isInPlaylist(value: Audio, playlist: string) {
   return res
 }
 
-
 export default function Music({ name }: { name: string }) {
   const { setAudioPlayer, audioList, setAudioList } = useContext(AppContext)
   const { playlists, setOldAudioList } = useContext(AppContext)
-
   const [playlistCheckedState, setPlaylistCheckedState] = useState({} as PlaylistCheckedState);
-  useEffect(() => {
-    fetchPlaylistCheckedState();
-  }, [audioList]);
-
-  const fetchPlaylistCheckedState = async () => {
-    const playlistCheckedState: PlaylistCheckedState = {};
-    for (const playlist of playlists) {
-      playlistCheckedState[playlist] = {};
-      for (const audio of audioList) {
-        const res = await isInPlaylist(audio, playlist);
-        playlistCheckedState[playlist][audio.id] = res as boolean;
-      }
-    }
-    setPlaylistCheckedState(playlistCheckedState);
-  };
 
   useEffect(() => {
-    if (name === undefined) {
-      setAudiosFromPlaylist("all")
-    } else {
-      setAudiosFromPlaylist(name)
+    const setAudiosFromPlaylist = async (playlist: string) => {
+      setOldAudioList(audioList)
+      const res = await invoke<Audio[]>("get_audio_playlist", {
+        playlist: playlist,
+      })
+      setAudioList(res)
     }
+    setAudiosFromPlaylist(name).catch(console.error)
   }, [name])
 
+  useEffect(() => {
+    const fetchPlaylistCheckedState = async () => {
+      const playlistCheckedState: PlaylistCheckedState = {};
+      for (const playlist of playlists) {
+        playlistCheckedState[playlist] = {};
+        for (const audio of audioList) {
+          const res = await isInPlaylist(audio, playlist);
+          playlistCheckedState[playlist][audio.id] = res as boolean;
+        }
+      }
+      setPlaylistCheckedState(playlistCheckedState);
+    }
+    fetchPlaylistCheckedState().catch(console.error)
+  }, [audioList])
 
-  const setAudiosFromPlaylist = async (playlist: string) => {
-    setOldAudioList(audioList)
-    const res = await invoke<Audio[]>("get_audio_playlist", {
-      playlist: playlist,
-    })
-    setAudioList(res)
-  }
-
+  console.log(playlistCheckedState)
   return (
     <div className="h-full flex-1 flex flex-col gap-6">
       <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
-        {name ?? "Music"}
+        {name == "all" ? "Music" : name}
       </h1>
       <div className="h-3/4 overflow-y-auto">
         <div className="container flex flex-col gap-2 items-stretch">
@@ -162,10 +155,6 @@ export default function Music({ name }: { name: string }) {
                                         playlist: playlist,
                                         path: value.path,
                                       })
-                                      await fetchPlaylistCheckedState();
-                                      if (name === playlist) {
-                                        await setAudiosFromPlaylist(playlist);
-                                      }
                                     }}
                                   />
                                   <label
