@@ -17,7 +17,7 @@ const AppContext = createContext({
 const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
   useEffect(() => {
     invoke<number>("startup_audios_init")
-      .then(async (response) => {
+      .then((response) => {
         if (response === 0) {
           return
         }
@@ -25,13 +25,15 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
       .catch((error) => {
         console.error(error)
       })
-    invoke<string[]>("get_playlists").then((response) => {
-      console.log(response)
-      if (response === null) {
-        return
-      }
-      setPlaylist(response)
-    })
+    invoke<string[]>("get_playlists")
+      .then((response) => {
+        console.log(response)
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (response === null) {
+          return
+        }
+        setPlaylist(response)
+      })
       .catch((error) => {
         console.error(error)
       })
@@ -42,12 +44,18 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
   const [oldAudioList, setOldAudioList] = useState<Audio[]>([] as Audio[])
   const [playlists, setPlaylist] = useState<string[]>([] as string[])
   return (
-    <AppContext.Provider value={{
-      audio, setAudioPlayer,
-      oldAudioList, setOldAudioList,
-      audioList, setAudioList,
-      playlists, setPlaylist
-    }}>
+    <AppContext.Provider
+      value={{
+        audio,
+        setAudioPlayer,
+        oldAudioList,
+        setOldAudioList,
+        audioList,
+        setAudioList,
+        playlists,
+        setPlaylist,
+      }}
+    >
       {children}
     </AppContext.Provider>
   )

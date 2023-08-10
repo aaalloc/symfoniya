@@ -20,7 +20,8 @@ export default function Layout({ children }: { children: React.ReactElement }) {
   })
 
   const setAudioById = (id: number) => {
-    if (audioList[id] != undefined) {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (audioList[id] !== undefined) {
       setAudioPlayer(audioList[id])
     } else {
       setAudioPlayer(oldAudioList[id])

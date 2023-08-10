@@ -7,8 +7,8 @@ import { AppContext } from "@/components/AppContext"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
-import { CreatePlaylist } from "./CreatePlaylist"
 
+import { CreatePlaylist } from "./CreatePlaylist"
 
 export function Sidebar({ className: className }: { className?: string }) {
   const { setAudioList } = useContext(AppContext)
@@ -32,10 +32,12 @@ export function Sidebar({ className: className }: { className?: string }) {
             </Button>
             <Button
               // eslint-disable-next-line @typescript-eslint/no-misused-promises
-              onClick={() => Router.push({
-                pathname: "/playlist",
-                query: { playlist: "all" },
-              })}
+              onClick={() =>
+                Router.push({
+                  pathname: "/playlist",
+                  query: { playlist: "all" },
+                })
+              }
               variant="ghost"
               className="w-full justify-start"
             >
@@ -76,7 +78,7 @@ export function Sidebar({ className: className }: { className?: string }) {
                   variant="ghost"
                   onClick={() => {
                     console.log("playlist", playlist)
-                    Router.push({
+                    void Router.push({
                       pathname: "/playlist",
                       query: { playlist: playlist },
                     })
@@ -90,7 +92,7 @@ export function Sidebar({ className: className }: { className?: string }) {
             </div>
           </ScrollArea>
         </div>
-      </div >
-    </div >
+      </div>
+    </div>
   )
 }

@@ -1,15 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
+import { CheckedState } from "@radix-ui/react-checkbox"
+import { invoke } from "@tauri-apps/api/tauri"
 import * as base64 from "byte-base64"
+import { ListPlus } from "lucide-react"
 import { useContext, useEffect } from "react"
-import { Audio } from "@/components/types/audio"
+import { useCallback, useState } from "react"
 
 import { AppContext } from "@/components/AppContext"
-import { format_duration } from "@/lib/utils"
-
-import { ListPlus } from "lucide-react"
-import { invoke } from "@tauri-apps/api/tauri"
-import { useState, useRef } from "react"
-
+import { CreatePlaylist } from "@/components/CreatePlaylist"
+import { Audio } from "@/components/types/audio"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Command,
   CommandEmpty,
@@ -18,27 +18,17 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command"
-
 import {
   ContextMenu,
   ContextMenuContent,
-  ContextMenuTrigger,
   ContextMenuSub,
   ContextMenuSubContent,
   ContextMenuSubTrigger,
+  ContextMenuTrigger,
 } from "@/components/ui/context-menu"
+import { format_duration } from "@/lib/utils"
 
-import { Checkbox } from "@/components/ui/checkbox"
-import { CreatePlaylist } from "@/components/CreatePlaylist"
-import { CheckedState } from "@radix-ui/react-checkbox"
-
-interface PlaylistCheckedState {
-  [playlist: string]: {
-    [audioId: string]: boolean;
-  };
-}
-
-
+type PlaylistCheckedState = Record<string, Record<string, boolean>>
 
 const grayb64 =
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mO8Ww8AAj8BXkQ+xPEAAAAASUVORK5CYII="
@@ -59,55 +49,65 @@ async function isInPlaylist(value: Audio, playlist: string) {
 export default function Music({ name }: { name: string }) {
   const { setAudioPlayer, audioList, setAudioList } = useContext(AppContext)
   const { playlists, setOldAudioList } = useContext(AppContext)
-  const [playlistCheckedState, setPlaylistCheckedState] = useState({} as PlaylistCheckedState);
+  const [playlistCheckedState, setPlaylistCheckedState] = useState(
+    {} as PlaylistCheckedState,
+  )
 
-  useEffect(() => {
-    const setAudiosFromPlaylist = async (playlist: string) => {
+  const fetchPlaylistCheckedState = useCallback(async () => {
+    const playlistCheckedState: PlaylistCheckedState = {}
+    for (const playlist of playlists) {
+      playlistCheckedState[playlist] = {}
+      for (const audio of audioList) {
+        const res = await isInPlaylist(audio, playlist)
+        playlistCheckedState[playlist][audio.id] = res as boolean
+      }
+    }
+    setPlaylistCheckedState(playlistCheckedState)
+  }, [audioList, playlists])
+
+  const setAudiosFromPlaylist = useCallback(
+    async (playlist: string) => {
       setOldAudioList(audioList)
       const res = await invoke<Audio[]>("get_audio_playlist", {
         playlist: playlist,
       })
       setAudioList(res)
-    }
+    },
+    [audioList, setAudioList, setOldAudioList],
+  )
+
+  useEffect(() => {
     setAudiosFromPlaylist(name).catch(console.error)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name])
 
   useEffect(() => {
-    const fetchPlaylistCheckedState = async () => {
-      const playlistCheckedState: PlaylistCheckedState = {};
-      for (const playlist of playlists) {
-        playlistCheckedState[playlist] = {};
-        for (const audio of audioList) {
-          const res = await isInPlaylist(audio, playlist);
-          playlistCheckedState[playlist][audio.id] = res as boolean;
-        }
-      }
-      setPlaylistCheckedState(playlistCheckedState);
-    }
     fetchPlaylistCheckedState().catch(console.error)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [audioList])
 
-  console.log(playlistCheckedState)
+  //console.log(playlistCheckedState)
   return (
     <div className="h-full flex-1 flex flex-col gap-6">
       <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
-        {name == "all" ? "Music" : name}
+        {name === "all" ? "Music" : name}
       </h1>
       <div className="h-3/4 overflow-y-auto">
         <div className="container flex flex-col gap-2 items-stretch">
           {audioList.map((value) => {
             return (
-              <ContextMenu>
+              <ContextMenu key={value.id}>
                 <ContextMenuTrigger>
                   <div
                     key={value.id}
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
                     onClick={async () => {
                       await invoke("update_player", {
-                        playlist: name ?? "all"
+                        playlist: name,
                       })
                       setAudioPlayer(value)
                     }}
-                    id={`audio-${value?.id}`}
+                    id={`audio-${value.id}`}
                     className="hover:cursor-pointer p-6 rounded-lg transition ease-in-out delay-90 dark:hover:bg-gray-900 hover:bg-gray-50 duration-150 flex items-center space-x-8"
                   >
                     <div className="flex-shrink-0">
@@ -141,20 +141,25 @@ export default function Music({ name }: { name: string }) {
                           <CommandEmpty>No playlist found.</CommandEmpty>
                           <CommandGroup>
                             {playlists.map((playlist) => (
-                              <CommandItem
-                                key={playlist}
-                              >
+                              <CommandItem key={playlist}>
                                 <div className="flex items-center space-x-2">
-                                  <Checkbox id={playlist}
+                                  <Checkbox
+                                    id={playlist}
                                     defaultChecked={
-                                      playlistCheckedState[playlist]?.[value.id] ?? false
+                                      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                                      playlistCheckedState[playlist][value.id] ?? false
                                     }
+                                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
                                     onCheckedChange={async (state) => {
                                       await invoke("add_audio_to_playlist", {
                                         state: state,
                                         playlist: playlist,
                                         path: value.path,
                                       })
+                                      await fetchPlaylistCheckedState()
+                                      if (name === playlist) {
+                                        await setAudiosFromPlaylist(playlist)
+                                      }
                                     }}
                                   />
                                   <label
@@ -177,6 +182,6 @@ export default function Music({ name }: { name: string }) {
           })}
         </div>
       </div>
-    </div >
+    </div>
   )
 }
