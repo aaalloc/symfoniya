@@ -1,11 +1,16 @@
 // thx to https://github.com/RandomEngy/tauri-sqlite/tree/main
-#[path = "./sql_requests.rs"]
-mod sql_requests;
+#[path = "./requests/delete.rs"]
+mod delete;
+#[path = "./requests/insert.rs"]
+mod insert;
+#[path = "./requests/schema.rs"]
+mod schema;
+#[path = "./requests/select.rs"]
+mod select;
+use crate::music::audio::{_Audio, _Tag};
 use rusqlite::{named_params, Connection};
 use std::fs;
 use tauri::AppHandle;
-
-use crate::music::audio::{_Audio, _Tag};
 
 const CURRENT_DB_VERSION: u32 = 1;
 
@@ -41,7 +46,7 @@ pub fn upgrade_database_if_needed(
         let tx = db.transaction()?;
         tx.pragma_update(None, "user_version", CURRENT_DB_VERSION)?;
         tx.pragma_update(None, "foreign_keys", 1)?;
-        tx.execute_batch(DB_SCHEMA)?;
+        tx.execute_batch(&schema::table::schema_complete())?;
         tx.commit()?;
     }
 
@@ -49,26 +54,26 @@ pub fn upgrade_database_if_needed(
 }
 
 pub fn add_audio(audio: &_Audio, db: &Connection) -> Result<(), rusqlite::Error> {
-    let mut artist_statement = db.prepare(sql_requests::ARTIST_INSERT)?;
+    let mut artist_statement = db.prepare(insert::artist::ARTIST_INSERT)?;
     artist_statement.execute(named_params! { "@name": audio.tag.artist })?;
 
-    let mut album_statement = db.prepare(sql_requests::ALBUM_INSERT)?;
+    let mut album_statement = db.prepare(insert::album::ALBUM_INSERT)?;
     album_statement.execute(named_params! { "@name": audio.tag.album })?;
 
-    let mut genre_statement = db.prepare(sql_requests::GENRE_INSERT)?;
+    let mut genre_statement = db.prepare(insert::genre::GENRE_INSERT)?;
     genre_statement.execute(named_params! { "@name": audio.tag.genre })?;
 
-    let mut tag_statement = db.prepare(sql_requests::TAG_INSERT)?;
+    let mut tag_statement = db.prepare(insert::tag::TAG_INSERT)?;
     tag_statement.execute(named_params! {
         "@artist": audio.tag.artist,
         "@album": audio.tag.album,
         "@genre": audio.tag.genre,
     })?;
     let folder = audio.path.rsplit_once('/').unwrap().0;
-    let mut folder_statement = db.prepare(sql_requests::FOLDER_INSERT)?;
+    let mut folder_statement = db.prepare(insert::folder::FOLDER_INSERT)?;
     folder_statement.execute(named_params! { "@path": folder })?;
 
-    let mut audio_statement = db.prepare(sql_requests::AUDIO_INSERT)?;
+    let mut audio_statement = db.prepare(insert::audio::AUDIO_INSERT)?;
     audio_statement.execute(named_params! {
         "@path": audio.path,
         "@folder": folder,
@@ -84,7 +89,7 @@ pub fn add_audio(audio: &_Audio, db: &Connection) -> Result<(), rusqlite::Error>
 }
 
 pub fn get_audios(db: &Connection, audios: &mut Vec<_Audio>) -> Result<usize, rusqlite::Error> {
-    let mut statement = db.prepare(sql_requests::AUDIO_SELECT)?;
+    let mut statement = db.prepare(select::audio::AUDIO_SELECT)?;
     let audios_iter = statement.query_map([], |row| {
         Ok(_Audio {
             path: row.get(0)?,
@@ -110,7 +115,7 @@ pub fn get_audios(db: &Connection, audios: &mut Vec<_Audio>) -> Result<usize, ru
 }
 
 pub fn is_audio_in_db(db: &Connection, path: &str) -> Result<bool, rusqlite::Error> {
-    let mut statement = db.prepare(sql_requests::AUDIO_IN_FOLDER_SELECT)?;
+    let mut statement = db.prepare(select::audio::AUDIO_IN_FOLDER_SELECT)?;
     let mut results = statement.query(&[(":path", &path)])?;
     // needs to simplify, one result is attended
     while let Some(result) = results.next()? {
@@ -123,7 +128,7 @@ pub fn is_audio_in_db(db: &Connection, path: &str) -> Result<bool, rusqlite::Err
 }
 
 pub fn add_playlist(db: &Connection, playlist_name: &str) -> Result<(), rusqlite::Error> {
-    let mut statement = db.prepare(sql_requests::PLAYLIST_INSERT)?;
+    let mut statement = db.prepare(insert::playlist::PLAYLIST_INSERT)?;
     statement.execute(named_params! {
         "@name": playlist_name
     })?;
@@ -131,7 +136,7 @@ pub fn add_playlist(db: &Connection, playlist_name: &str) -> Result<(), rusqlite
 }
 
 pub fn retrieve_playlist(db: &Connection) -> Result<Vec<String>, rusqlite::Error> {
-    let mut statement = db.prepare(sql_requests::PLAYLIST_SELECT)?;
+    let mut statement = db.prepare(select::playlist::PLAYLIST_SELECT)?;
     let mut results = statement.query([])?;
     let mut playlists = Vec::new();
     while let Some(result) = results.next()? {
@@ -149,7 +154,7 @@ pub fn is_in_playlist(
     playlist_name: &str,
     path: &str,
 ) -> Result<bool, rusqlite::Error> {
-    let mut statement = db.prepare(sql_requests::AUDIO_IN_PLAYLIST_SELECT)?;
+    let mut statement = db.prepare(select::audio::AUDIO_IN_PLAYLIST_SELECT)?;
     let mut results = statement.query(&[("@name", &playlist_name), ("@path", &path)])?;
     while let Some(result) = results.next()? {
         let result: i16 = result.get(0)?;
@@ -168,9 +173,9 @@ pub fn insert_audio_in_playlist(
 ) -> Result<(), rusqlite::Error> {
     let mut statement;
     if state {
-        statement = db.prepare(sql_requests::PLAYLIST_AUDIO_INSERT)?;
+        statement = db.prepare(insert::playlist::PLAYLIST_AUDIO_INSERT)?;
     } else {
-        statement = db.prepare(sql_requests::PLAYLIST_AUDIO_DELETE)?;
+        statement = db.prepare(delete::playlist::PLAYLIST_AUDIO_DELETE)?;
     }
     statement.execute(named_params! {
         "@name": playlist_name,
@@ -183,7 +188,7 @@ pub fn get_audios_from_playlist(
     db: &Connection,
     playlist_name: &str,
 ) -> Result<Vec<_Audio>, rusqlite::Error> {
-    let mut statement = db.prepare(sql_requests::PLAYLIST_AUDIO_SELECT)?;
+    let mut statement = db.prepare(select::playlist::PLAYLIST_AUDIO_SELECT)?;
     let audios_iter = statement.query_map(&[("@name", &playlist_name)], |row| {
         Ok(_Audio {
             path: row.get(0)?,
@@ -208,62 +213,3 @@ pub fn get_audios_from_playlist(
     audios.dedup_by(|a, b| a.path == b.path);
     Ok(audios)
 }
-
-const DB_SCHEMA: &str = "
-CREATE TABLE artists (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE DEFAULT 'Unknown'
-);
-
-CREATE TABLE albums (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE DEFAULT 'Unknown'
-);
-
-CREATE TABLE genres (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE DEFAULT 'Unknown'
-);
-
-CREATE TABLE tags (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    artist_id INTEGER NOT NULL,
-    album_id INTEGER NOT NULL,
-    genre_id INTEGER NOT NULL,
-    FOREIGN KEY (artist_id) REFERENCES artists (id),
-    FOREIGN KEY (album_id) REFERENCES albums (id),
-    FOREIGN KEY (genre_id) REFERENCES genres (id)
-    UNIQUE (artist_id, album_id, genre_id)
-);
-
-CREATE TABLE folders (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    path TEXT NOT NULL UNIQUE
-);
-
-CREATE TABLE playlists_audio (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    playlist_id INTEGER NOT NULL,
-    audio_id INTEGER NOT NULL,
-    FOREIGN KEY (playlist_id) REFERENCES playlists (id),
-    FOREIGN KEY (audio_id) REFERENCES audios (id)
-    UNIQUE (playlist_id, audio_id)
-);
-
-CREATE TABLE playlists (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE
-);
-
-CREATE TABLE audios (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    path TEXT NOT NULL UNIQUE,
-    duration INTEGER NOT NULL,
-    title TEXT NOT NULL,
-    tag_id INTEGER NOT NULL,
-    folder_id INTEGER NOT NULL,
-    cover BLOB,
-    FOREIGN KEY (tag_id) REFERENCES tags (id)
-    FOREIGN KEY (folder_id) REFERENCES folders (id)
-);
-";
