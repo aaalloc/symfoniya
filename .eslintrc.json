@@ -8,13 +8,24 @@
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": ["./tsconfig.json"]
+    "project": [
+      "./tsconfig.json"
+    ]
   },
-  "plugins": ["@typescript-eslint", "simple-import-sort", "prettier"],
+  "plugins": [
+    "@typescript-eslint",
+    "simple-import-sort",
+    "prettier"
+  ],
   "rules": {
     "eqeqeq": "error",
     "no-else-return": "error",
-    "no-implicit-coercion": ["error", { "disallowTemplateShorthand": true }],
+    "no-implicit-coercion": [
+      "error",
+      {
+        "disallowTemplateShorthand": true
+      }
+    ],
     "no-unneeded-ternary": "error",
     "no-useless-call": "error",
     "no-useless-computed-key": "error",
@@ -24,7 +35,10 @@
     "prefer-rest-params": "error",
     "prefer-spread": "error",
     "prefer-template": "error",
-    "radix": ["error", "always"],
+    "radix": [
+      "error",
+      "always"
+    ],
     "simple-import-sort/imports": "error",
     "simple-import-sort/exports": "error",
     "prettier/prettier": "error",

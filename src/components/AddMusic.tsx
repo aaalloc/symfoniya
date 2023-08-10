@@ -29,8 +29,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 async function get_audios(): Promise<Audio[]> {
   const audios: Audio[] = []
   try {
-    const values = await invoke("retrieve_audios")
-    //console.log(values);
+    const values = await invoke("retrieve_audios", { playlists: "all" })
     return values as Audio[]
   } catch (error) {
     console.error(error)

@@ -1,13 +1,14 @@
 use rodio::Sink;
-use std::time::Duration;
-pub mod audio;
-use crate::{player::audio::*, update_status};
-use audio::{AudioStatus, _Audio};
+use std::{collections::HashMap, time::Duration};
+
+use crate::{database, db::state::DbAccess, music::audio::*, update_status};
 use std::time::Instant;
+use tauri::AppHandle;
 pub struct MusicPlayer {
     pub total_time: Duration,
     pub audios: Vec<_Audio>,
     pub is_playing: bool,
+    pub playlists: HashMap<String, Vec<_Audio>>,
     sink: Sink,
     stream_handle: rodio::OutputStreamHandle,
     index: usize,
@@ -16,7 +17,8 @@ pub struct MusicPlayer {
 pub trait Player {
     fn new(stream_handler: rodio::OutputStreamHandle) -> Self;
     fn add_audio(&mut self, audio: _Audio) -> bool;
-    fn import(&mut self, path: &str) -> usize;
+    fn import_from_folders(&mut self, path: &str, app_handle: &AppHandle) -> usize;
+    fn import_from_db(&mut self, app_handle: &AppHandle) -> Result<usize, rusqlite::Error>;
     fn set_index(&mut self, index: usize);
     fn update_total_time(&mut self);
     fn play(&mut self);
@@ -31,6 +33,7 @@ pub trait Player {
     fn get_volume(&self) -> f32;
     //fn stop(&mut self);
     fn get_index(&self) -> usize;
+    fn write_to_db(&self, app_handle: AppHandle);
 }
 
 //unsafe impl Send for MusicPlayer {}
@@ -60,6 +63,7 @@ impl Player for MusicPlayer {
             is_playing: false,
             stream_handle: stream_handler,
             index: 0,
+            playlists: HashMap::new(),
         }
     }
 
@@ -68,8 +72,19 @@ impl Player for MusicPlayer {
         true
     }
 
-    fn import(&mut self, path: &str) -> usize {
-        let value = get_audios(self.audios.as_mut(), path);
+    fn import_from_folders(&mut self, path: &str, app_handle: &AppHandle) -> usize {
+        let value = get_audios(self.audios.as_mut(), path, app_handle);
+        self.audios.sort_by(|a, b| a.path.cmp(&b.path));
+        self.playlists
+            .insert("all".to_string(), self.audios.clone());
+        self.update_total_time();
+        value
+    }
+
+    fn import_from_db(&mut self, app_handle: &AppHandle) -> Result<usize, rusqlite::Error> {
+        let value = app_handle.db(|db| database::get_audios(db, self.audios.as_mut()));
+        self.playlists
+            .insert("all".to_string(), self.audios.clone());
         self.update_total_time();
         value
     }
@@ -133,10 +148,6 @@ impl Player for MusicPlayer {
 
     fn current_audio_status(&self) -> AudioStatus {
         let current_audio = self.audios.get(self.index).unwrap();
-        println!(
-            "status for index {} is {}",
-            self.index, current_audio.status
-        );
         current_audio.status.clone()
     }
 
@@ -154,5 +165,12 @@ impl Player for MusicPlayer {
 
     fn get_volume(&self) -> f32 {
         self.sink.volume()
+    }
+
+    fn write_to_db(&self, app_handle: AppHandle) {
+        for audio in self.audios.iter() {
+            app_handle.db(|db| database::add_audio(audio, db)).unwrap();
+        }
+        println!("{} audios added", self.audios.len());
     }
 }
