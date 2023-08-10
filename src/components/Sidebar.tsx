@@ -2,13 +2,13 @@ import { Home, Library, ListMusic, Mic2, Music2, User } from "lucide-react"
 import Router from "next/router"
 import { useContext } from "react"
 
-import { AddMusic } from "@/components/AddMusic"
 import { AppContext } from "@/components/AppContext"
+import { AddMusic } from "@/components/modals/AddMusic"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
 
-import { CreatePlaylist } from "./CreatePlaylist"
+import { CreatePlaylist } from "./modals/CreatePlaylist"
 
 export function Sidebar({ className: className }: { className?: string }) {
   const { setAudioList } = useContext(AppContext)

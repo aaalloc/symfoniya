@@ -1,11 +1,11 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { DialogOverlay, DialogPortal } from "@radix-ui/react-dialog"
 
-import { Searchbar } from "@/components/Searchbar"
+import { Search } from "@/components/modals/Search"
 import { Command, CommandInput } from "@/components/ui/command"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 
-export function Search() {
+export function SearchBar() {
   return (
     <Dialog>
       <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
@@ -32,7 +32,7 @@ export function Search() {
               data-[state=open]:slide-in-from-top-[48%]
                md:w-full "
         >
-          <Searchbar />
+          <Search />
         </DialogPrimitive.Content>
       </DialogPortal>
     </Dialog>

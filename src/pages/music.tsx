@@ -7,7 +7,7 @@ import { useContext, useEffect } from "react"
 import { useCallback, useState } from "react"
 
 import { AppContext } from "@/components/AppContext"
-import { CreatePlaylist } from "@/components/CreatePlaylist"
+import { CreatePlaylist } from "@/components/modals/CreatePlaylist"
 import { Audio } from "@/components/types/audio"
 import { Checkbox } from "@/components/ui/checkbox"
 import {

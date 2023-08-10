@@ -2,9 +2,9 @@ import { invoke } from "@tauri-apps/api/tauri"
 import { Volume2 } from "lucide-react"
 import { useState } from "react"
 
-import { Button } from "./ui/button"
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
-import { Slider } from "./ui/slider"
+import { Button } from "../ui/button"
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
+import { Slider } from "../ui/slider"
 
 export default function VolumeButton() {
   const [volume, setVolume] = useState([100])

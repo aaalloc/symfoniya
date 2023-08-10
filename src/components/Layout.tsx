@@ -5,8 +5,8 @@ import { useContext } from "react"
 
 import { AppContext } from "@/components/AppContext"
 //import { MenubarDemo } from "@/components/MenubarDemo"
-import { Player } from "@/components/Player"
-import { Search } from "@/components/Search"
+import { Player } from "@/components/player/Player"
+import { SearchBar } from "@/components/search/SearchBar"
 import { Sidebar } from "@/components/Sidebar"
 import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/toaster"
@@ -41,7 +41,7 @@ export default function Layout({ children }: { children: React.ReactElement }) {
           <Sidebar className="basis-1/5" />
           <div className="flex-1 flex flex-col gap-4 h-full items-stretch">
             <div className="flex justify-normal items-center px-[18rem]">
-              <Search />
+              <SearchBar />
               <Button
                 onClick={() => {
                   setTheme(theme === "dark" ? "light" : "dark")

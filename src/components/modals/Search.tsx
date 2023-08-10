@@ -11,7 +11,7 @@ import {
   CommandShortcut,
 } from "@/components/ui/command"
 
-export function Searchbar() {
+export function Search() {
   return (
     <Command className="rounded-lg border shadow-md">
       <CommandInput placeholder="Type a command or search..." />
