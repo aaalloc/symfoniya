@@ -11,7 +11,7 @@ import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
 import { format_duration } from "@/lib/utils"
 
-import { Button } from "./ui/button"
+import { Button } from "../ui/button"
 import VolumeButton from "./Volume"
 
 interface AudioStatus {

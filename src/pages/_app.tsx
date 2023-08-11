@@ -5,8 +5,8 @@ import { ThemeProvider } from "next-themes"
 
 import { AppContextProvider } from "@/components/AppContext"
 import Layout from "@/components/Layout"
-import NoSSR from "@/components/NoSSR"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import NoSSR from "@/components/utilities/NoSSR"
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
