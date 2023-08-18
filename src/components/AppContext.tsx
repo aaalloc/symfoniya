@@ -3,6 +3,8 @@ import { createContext, useEffect, useState } from "react"
 
 import { Audio } from "@/components/types/audio"
 
+type PlaylistCheckedState = Record<string, Record<string, boolean>>
+
 const AppContext = createContext({
   audio: {} as Audio,
   setAudioPlayer: {} as (audio: Audio) => void,
@@ -12,6 +14,8 @@ const AppContext = createContext({
   setOldAudioList: {} as (audioList: Audio[]) => void,
   playlists: [] as string[],
   setPlaylist: {} as (playlist: string[]) => void,
+  playlistCheckedState: {} as PlaylistCheckedState,
+  setPlaylistCheckedState: {} as (playlistCheckedState: PlaylistCheckedState) => void,
 })
 
 const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
@@ -43,6 +47,9 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
   const [audioList, setAudioList] = useState<Audio[]>([] as Audio[])
   const [oldAudioList, setOldAudioList] = useState<Audio[]>([] as Audio[])
   const [playlists, setPlaylist] = useState<string[]>([] as string[])
+  const [playlistCheckedState, setPlaylistCheckedState] = useState(
+    {} as PlaylistCheckedState,
+  )
   return (
     <AppContext.Provider
       value={{
@@ -54,6 +61,8 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
         setAudioList,
         playlists,
         setPlaylist,
+        playlistCheckedState,
+        setPlaylistCheckedState,
       }}
     >
       {children}
