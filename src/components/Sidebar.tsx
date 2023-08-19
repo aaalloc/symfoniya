@@ -74,19 +74,19 @@ export function Sidebar({ className: className }: { className?: string }) {
             <div className="space-y-1 p-2">
               {playlists.map((playlist, i) => (
                 <Button
-                  key={`${playlist}-${i}`}
+                  key={`${playlist.name}-${i}`}
                   variant="ghost"
                   onClick={() => {
                     console.log("playlist", playlist)
                     void Router.push({
                       pathname: "/playlist",
-                      query: { playlist: playlist },
+                      query: { playlist: playlist.name },
                     })
                   }}
                   className="w-full justify-start font-normal"
                 >
                   <ListMusic className="mr-2 h-4 w-4" />
-                  {playlist}
+                  {playlist.name}
                 </Button>
               ))}
             </div>

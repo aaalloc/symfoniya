@@ -6,6 +6,7 @@ import { useContext } from "react"
 import { AppContext } from "@/components/AppContext"
 import { CreatePlaylist } from "@/components/modals/CreatePlaylist"
 import { Audio } from "@/components/types/audio"
+import { Playlist } from "@/components/types/playlist"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Command,
@@ -31,16 +32,16 @@ export async function isInPlaylist(value: Audio, playlist: string) {
 }
 
 export async function fetchPlaylistCheckedState(
-  playlists: string[],
+  playlists: Playlist[],
   audioList: Audio[],
   setPlaylistCheckedState: (playlistCheckedState: PlaylistCheckedState) => void,
 ) {
   const playlistCheckedState: PlaylistCheckedState = {}
   for (const playlist of playlists) {
-    playlistCheckedState[playlist] = {}
+    playlistCheckedState[playlist.name] = {}
     for (const audio of audioList) {
-      const res = await isInPlaylist(audio, playlist)
-      playlistCheckedState[playlist][audio.id] = res as boolean
+      const res = await isInPlaylist(audio, playlist.name)
+      playlistCheckedState[playlist.name][audio.id] = res as boolean
     }
   }
   setPlaylistCheckedState(playlistCheckedState)
@@ -60,8 +61,8 @@ export async function setAudiosFromPlaylist(
 }
 
 function PlaylistCommandItem(props: { playlist: string; value: Audio; name: string }) {
-  const { audioList, setAudioList } = useContext(AppContext)
-  const { playlists, setOldAudioList } = useContext(AppContext)
+  const { audioList, setAudioList, setOldAudioList } = useContext(AppContext)
+  const { playlists, setPlaylist } = useContext(AppContext)
   const { playlistCheckedState, setPlaylistCheckedState } = useContext(AppContext)
   return (
     <CommandItem key={props.playlist}>
@@ -92,6 +93,13 @@ function PlaylistCommandItem(props: { playlist: string; value: Audio; name: stri
                 setOldAudioList,
               )
             }
+            invoke<Playlist[]>("get_playlists")
+              .then((response) => {
+                setPlaylist(response)
+              })
+              .catch((error) => {
+                console.error(error)
+              })
           }}
         />
         <label
@@ -122,10 +130,10 @@ export default function CPlaylistSub({ value, name }: { value: Audio; name: stri
             <CommandGroup>
               {playlists.map((playlist) => (
                 <PlaylistCommandItem
-                  key={playlist}
+                  key={playlist.name}
                   value={value}
                   name={name}
-                  playlist={playlist}
+                  playlist={playlist.name}
                 />
               ))}
             </CommandGroup>

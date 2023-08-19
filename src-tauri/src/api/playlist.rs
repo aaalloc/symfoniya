@@ -9,6 +9,13 @@ use crate::{
     music::player::MusicPlayer,
 };
 
+#[derive(serde::Serialize)]
+pub struct Playlist {
+    pub name: String,
+    pub count: i64,
+    pub cover: Vec<u8>,
+}
+
 #[tauri::command]
 pub fn create_playlist(name: String, app_handle: AppHandle) -> Result<(), String> {
     let result = app_handle.db(|db| database::add_playlist(db, &name));
@@ -47,16 +54,10 @@ pub fn is_in_playlist(
 }
 
 #[tauri::command]
-pub fn get_playlists(app_handle: AppHandle) -> Result<Vec<String>, String> {
-    let result = app_handle.db(database::retrieve_playlist);
+pub fn get_playlists(app_handle: AppHandle) -> Result<Vec<Playlist>, String> {
+    let result = app_handle.db(database::get_playlist_info);
     match result {
-        Ok(playlists) => match playlists.len() {
-            0 => Err("No playlists found".to_string()),
-            _ => match playlists[0].as_str() {
-                "" => Err("No playlists".to_string()),
-                _ => Ok(playlists),
-            },
-        },
+        Ok(list) => Ok(list),
         Err(e) => Err(e.to_string()),
     }
 }

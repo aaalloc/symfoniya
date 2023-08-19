@@ -7,7 +7,10 @@ mod insert;
 mod schema;
 #[path = "./requests/select.rs"]
 mod select;
-use crate::music::audio::{_Audio, _Tag};
+use crate::{
+    api::playlist::Playlist,
+    music::audio::{_Audio, _Tag},
+};
 use rusqlite::{named_params, Connection};
 use std::fs;
 use tauri::AppHandle;
@@ -135,20 +138,6 @@ pub fn add_playlist(db: &Connection, playlist_name: &str) -> Result<(), rusqlite
     Ok(())
 }
 
-pub fn retrieve_playlist(db: &Connection) -> Result<Vec<String>, rusqlite::Error> {
-    let mut statement = db.prepare(select::playlist::PLAYLIST_SELECT)?;
-    let mut results = statement.query([])?;
-    let mut playlists = Vec::new();
-    while let Some(result) = results.next()? {
-        let result: String = result.get(0)?;
-        if playlists.contains(&result) {
-            continue;
-        }
-        playlists.push(result);
-    }
-    Ok(playlists)
-}
-
 pub fn is_in_playlist(
     db: &Connection,
     playlist_name: &str,
@@ -212,4 +201,20 @@ pub fn get_audios_from_playlist(
     audios.sort_by(|a, b| a.path.cmp(&b.path));
     audios.dedup_by(|a, b| a.path == b.path);
     Ok(audios)
+}
+
+pub fn get_playlist_info(db: &Connection) -> Result<Vec<Playlist>, rusqlite::Error> {
+    let mut statement = db.prepare(select::playlist::PLAYLIST_INFO_SELECT)?;
+    let mut results = statement.query([])?;
+    let mut playlists_info: Vec<Playlist> = Vec::new();
+    while let Some(result) = results.next()? {
+        let playlist_info = Playlist {
+            name: result.get(0)?,
+            count: result.get(1)?,
+            // if cover is null, return empty string
+            cover: result.get(2).unwrap_or(Vec::new()),
+        };
+        playlists_info.push(playlist_info);
+    }
+    Ok(playlists_info)
 }

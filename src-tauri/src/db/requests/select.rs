@@ -10,9 +10,12 @@ INNER JOIN playlists_audio ON audios.id = playlists_audio.audio_id
 WHERE playlists_audio.playlist_id = (SELECT id FROM playlists WHERE name = @name)
 ";
 
-    pub const PLAYLIST_SELECT: &str = "
-SELECT name
+    pub const PLAYLIST_INFO_SELECT: &str = "
+SELECT name, COUNT(audio_id), audios.cover
 FROM playlists
+LEFT JOIN playlists_audio ON playlists.id = playlists_audio.playlist_id
+LEFT JOIN audios ON playlists_audio.audio_id = audios.id
+GROUP BY name
 ";
 }
 

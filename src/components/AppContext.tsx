@@ -2,6 +2,7 @@ import { invoke } from "@tauri-apps/api/tauri"
 import { createContext, useEffect, useState } from "react"
 
 import { Audio } from "@/components/types/audio"
+import { Playlist } from "@/components/types/playlist"
 
 type PlaylistCheckedState = Record<string, Record<string, boolean>>
 
@@ -12,13 +13,20 @@ const AppContext = createContext({
   setAudioList: {} as (audioList: Audio[]) => void,
   oldAudioList: [] as Audio[],
   setOldAudioList: {} as (audioList: Audio[]) => void,
-  playlists: [] as string[],
-  setPlaylist: {} as (playlist: string[]) => void,
+  playlists: [] as Playlist[],
+  setPlaylist: {} as (playlist: Playlist[]) => void,
   playlistCheckedState: {} as PlaylistCheckedState,
   setPlaylistCheckedState: {} as (playlistCheckedState: PlaylistCheckedState) => void,
 })
 
 const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
+  const [audio, setAudioPlayer] = useState<Audio>({} as Audio)
+  const [audioList, setAudioList] = useState<Audio[]>([] as Audio[])
+  const [oldAudioList, setOldAudioList] = useState<Audio[]>([] as Audio[])
+  const [playlists, setPlaylist] = useState<Playlist[]>([] as Playlist[])
+  const [playlistCheckedState, setPlaylistCheckedState] = useState(
+    {} as PlaylistCheckedState,
+  )
   useEffect(() => {
     invoke<number>("startup_audios_init")
       .then((response) => {
@@ -29,7 +37,7 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
       .catch((error) => {
         console.error(error)
       })
-    invoke<string[]>("get_playlists")
+    invoke<Playlist[]>("get_playlists")
       .then((response) => {
         console.log(response)
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -43,13 +51,6 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
       })
   }, [])
 
-  const [audio, setAudioPlayer] = useState<Audio>({} as Audio)
-  const [audioList, setAudioList] = useState<Audio[]>([] as Audio[])
-  const [oldAudioList, setOldAudioList] = useState<Audio[]>([] as Audio[])
-  const [playlists, setPlaylist] = useState<string[]>([] as string[])
-  const [playlistCheckedState, setPlaylistCheckedState] = useState(
-    {} as PlaylistCheckedState,
-  )
   return (
     <AppContext.Provider
       value={{
