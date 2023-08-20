@@ -23,11 +23,10 @@ import { byteToImage, format_duration } from "@/lib/utils"
 export default function Music({ name }: { name: string }) {
   const { setAudioPlayer, audioList, setAudioList } = useContext(AppContext)
   const { playlists, setOldAudioList } = useContext(AppContext)
-  const { setPlaylistCheckedState, currentPlaylistListening } = useContext(AppContext)
+  const { setPlaylistCheckedState } = useContext(AppContext)
   const { setCurrentPlaylistListening } = useContext(AppContext)
 
   const shuffle = async (name: string) => {
-    //setCurrentPlaylistListening(name)
     const audios: Audio[] = await invoke("shuffle", {
       playlist: name,
     })
