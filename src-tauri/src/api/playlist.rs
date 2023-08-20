@@ -78,7 +78,13 @@ pub fn get_audio_playlist(
             Ok(list) => {
                 if player.playlists.contains_key(str) {
                     let mut clone_playlist = player.playlists.get(str).unwrap().clone();
+                    // is there a better way to do this?
                     clone_playlist.retain(|a| list.contains(a));
+                    for audio in list {
+                        if !clone_playlist.contains(&audio) {
+                            clone_playlist.push(audio);
+                        }
+                    }
                     player.playlists.insert(str.to_string(), clone_playlist);
                     Ok(create_audio_list(player, str))
                 } else {

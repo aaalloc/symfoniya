@@ -50,10 +50,20 @@ export function Player() {
     setIsPlaying(false)
   }
 
+  const update_after_play = async () => {
+    await invoke("update_player", {
+      playlist: currentPlaylistListening,
+    })
+    const res = await invoke<Audio[]>("get_audio_playlist", {
+      playlist: currentPlaylistListening,
+    })
+    setOldAudioList(res)
+  }
+
   const next = async () => {
+    await update_after_play()
     const id: number = await invoke("goto_next")
     await invoke("play_from_id", { id: id })
-    console.debug(id)
     setAudioById(id)
     if (!isPlaying) {
       setIsPlaying(true)
@@ -61,6 +71,7 @@ export function Player() {
   }
 
   const previous = async () => {
+    await update_after_play()
     const id: number = await invoke("goto_previous")
     await invoke("play_from_id", { id: id })
     setAudioById(id)
