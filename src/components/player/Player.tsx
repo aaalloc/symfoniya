@@ -76,8 +76,10 @@ export function Player() {
   }
 
   const shuffle = async (name: string, currentPlaylistListening: string) => {
-    const audios: Audio[] = await invoke("shuffle", { playlist: name })
-    if (name === currentPlaylistListening || currentPlaylistListening === "") {
+    const audios: Audio[] = await invoke("shuffle", {
+      playlist: currentPlaylistListening,
+    })
+    if (name === currentPlaylistListening) {
       setAudioList(audios)
     } else {
       setOldAudioList(audios)
@@ -153,7 +155,7 @@ export function Player() {
               variant="ghost"
               size="icon"
               onClick={() =>
-                shuffle(currentPlaylistListening, router.query.playlist as string)
+                shuffle(router.query.playlist as string, currentPlaylistListening)
               }
             >
               <Shuffle />

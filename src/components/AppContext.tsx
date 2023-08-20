@@ -13,7 +13,7 @@ const AppContext = createContext({
   audioList: [] as Audio[],
   setAudioList: {} as (audioList: Audio[]) => void,
   oldAudioList: [] as Audio[],
-  currentPlaylistListening: {} as string,
+  currentPlaylistListening: "",
   setCurrentPlaylistListening: {} as (playlist: string) => void,
   setOldAudioList: {} as (audioList: Audio[]) => void,
   playlists: [] as Playlist[],

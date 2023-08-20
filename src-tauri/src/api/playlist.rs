@@ -73,15 +73,18 @@ pub fn get_audio_playlist(
     if str == "all" {
         Ok(create_audio_list(player, str))
     } else {
-        if player.playlists.contains_key(str) {
-            return Ok(create_audio_list(player, str));
-        }
-        // When shuffled, do you want to keep the shuffled list or get the original one ?
         let result = app_handle.db(|db| database::get_audios_from_playlist(db, str));
         match result {
             Ok(list) => {
-                player.playlists.insert(str.to_string(), list);
-                Ok(create_audio_list(player, str))
+                if player.playlists.contains_key(str) {
+                    let mut clone_playlist = player.playlists.get(str).unwrap().clone();
+                    clone_playlist.retain(|a| list.contains(a));
+                    player.playlists.insert(str.to_string(), clone_playlist);
+                    Ok(create_audio_list(player, str))
+                } else {
+                    player.playlists.insert(str.to_string(), list);
+                    Ok(create_audio_list(player, str))
+                }
             }
             Err(e) => Err(e.to_string()),
         }

@@ -131,6 +131,12 @@ impl std::fmt::Display for _Audio {
     }
 }
 
+impl std::cmp::PartialEq for _Audio {
+    fn eq(&self, other: &Self) -> bool {
+        self.path == other.path
+    }
+}
+
 pub fn create_audio(path: &str, format: FileFormat) -> _Audio {
     let tagged_file = Probe::open(path)
         .expect("ERROR: Bad path provided!")
