@@ -2,6 +2,7 @@ use rodio::Sink;
 use std::{collections::HashMap, time::Duration};
 
 use crate::{database, db::state::DbAccess, music::audio::*, update_status};
+use rand::prelude::*;
 use std::time::Instant;
 use tauri::AppHandle;
 pub struct MusicPlayer {
@@ -31,6 +32,7 @@ pub trait Player {
     fn get_current_audio(&self) -> &_Audio;
     fn set_volume(&mut self, volume: f32);
     fn get_volume(&self) -> f32;
+    fn shuffle(&mut self, playlist: &str);
     //fn stop(&mut self);
     fn get_index(&self) -> usize;
     fn write_to_db(&self, app_handle: AppHandle);
@@ -165,6 +167,13 @@ impl Player for MusicPlayer {
 
     fn get_volume(&self) -> f32 {
         self.sink.volume()
+    }
+
+    fn shuffle(&mut self, playlist: &str) {
+        // shuffle self.playlists[playlist]
+        let mut rng = rand::thread_rng();
+        self.playlists.get_mut(playlist).unwrap().shuffle(&mut rng);
+        self.audios = self.playlists.get(playlist).unwrap().to_vec();
     }
 
     fn write_to_db(&self, app_handle: AppHandle) {

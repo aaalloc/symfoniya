@@ -51,9 +51,7 @@ export async function setAudiosFromPlaylist(
   playlist: string,
   audioList: Audio[],
   setAudioList: (audioList: Audio[]) => void,
-  setOldAudioList: (audioList: Audio[]) => void,
 ) {
-  setOldAudioList(audioList)
   const res = await invoke<Audio[]>("get_audio_playlist", {
     playlist: playlist,
   })
@@ -61,7 +59,7 @@ export async function setAudiosFromPlaylist(
 }
 
 function PlaylistCommandItem(props: { playlist: string; value: Audio; name: string }) {
-  const { audioList, setAudioList, setOldAudioList } = useContext(AppContext)
+  const { audioList, setAudioList } = useContext(AppContext)
   const { playlists, setPlaylist } = useContext(AppContext)
   const { playlistCheckedState, setPlaylistCheckedState } = useContext(AppContext)
   return (
@@ -86,12 +84,7 @@ function PlaylistCommandItem(props: { playlist: string; value: Audio; name: stri
             fetchPlaylistCheckedState(playlists, audioList, setPlaylistCheckedState)
             if (props.name === props.playlist) {
               // eslint-disable-next-line @typescript-eslint/no-floating-promises
-              setAudiosFromPlaylist(
-                props.playlist,
-                audioList,
-                setAudioList,
-                setOldAudioList,
-              )
+              setAudiosFromPlaylist(props.playlist, audioList, setAudioList)
             }
             invoke<Playlist[]>("get_playlists")
               .then((response) => {

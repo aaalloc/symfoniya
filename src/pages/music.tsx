@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @next/next/no-img-element */
 import { invoke } from "@tauri-apps/api/tauri"
+import { Shuffle } from "lucide-react"
 import { useContext, useEffect } from "react"
 
 import { AppContext } from "@/components/AppContext"
@@ -7,6 +9,8 @@ import CPlaylistSub, {
   fetchPlaylistCheckedState,
   setAudiosFromPlaylist,
 } from "@/components/contexts_menu/CPlaylistSub"
+import { shuffle } from "@/components/player/Player"
+import { Button } from "@/components/ui/button"
 import {
   ContextMenu,
   ContextMenuContent,
@@ -19,10 +23,10 @@ export default function Music({ name }: { name: string }) {
   const { setAudioPlayer, audioList, setAudioList } = useContext(AppContext)
   const { playlists, setOldAudioList } = useContext(AppContext)
   const { setPlaylistCheckedState } = useContext(AppContext)
+  const { setCurrentPlaylistListening } = useContext(AppContext)
+
   useEffect(() => {
-    setAudiosFromPlaylist(name, audioList, setAudioList, setOldAudioList).catch(
-      console.error,
-    )
+    setAudiosFromPlaylist(name, audioList, setAudioList).catch(console.error)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name])
 
@@ -39,6 +43,13 @@ export default function Music({ name }: { name: string }) {
       <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
         {name === "all" ? "Music" : name}
       </h1>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => shuffle(name, "", setAudioList, setOldAudioList)}
+      >
+        <Shuffle />
+      </Button>
       <div className="h-3/4 overflow-y-auto">
         <div className="container flex flex-col gap-2 items-stretch">
           {audioList.map((value) => {
@@ -52,6 +63,8 @@ export default function Music({ name }: { name: string }) {
                       await invoke("update_player", {
                         playlist: name,
                       })
+                      setCurrentPlaylistListening(name)
+                      setOldAudioList(audioList)
                       setAudioPlayer(value)
                     }}
                     id={`audio-${value.id}`}

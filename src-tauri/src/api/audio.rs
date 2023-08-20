@@ -5,7 +5,10 @@ use tauri::{AppHandle, State};
 use crate::{
     api::utils::create_audio_list,
     api::utils::Audio,
-    music::player::{MusicPlayer, Player},
+    music::{
+        audio::Status,
+        player::{MusicPlayer, Player},
+    },
 };
 
 #[tauri::command]
@@ -35,17 +38,14 @@ pub fn retrieve_audios(
 }
 
 #[tauri::command]
-pub fn current_audio_status(
-    player: State<'_, Arc<Mutex<MusicPlayer>>>,
-) -> Result<(String, u64, u64), String> {
+pub fn current_audio_status(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<Status, String> {
     let mut player = player.lock().unwrap();
-    let status = player.current_audio_status();
-    let formated = status.get_status();
+    let status = player.current_audio_status().get_status();
     let index = player.get_index();
-    if formated.1 == formated.2 && formated.0 == "Playing" {
+    if status.current == status.total && status.status == "Playing" {
         player.update_sink(index);
     }
-    Ok(formated)
+    Ok(status)
 }
 
 #[tauri::command]
@@ -73,4 +73,14 @@ pub fn goto_previous(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<usize
     let mut player = player.lock().unwrap();
     player.previous();
     Ok(player.get_index())
+}
+
+#[tauri::command]
+pub fn shuffle(
+    playlist: String,
+    player: State<'_, Arc<Mutex<MusicPlayer>>>,
+) -> Result<Vec<Audio>, String> {
+    let mut player = player.lock().unwrap();
+    player.shuffle(playlist.as_str());
+    Ok(create_audio_list(player, playlist.as_str()))
 }

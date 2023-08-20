@@ -1,9 +1,7 @@
 import { Moon, Sun } from "lucide-react"
 import Head from "next/head"
 import { useTheme } from "next-themes"
-import { useContext } from "react"
 
-import { AppContext } from "@/components/AppContext"
 //import { MenubarDemo } from "@/components/MenubarDemo"
 import { Player } from "@/components/player/Player"
 import { SearchBar } from "@/components/search/SearchBar"
@@ -13,20 +11,10 @@ import { Toaster } from "@/components/ui/toaster"
 import { useGlobalShortcut } from "@/hooks/tauri/shortcuts"
 
 export default function Layout({ children }: { children: React.ReactElement }) {
-  const { audio, setAudioPlayer, audioList, oldAudioList } = useContext(AppContext)
   const { theme, setTheme } = useTheme()
   useGlobalShortcut("CommandOrControl+P", () => {
     console.log("Ctrl+P was pressed!")
   })
-
-  const setAudioById = (id: number) => {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (audioList[id] !== undefined) {
-      setAudioPlayer(audioList[id])
-    } else {
-      setAudioPlayer(oldAudioList[id])
-    }
-  }
 
   return (
     <>
@@ -57,7 +45,7 @@ export default function Layout({ children }: { children: React.ReactElement }) {
             {children}
           </div>
         </div>
-        <Player currentAudio={audio} setter={setAudioById} />
+        <Player />
       </main>
     </>
   )
