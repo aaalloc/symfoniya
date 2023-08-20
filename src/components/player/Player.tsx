@@ -28,26 +28,12 @@ function isObjectEmpty(objectName: object) {
   return Object.keys(objectName).length === 0
 }
 
-export async function shuffle(
-  name: string,
-  currentPlaylistListening: string,
-  setAudioList: (audios: Audio[]) => void,
-  setOldAudioList: (audios: Audio[]) => void,
-) {
-  const audios: Audio[] = await invoke("shuffle", { playlist: name })
-  if (name === currentPlaylistListening || currentPlaylistListening === "") {
-    setAudioList(audios)
-  } else {
-    setOldAudioList(audios)
-  }
-}
-
 export function Player() {
   const router = useRouter()
   const [isPlaying, setIsPlaying] = useState(false)
   const [status, setStatus] = useState({ current: 0 } as AudioStatus)
   const { audio } = useContext(AppContext)
-  const { setAudioById } = useContext(AppContext)
+  const { setAudioById, setAudioPlayer } = useContext(AppContext)
   const { currentPlaylistListening } = useContext(AppContext)
   const { setAudioList, setOldAudioList } = useContext(AppContext)
 
@@ -87,6 +73,16 @@ export function Player() {
     const status: AudioStatus = await invoke("current_audio_status")
     console.debug(status)
     setStatus(status)
+  }
+
+  const shuffle = async (name: string, currentPlaylistListening: string) => {
+    const audios: Audio[] = await invoke("shuffle", { playlist: name })
+    if (name === currentPlaylistListening || currentPlaylistListening === "") {
+      setAudioList(audios)
+    } else {
+      setOldAudioList(audios)
+    }
+    setAudioPlayer(audios[0])
   }
 
   useEffect(() => {
@@ -157,12 +153,7 @@ export function Player() {
               variant="ghost"
               size="icon"
               onClick={() =>
-                shuffle(
-                  currentPlaylistListening,
-                  router.query.playlist as string,
-                  setAudioList,
-                  setOldAudioList,
-                )
+                shuffle(currentPlaylistListening, router.query.playlist as string)
               }
             >
               <Shuffle />

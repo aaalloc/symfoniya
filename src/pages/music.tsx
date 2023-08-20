@@ -9,7 +9,7 @@ import CPlaylistSub, {
   fetchPlaylistCheckedState,
   setAudiosFromPlaylist,
 } from "@/components/contexts_menu/CPlaylistSub"
-import { shuffle } from "@/components/player/Player"
+import { Audio } from "@/components/types/audio"
 import { Button } from "@/components/ui/button"
 import {
   ContextMenu,
@@ -24,6 +24,16 @@ export default function Music({ name }: { name: string }) {
   const { playlists, setOldAudioList } = useContext(AppContext)
   const { setPlaylistCheckedState } = useContext(AppContext)
   const { setCurrentPlaylistListening } = useContext(AppContext)
+
+  const shuffle = async (name: string, currentPlaylistListening: string) => {
+    const audios: Audio[] = await invoke("shuffle", { playlist: name })
+    if (name === currentPlaylistListening || currentPlaylistListening === "") {
+      setAudioList(audios)
+    } else {
+      setOldAudioList(audios)
+    }
+    setAudioPlayer(audios[0])
+  }
 
   useEffect(() => {
     setAudiosFromPlaylist(name, audioList, setAudioList).catch(console.error)
@@ -43,11 +53,7 @@ export default function Music({ name }: { name: string }) {
       <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
         {name === "all" ? "Music" : name}
       </h1>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => shuffle(name, "", setAudioList, setOldAudioList)}
-      >
+      <Button variant="ghost" size="icon" onClick={() => shuffle(name, "")}>
         <Shuffle />
       </Button>
       <div className="h-3/4 overflow-y-auto">
