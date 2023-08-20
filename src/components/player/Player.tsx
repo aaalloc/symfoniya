@@ -12,6 +12,7 @@ import { useContext } from "react"
 import { AppContext } from "@/components/AppContext"
 import { Audio } from "@/components/types/audio"
 import { Progress } from "@/components/ui/progress"
+import { useToast } from "@/components/ui/use-toast"
 import { cn } from "@/lib/utils"
 import { format_duration } from "@/lib/utils"
 
@@ -32,18 +33,37 @@ export function Player() {
   const router = useRouter()
   const [isPlaying, setIsPlaying] = useState(false)
   const [status, setStatus] = useState({ current: 0 } as AudioStatus)
-  const { audio } = useContext(AppContext)
+  const { audio, audioList, oldAudioList } = useContext(AppContext)
   const { setAudioById, setAudioPlayer } = useContext(AppContext)
   const { currentPlaylistListening } = useContext(AppContext)
   const { setAudioList, setOldAudioList } = useContext(AppContext)
+  const { toast } = useToast()
+
+  const play_from_id_or_skip = async (id: number) => {
+    const result: boolean = await invoke("play_from_id", { id: id })
+    if (!result) {
+      setAudioList(audioList.filter((audio) => audio.id !== id))
+      setOldAudioList(oldAudioList.filter((audio) => audio.id !== id))
+      toast({
+        title: "Audio",
+        description: `${audio.title} is deleted, skipping to next audio`,
+      })
+      return false
+    }
+    return true
+  }
 
   const play = async () => {
     if (status.current === audio.duration) {
       status.current = 0
       //props.setter(props.currentAudio.id)
     }
-    await invoke("play_from_id", { id: audio.id })
-    setIsPlaying(true)
+    const result = await play_from_id_or_skip(audio.id)
+    if (result) {
+      setIsPlaying(true)
+    } else {
+      next()
+    }
   }
   const pause = async () => {
     await invoke("pause")
@@ -63,20 +83,24 @@ export function Player() {
   const next = async () => {
     await update_after_play()
     const id: number = await invoke("goto_next")
-    await invoke("play_from_id", { id: id })
-    setAudioById(id)
-    if (!isPlaying) {
-      setIsPlaying(true)
+    const result = await play_from_id_or_skip(id)
+    if (result) {
+      setAudioById(id)
+      if (!isPlaying) {
+        setIsPlaying(true)
+      }
     }
   }
 
   const previous = async () => {
     await update_after_play()
     const id: number = await invoke("goto_previous")
-    await invoke("play_from_id", { id: id })
-    setAudioById(id)
-    if (!isPlaying) {
-      setIsPlaying(true)
+    const result = await play_from_id_or_skip(id)
+    if (result) {
+      setAudioById(id)
+      if (!isPlaying) {
+        setIsPlaying(true)
+      }
     }
   }
 
@@ -118,8 +142,7 @@ export function Player() {
     } else if (!isPlaying) {
       play()
     } else {
-      pause()
-      play()
+      setIsPlaying(true)
     }
   }, [audio])
 

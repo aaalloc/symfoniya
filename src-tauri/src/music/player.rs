@@ -105,7 +105,8 @@ impl Player for MusicPlayer {
     }
 
     fn play(&mut self) {
-        if !self.sink.empty() {
+        let current_status = self.current_audio_status().get_status();
+        if !self.is_playing && current_status.status == "Stopped" {
             self.sink.play();
         } else {
             self.sink.append(get_decoder(&self.audios[self.index].path));

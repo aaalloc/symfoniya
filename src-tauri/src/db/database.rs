@@ -218,3 +218,21 @@ pub fn get_playlist_info(db: &Connection) -> Result<Vec<Playlist>, rusqlite::Err
     }
     Ok(playlists_info)
 }
+
+pub fn delete_audio(db: &Connection, path: &str) -> Result<(), rusqlite::Error> {
+    let mut statement = db.prepare(delete::playlist::AUDIO_IN_PLAYLIST_DELETE)?;
+    statement.execute(named_params! {
+        "@path": path
+    })?;
+    statement = db.prepare(delete::audio::AUDIO_DELETE)?;
+    statement.execute(named_params! {
+        "@path": path
+    })?;
+
+    statement = db.prepare(delete::tag::AUDIO_DELETE_TAG)?;
+    statement.execute(named_params! {
+        "@path": path
+    })?;
+
+    Ok(())
+}
