@@ -25,6 +25,7 @@ pub fn import_from_folders(
 pub fn play_from_id(id: usize, player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<bool, String> {
     let mut player = player.lock().unwrap();
     // TODO FIX: When the user click on the same audio, there is a bug
+    // TODO: when file is deleted, the player should skip to the next audio and delete the audio from the db
     player.update_sink(id);
     player.set_index(id);
     player.play();
