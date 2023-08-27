@@ -8,4 +8,10 @@ interface Audio {
   cover: number[] // byte array
 }
 
-export type { Audio }
+interface AudioStatus {
+  status: string
+  current: number
+  total: number
+}
+
+export type { Audio, AudioStatus }

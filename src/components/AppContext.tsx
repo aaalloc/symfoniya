@@ -2,14 +2,18 @@ import { invoke } from "@tauri-apps/api/tauri"
 import { useRouter } from "next/router"
 import { createContext, useEffect, useState } from "react"
 
-import { Audio } from "@/components/types/audio"
+import { Audio, AudioStatus } from "@/components/types/audio"
 import { Playlist } from "@/components/types/playlist"
+import { Toast, ToasterToast, useToast } from "@/components/ui/use-toast"
+import { isObjectEmpty } from "@/lib/utils"
 
 type PlaylistCheckedState = Record<string, Record<string, boolean>>
 
 const AppContext = createContext({
   audio: {} as Audio,
   setAudioPlayer: {} as (audio: Audio) => void,
+  status: {} as AudioStatus,
+  setStatus: {} as (status: AudioStatus) => void,
   audioList: [] as Audio[],
   setAudioList: {} as (audioList: Audio[]) => void,
   oldAudioList: [] as Audio[],
@@ -21,10 +25,45 @@ const AppContext = createContext({
   playlistCheckedState: {} as PlaylistCheckedState,
   setPlaylistCheckedState: {} as (playlistCheckedState: PlaylistCheckedState) => void,
   setAudioById: {} as (id: number) => void,
+  isPlaying: false,
+  setIsPlaying: {} as (isPlaying: boolean) => void,
+  toast: {} as ({ ...props }: Toast) => {
+    id: string
+    dismiss: () => void
+    update: (props: ToasterToast) => void
+  },
 })
+
+interface appContext {
+  audio: Audio
+  setAudioPlayer: (audio: Audio) => void
+  status: AudioStatus
+  setStatus: (status: AudioStatus) => void
+  audioList: Audio[]
+  setAudioList: (audioList: Audio[]) => void
+  oldAudioList: Audio[]
+  setOldAudioList: (audioList: Audio[]) => void
+  playlists: Playlist[]
+  setPlaylist: (playlist: Playlist[]) => void
+  playlistCheckedState: PlaylistCheckedState
+  setPlaylistCheckedState: (playlistCheckedState: PlaylistCheckedState) => void
+  currentPlaylistListening: string
+  setCurrentPlaylistListening: (playlist: string) => void
+  setAudioById: (id: number) => void
+  isPlaying: boolean
+  setIsPlaying: (isPlaying: boolean) => void
+  toast: ({ ...props }: Toast) => {
+    id: string
+    dismiss: () => void
+    update: (props: ToasterToast) => void
+  }
+}
+
+export type { appContext }
 
 const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
   const router = useRouter()
+  const { toast } = useToast()
   const [audio, setAudioPlayer] = useState<Audio>({} as Audio)
   const [audioList, setAudioList] = useState<Audio[]>([] as Audio[])
   const [oldAudioList, setOldAudioList] = useState<Audio[]>([] as Audio[])
@@ -35,11 +74,14 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
   const [currentPlaylistListening, setCurrentPlaylistListening] = useState<string>(
     {} as string,
   )
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [status, setStatus] = useState({ current: 0 } as AudioStatus)
 
   const setAudioById = (id: number) => {
     const playlistPage = router.query.playlist as string
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (currentPlaylistListening === playlistPage) {
+      setAudioPlayer(audioList[id])
+    } else if (isObjectEmpty(currentPlaylistListening as unknown as object)) {
       setAudioPlayer(audioList[id])
     } else {
       setAudioPlayer(oldAudioList[id])
@@ -75,6 +117,8 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
       value={{
         audio,
         setAudioPlayer,
+        status,
+        setStatus,
         oldAudioList,
         setOldAudioList,
         audioList,
@@ -86,6 +130,9 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
         currentPlaylistListening,
         setCurrentPlaylistListening,
         setAudioById,
+        isPlaying,
+        setIsPlaying,
+        toast,
       }}
     >
       {children}

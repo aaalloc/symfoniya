@@ -10,7 +10,7 @@ import CPlaylistSub, {
   fetchPlaylistCheckedState,
   setAudiosFromPlaylist,
 } from "@/components/contexts_menu/CPlaylistSub"
-import { Audio } from "@/components/types/audio"
+import { play, shuffle } from "@/components/player/Player"
 import { Button } from "@/components/ui/button"
 import {
   ContextMenu,
@@ -21,19 +21,11 @@ import {
 import { byteToImage, format_duration } from "@/lib/utils"
 
 export default function Music({ name }: { name: string }) {
+  const context = useContext(AppContext)
   const { setAudioPlayer, audioList, setAudioList } = useContext(AppContext)
   const { playlists, setOldAudioList } = useContext(AppContext)
   const { setPlaylistCheckedState } = useContext(AppContext)
   const { setCurrentPlaylistListening } = useContext(AppContext)
-
-  const shuffle = async (name: string) => {
-    const audios: Audio[] = await invoke("shuffle", {
-      playlist: name,
-    })
-    setAudioList(audios)
-    setAudioPlayer(audios[0])
-    setCurrentPlaylistListening(name)
-  }
 
   useEffect(() => {
     setAudiosFromPlaylist(name, audioList, setAudioList).catch(console.error)
@@ -53,7 +45,7 @@ export default function Music({ name }: { name: string }) {
       <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
         {name === "all" ? "Music" : name}
       </h1>
-      <Button variant="ghost" size="icon" onClick={() => shuffle(name)}>
+      <Button variant="ghost" size="icon" onClick={() => shuffle(name, context, true)}>
         <Shuffle />
       </Button>
       <div className="h-3/4 overflow-y-auto">
@@ -71,6 +63,9 @@ export default function Music({ name }: { name: string }) {
                       })
                       setCurrentPlaylistListening(name)
                       setOldAudioList(audioList)
+                      if (context.isPlaying) {
+                        await play(context, true)
+                      }
                       setAudioPlayer(value)
                     }}
                     id={`audio-${value.id}`}

@@ -30,12 +30,12 @@ pub fn import_from_folders(
 #[tauri::command]
 pub fn play_from_id(
     id: usize,
+    path: String,
     app_handle: AppHandle,
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
 ) -> Result<bool, String> {
     let mut player = player.lock().unwrap();
     // TODO FIX: When the user click on the same audio, there is a bug
-    // TODO: when file is deleted, the player should skip to the next audio and delete the audio from the db
     if File::open(&player.audios[id].path).is_err() {
         println!("File not found: {}", player.audios[id].path);
         let result = app_handle.db(|db| database::delete_audio(db, &player.audios[id].path));
@@ -49,7 +49,10 @@ pub fn play_from_id(
 
         Ok(false)
     } else {
-        player.update_sink(id); // this leads to reloading the audio when paused and played again
+        println!("{} {}", player.get_current_audio().path, path);
+        if player.get_current_audio().path != path {
+            player.update_sink(id);
+        }
         player.set_index(id);
         player.play();
         Ok(true)
