@@ -108,7 +108,7 @@ export async function shuffle(
     setCurrentPlaylistListening,
     currentPlaylistListening,
   } = context
-  const { audio, setAudioPlayer } = context
+  const { audio, setAudioPlayer, setIsPlaying } = context
   const audios: Audio[] = await invoke("shuffle", {
     playlist: fromMusicPage ? name : currentPlaylistListening,
   })
@@ -121,8 +121,8 @@ export async function shuffle(
   } else {
     setOldAudioList(audios)
   }
-  await update_after_play(context)
-  const result = await play_from_id_or_skip(audios[0].id, context)
+  await update_after_play(context, name)
+  const result = await play_from_id_or_skip(audios[0].id, context, fromMusicPage)
   if (result) {
     if (audios[0] === audio) {
       return
@@ -131,6 +131,7 @@ export async function shuffle(
     if (fromMusicPage) {
       setCurrentPlaylistListening(name)
     }
+    setIsPlaying(true)
   }
 }
 

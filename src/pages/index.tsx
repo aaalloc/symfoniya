@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import "keen-slider/keen-slider.min.css"
 
-import { useKeenSlider } from "keen-slider/react"
+// import { useKeenSlider } from "keen-slider/react"
 import type { NextPage } from "next"
 import Router from "next/router"
 import { useContext } from "react"
@@ -16,18 +16,23 @@ const Home: NextPage = () => {
     console.log("Ctrl+P was pressed!")
   })
 
-  const [ref] = useKeenSlider<HTMLDivElement>({
-    slides: {
-      perView: 2,
-      spacing: 15,
-    },
-  })
+  // const [ref] = useKeenSlider<HTMLDivElement>(
+  //   {
+  //     slides: {
+  //       perView: 4,
+  //       spacing: 1,
+  //     },
+  //     mode: "free",
+  //     loop: false,
+  //   },
+  //   [],
+  // )
   return (
     <div className="h-full flex-1 flex flex-col gap-6">
       <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
         Hello !
       </h1>
-      <div ref={ref} className="keen-slider flex flex-row container gap-x-8">
+      <div className="flex flex-row container">
         {playlists.map((value, index) => {
           return (
             <div
@@ -40,7 +45,7 @@ const Home: NextPage = () => {
                 })
               }}
               id={`playlist-${value.name}`}
-              className="shrink-0
+              className="shrink-0 keen-slider__slide
                 hover:cursor-pointer hover:bg-gray-50 duration-150
                 delay-90 dark:hover:bg-gray-900 p-6 rounded-lg transition ease-in-out  items-center space-y-4"
             >
