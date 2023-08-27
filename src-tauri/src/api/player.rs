@@ -48,14 +48,10 @@ pub fn play_from_id(
 
         Ok(false)
     } else {
-        println!("{} {}", player.current_audio.path, path);
-        if player.current_audio.path != path
-            || player.current_audio.path == path && player.is_playing
-        {
+        if player.current_audio.path != path || player.is_playing {
             player.update_sink(id);
         }
         player.set_index(id);
-        println!("{}", player.get_index());
         player.play();
         Ok(true)
     }
