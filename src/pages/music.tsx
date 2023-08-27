@@ -22,22 +22,22 @@ import { byteToImage, format_duration } from "@/lib/utils"
 
 export default function Music({ name }: { name: string }) {
   const context = useContext(AppContext)
-  const { setAudioPlayer, audioList, setAudioList } = useContext(AppContext)
-  const { playlists, setOldAudioList } = useContext(AppContext)
-  const { setPlaylistCheckedState } = useContext(AppContext)
-  const { setCurrentPlaylistListening } = useContext(AppContext)
 
   useEffect(() => {
-    setAudiosFromPlaylist(name, audioList, setAudioList).catch(console.error)
+    setAudiosFromPlaylist(name, context.audioList, context.setAudioList).catch(
+      console.error,
+    )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name])
 
   useEffect(() => {
-    fetchPlaylistCheckedState(playlists, audioList, setPlaylistCheckedState).catch(
-      console.error,
-    )
+    fetchPlaylistCheckedState(
+      context.playlists,
+      context.audioList,
+      context.setPlaylistCheckedState,
+    ).catch(console.error)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [audioList])
+  }, [context.audioList])
 
   //console.log(playlistCheckedState)
   return (
@@ -50,7 +50,7 @@ export default function Music({ name }: { name: string }) {
       </Button>
       <div className="h-3/4 overflow-y-auto">
         <div className="container flex flex-col gap-2 items-stretch">
-          {audioList.map((value) => {
+          {context.audioList.map((value) => {
             return (
               <ContextMenu key={value.id}>
                 <ContextMenuTrigger>
@@ -61,12 +61,12 @@ export default function Music({ name }: { name: string }) {
                       await invoke("update_player", {
                         playlist: name,
                       })
-                      setCurrentPlaylistListening(name)
-                      setOldAudioList(audioList)
+                      context.setCurrentPlaylistListening(name)
+                      context.setOldAudioList(context.audioList)
                       if (context.isPlaying) {
                         await play(context, true)
                       }
-                      setAudioPlayer(value)
+                      context.setAudioPlayer(value)
                     }}
                     id={`audio-${value.id}`}
                     className="hover:cursor-pointer p-6 rounded-lg transition ease-in-out delay-90 dark:hover:bg-gray-900 hover:bg-gray-50 duration-150 flex items-center space-x-8"
