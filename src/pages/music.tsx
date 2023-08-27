@@ -63,9 +63,6 @@ export default function Music({ name }: { name: string }) {
                       })
                       context.setCurrentPlaylistListening(name)
                       context.setOldAudioList(context.audioList)
-                      if (context.isPlaying) {
-                        await play(context, true)
-                      }
                       context.setAudioPlayer(value)
                     }}
                     id={`audio-${value.id}`}
