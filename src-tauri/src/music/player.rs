@@ -8,6 +8,7 @@ use tauri::AppHandle;
 pub struct MusicPlayer {
     pub total_time: Duration,
     pub audios: Vec<_Audio>,
+    pub current_audio: _Audio,
     pub is_playing: bool,
     pub playlists: HashMap<String, Vec<_Audio>>,
     sink: Sink,
@@ -29,7 +30,6 @@ pub trait Player {
     fn previous(&mut self);
     fn current_audio_status(&self) -> AudioStatus;
     fn get_audio(&self, index: usize) -> &_Audio;
-    fn get_current_audio(&self) -> &_Audio;
     fn set_volume(&mut self, volume: f32);
     fn get_volume(&self) -> f32;
     fn shuffle(&mut self, playlist: &str);
@@ -61,6 +61,19 @@ impl Player for MusicPlayer {
         MusicPlayer {
             total_time: Duration::new(0, 0),
             audios: Vec::new(),
+            current_audio: _Audio {
+                path: String::new(),
+                duration: Duration::new(0, 0),
+                status: AudioStatus::Waiting,
+                format: String::new(),
+                tag: _Tag {
+                    title: String::new(),
+                    artist: String::new(),
+                    album: String::new(),
+                    genre: String::new(),
+                },
+                cover: Vec::new(),
+            },
             sink: Sink::try_new(&stream_handler).unwrap(),
             is_playing: false,
             stream_handle: stream_handler,
@@ -116,6 +129,7 @@ impl Player for MusicPlayer {
             let status = &mut item.status;
             update_status!(status, item.duration);
         }
+        self.current_audio = self.audios.get(self.index).unwrap().clone();
         self.is_playing = true;
     }
 
@@ -156,10 +170,6 @@ impl Player for MusicPlayer {
 
     fn get_audio(&self, index: usize) -> &_Audio {
         self.audios.get(index).unwrap()
-    }
-
-    fn get_current_audio(&self) -> &_Audio {
-        self.audios.get(self.index).unwrap()
     }
 
     fn set_volume(&mut self, volume: f32) {

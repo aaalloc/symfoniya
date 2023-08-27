@@ -42,13 +42,13 @@ async function play_from_id_or_skip(
   return true
 }
 
-async function update_after_play(context: appContext) {
+export async function update_after_play(context: appContext, playlistListening = "") {
   const { currentPlaylistListening, setOldAudioList } = context
   await invoke("update_player", {
-    playlist: currentPlaylistListening,
+    playlist: playlistListening || currentPlaylistListening,
   })
   const res = await invoke<Audio[]>("get_audio_playlist", {
-    playlist: currentPlaylistListening,
+    playlist: playlistListening || currentPlaylistListening,
   })
   setOldAudioList(res)
 }
@@ -63,17 +63,19 @@ async function next(context: appContext) {
   }
 }
 
-export async function play(context: appContext, fromMusicPage = false) {
-  const { isPlaying, setIsPlaying } = context
+export async function play(context: appContext, toPlay: Audio, fromMusicPage = false) {
+  const { isPlaying, setIsPlaying, setAudioPlayer } = context
   const { status } = context
-  const { audio } = context
-  if (status.current === audio.duration) {
+  if (status.current === toPlay.duration) {
     console.log("resetting current")
     status.current = 0
   }
-  const result = await play_from_id_or_skip(audio.id, context, fromMusicPage)
+  const result = await play_from_id_or_skip(toPlay.id, context, fromMusicPage)
   if (result && !isPlaying) {
     setIsPlaying(true)
+    setAudioPlayer(toPlay)
+  } else if (result && isPlaying) {
+    setAudioPlayer(toPlay)
   } else {
     next(context)
   }
@@ -176,7 +178,7 @@ export function Player() {
                 <Pause className="w-8 h-8" />
               </Button>
             ) : (
-              <Button variant="ghost" size="icon" onClick={() => play(context)}>
+              <Button variant="ghost" size="icon" onClick={() => play(context, audio)}>
                 <Play className="w-8 h-8" />
               </Button>
             )}

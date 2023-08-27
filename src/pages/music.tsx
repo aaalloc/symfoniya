@@ -10,7 +10,7 @@ import CPlaylistSub, {
   fetchPlaylistCheckedState,
   setAudiosFromPlaylist,
 } from "@/components/contexts_menu/CPlaylistSub"
-import { play, shuffle } from "@/components/player/Player"
+import { play, shuffle, update_after_play } from "@/components/player/Player"
 import { Button } from "@/components/ui/button"
 import {
   ContextMenu,
@@ -62,8 +62,8 @@ export default function Music({ name }: { name: string }) {
                         playlist: name,
                       })
                       context.setCurrentPlaylistListening(name)
-                      context.setOldAudioList(context.audioList)
-                      context.setAudioPlayer(value)
+                      await update_after_play(context, name)
+                      await play(context, value, true)
                     }}
                     id={`audio-${value.id}`}
                     className="hover:cursor-pointer p-6 rounded-lg transition ease-in-out delay-90 dark:hover:bg-gray-900 hover:bg-gray-50 duration-150 flex items-center space-x-8"
