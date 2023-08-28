@@ -163,7 +163,7 @@ export function Player() {
   return (
     <div
       className={cn(
-        "sticky bottom-0 w-full bg-slate-50 dark:bg-slate-950 transition-all duration-300 ease-out",
+        "sticky bottom-0 w-full bg-slate-50 dark:bg-slate-900 transition-all duration-300 ease-out",
         isObjectEmpty(audio) ? "translate-y-full" : "",
       )}
     >

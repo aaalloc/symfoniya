@@ -56,7 +56,7 @@ const Home: NextPage = () => {
               />
               <div>
                 <h2 className="text-left text-sm font-medium truncate">{value.name}</h2>
-                <p className="text-left text-xs truncate text-slate-600">
+                <p className="text-left text-xs truncate text-slate-600 dark:text-slate-400">
                   {value.count} songs
                 </p>
               </div>
