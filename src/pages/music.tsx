@@ -18,7 +18,7 @@ import {
   ContextMenuSub,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
-import { byteToImage, format_duration } from "@/lib/utils"
+import { byteToImage, cn, format_duration, isObjectEmpty } from "@/lib/utils"
 
 export default function Music({ name }: { name: string }) {
   const context = useContext(AppContext)
@@ -39,15 +39,42 @@ export default function Music({ name }: { name: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [context.audioList])
 
-  //console.log(playlistCheckedState)
+  if (context.audioList === undefined) {
+    console.log("audioList is undefined")
+    return <div>Loading...</div>
+  }
   return (
     <div className="h-full flex-1 flex flex-col gap-6">
-      <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
-        {name === "all" ? "Music" : name}
-      </h1>
-      <Button variant="ghost" size="icon" onClick={() => shuffle(name, context, true)}>
-        <Shuffle />
-      </Button>
+      <div className="flex flex-row container mx-auto px-30">
+        <img
+          className="h-56 w-56 object-cover rounded-lg"
+          src={
+            isObjectEmpty(context.audioList)
+              ? byteToImage([] as number[])
+              : byteToImage(context.audioList[0].cover)
+          }
+          alt="playlist"
+        />
+        <div className="flex flex-col justify-center gap-2">
+          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
+            {name === "all" ? "Music" : name}
+          </h1>
+          <p className="text-lg text-muted-foreground container">
+            {context.audioList.length ?? 0} songs
+          </p>
+          <Button
+            className={cn(
+              "w-28 h-50 jusitfy-center",
+              context.audioList.length === 0 ? "cursor-not-allowed" : "",
+            )}
+            variant= "outline"
+            disabled={context.audioList.length === 0}
+            onClick={() => shuffle(name, context, true)}
+          >
+            <Shuffle className="mr-2 h-5 w-5" /> Shuffle
+          </Button>
+        </div>
+      </div>
       <div className="h-3/4 overflow-y-auto">
         <div className="container flex flex-col gap-2 items-stretch">
           {context.audioList.map((value) => {
@@ -94,4 +121,5 @@ export default function Music({ name }: { name: string }) {
       </div>
     </div>
   )
+  //console.log(playlistCheckedState)
 }
