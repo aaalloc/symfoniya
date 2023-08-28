@@ -32,7 +32,7 @@ const Home: NextPage = () => {
       <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
         Hello !
       </h1>
-      <div className="flex flex-row container">
+      <div className="flex flex-row container mx-auto px-16">
         {playlists.map((value, index) => {
           return (
             <div
@@ -45,7 +45,7 @@ const Home: NextPage = () => {
                 })
               }}
               id={`playlist-${value.name}`}
-              className="shrink-0 keen-slider__slide
+              className="shrink-0
                 hover:cursor-pointer hover:bg-gray-50 duration-150
                 delay-90 dark:hover:bg-gray-900 p-6 rounded-lg transition ease-in-out  items-center space-y-4"
             >
@@ -56,7 +56,9 @@ const Home: NextPage = () => {
               />
               <div>
                 <h2 className="text-left text-sm font-medium truncate">{value.name}</h2>
-                <p className="text-left text-xs truncate">{value.count} songs</p>
+                <p className="text-left text-xs truncate text-slate-600">
+                  {value.count} songs
+                </p>
               </div>
             </div>
           )
