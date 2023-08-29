@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @next/next/no-img-element */
 import { invoke } from "@tauri-apps/api/tauri"
 import type { NextPage } from "next"
@@ -31,10 +32,10 @@ const Home: NextPage = () => {
     const getHistory = async () => {
       const res = await invoke<Audio[]>("get_audios_history")
       setHistory(res)
-      // apprently history is 0 lol, needs to fix asap
-      // i hate useEffect
+      console.log(res, history)
     }
     void getHistory()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [context.audio])
 
   return (
@@ -85,8 +86,8 @@ const Home: NextPage = () => {
       <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
         Listen again
       </h1>
-      <div className="flex flex-row container mx-auto px-16">
-        {history.length !== 0 ? (
+      <div className="grid grid-cols-2 container">
+        {history !== null ? (
           history.map((value) => {
             return MusicCard(value, context, "recent")
           })
