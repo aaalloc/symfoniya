@@ -39,13 +39,9 @@ export default function Music({ name }: { name: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [context.audioList])
 
-  if (context.audioList === undefined) {
-    console.log("audioList is undefined")
-    return <div>Loading...</div>
-  }
   return (
-    <div className="h-full flex-1 flex flex-col gap-6">
-      <div className="flex flex-row container mx-auto px-30 gap-x-12">
+    <div className="h-full flex flex-col gap-10">
+      <div className="flex flex-row container gap-x-12">
         <img
           className="h-56 w-56 object-cover rounded-lg"
           src={
@@ -99,7 +95,7 @@ export default function Music({ name }: { name: string }) {
                       await play(context, value, true)
                     }}
                     id={`audio-${value.id}`}
-                    className="hover:cursor-pointer p-6 rounded-lg transition ease-in-out delay-90 dark:hover:bg-gray-900 hover:bg-gray-50 duration-150 flex items-center space-x-8"
+                    className="hover:cursor-pointer p-4 rounded-lg transition ease-in-out delay-90 dark:hover:bg-gray-900 hover:bg-gray-50 duration-150 flex items-center space-x-8"
                   >
                     <div className="flex-shrink-0">
                       <img

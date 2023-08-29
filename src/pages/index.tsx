@@ -1,7 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import "keen-slider/keen-slider.min.css"
 
-// import { useKeenSlider } from "keen-slider/react"
 import type { NextPage } from "next"
 import Router from "next/router"
 import { useContext } from "react"
@@ -16,19 +15,8 @@ const Home: NextPage = () => {
     console.log("Ctrl+P was pressed!")
   })
 
-  // const [ref] = useKeenSlider<HTMLDivElement>(
-  //   {
-  //     slides: {
-  //       perView: 4,
-  //       spacing: 1,
-  //     },
-  //     mode: "free",
-  //     loop: false,
-  //   },
-  //   [],
-  // )
   return (
-    <div className="h-full flex-1 flex flex-col gap-6">
+    <div className="h-full flex flex-col gap-6">
       <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
         Hello !
       </h1>
