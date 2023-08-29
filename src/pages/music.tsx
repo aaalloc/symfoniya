@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @next/next/no-img-element */
 import { invoke } from "@tauri-apps/api/tauri"
-import { Shuffle } from "lucide-react"
+import { PenBox, Shuffle } from "lucide-react"
 import { useContext, useEffect } from "react"
 
 import { AppContext } from "@/components/AppContext"
@@ -45,7 +45,7 @@ export default function Music({ name }: { name: string }) {
   }
   return (
     <div className="h-full flex-1 flex flex-col gap-6">
-      <div className="flex flex-row container mx-auto px-30">
+      <div className="flex flex-row container mx-auto px-30 gap-x-12">
         <img
           className="h-56 w-56 object-cover rounded-lg"
           src={
@@ -56,18 +56,23 @@ export default function Music({ name }: { name: string }) {
           alt="playlist"
         />
         <div className="flex flex-col justify-center gap-2">
-          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
-            {name === "all" ? "Music" : name}
-          </h1>
-          <p className="text-lg text-muted-foreground container">
+          <div className="flex flex-row gap-6">
+            <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
+              {name === "all" ? "Music" : name}
+            </h1>
+            <Button variant="ghost" size="icon">
+              <PenBox className="h-6 w-6" />
+            </Button>
+          </div>
+          <p className="text-lg text-muted-foreground mb-2">
             {context.audioList.length ?? 0} songs
           </p>
           <Button
             className={cn(
-              "w-28 h-50 jusitfy-center",
+              "w-28 h-50",
               context.audioList.length === 0 ? "cursor-not-allowed" : "",
             )}
-            variant= "outline"
+            variant="outline"
             disabled={context.audioList.length === 0}
             onClick={() => shuffle(name, context, true)}
           >
@@ -75,6 +80,7 @@ export default function Music({ name }: { name: string }) {
           </Button>
         </div>
       </div>
+      {/* 2/4 */}
       <div className="h-3/4 overflow-y-auto">
         <div className="container flex flex-col gap-2 items-stretch">
           {context.audioList.map((value) => {
