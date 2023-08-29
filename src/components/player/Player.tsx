@@ -42,13 +42,23 @@ async function play_from_id_or_skip(
   return true
 }
 
-export async function update_after_play(context: appContext, playlistListening = "") {
+export async function update_after_play(
+  context: appContext,
+  name?: string,
+  fromMusicPage = false,
+) {
   const { currentPlaylistListening, setOldAudioList } = context
+  const playlist = isObjectEmpty(currentPlaylistListening as unknown as object)
+    ? name
+    : !fromMusicPage
+    ? currentPlaylistListening
+    : name
+  console.log(playlist)
   await invoke("update_player", {
-    playlist: playlistListening || currentPlaylistListening,
+    playlist: playlist,
   })
   const res = await invoke<Audio[]>("get_audio_playlist", {
-    playlist: playlistListening || currentPlaylistListening,
+    playlist: playlist,
   })
   setOldAudioList(res)
 }
@@ -121,7 +131,7 @@ export async function shuffle(
   } else {
     setOldAudioList(audios)
   }
-  await update_after_play(context, name)
+  await update_after_play(context, fromMusicPage ? name : undefined, fromMusicPage)
   const result = await play_from_id_or_skip(audios[0].id, context, fromMusicPage)
   if (result) {
     if (audios[0] === audio) {
