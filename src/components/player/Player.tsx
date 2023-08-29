@@ -86,6 +86,7 @@ export async function play(context: appContext, toPlay: Audio, fromMusicPage = f
     setAudioPlayer(toPlay)
   } else if (result && isPlaying) {
     setAudioPlayer(toPlay)
+    await invoke("update_history")
   } else {
     next(context)
   }

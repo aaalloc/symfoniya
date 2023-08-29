@@ -236,3 +236,35 @@ pub fn delete_audio(db: &Connection, path: &str) -> Result<(), rusqlite::Error> 
 
     Ok(())
 }
+
+pub fn update_recent_history(db: &Connection, path: &str) -> Result<(), rusqlite::Error> {
+    let mut statement = db.prepare(insert::recent::RECENT_INSERT)?;
+    statement.execute(named_params! {
+        "@path": path
+    })?;
+    Ok(())
+}
+
+pub fn get_audios_history(db: &Connection) -> Result<Vec<_Audio>, rusqlite::Error> {
+    let mut statement = db.prepare(select::recent::RECENT_SELECT)?;
+    let audios_iter = statement.query_map([], |row| {
+        Ok(_Audio {
+            path: row.get(0)?,
+            duration: std::time::Duration::from_secs(row.get(1)?),
+            tag: _Tag {
+                title: row.get(2)?,
+                artist: row.get(3)?,
+                album: row.get(4)?,
+                genre: row.get(5)?,
+            },
+            cover: row.get(6)?,
+            format: String::from("mp3"),
+            status: crate::music::audio::AudioStatus::Waiting,
+        })
+    })?;
+    let mut audios = Vec::new();
+    audios_iter
+        .filter(|a| a.is_ok())
+        .for_each(|a| audios.push(a.unwrap()));
+    Ok(audios)
+}

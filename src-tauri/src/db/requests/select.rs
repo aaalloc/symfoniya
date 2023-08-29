@@ -42,3 +42,16 @@ FROM audios
 WHERE path = :path
 ";
 }
+
+pub mod recent {
+    pub const RECENT_SELECT: &str = "
+SELECT path, duration, title, artists.name, albums.name, genres.name, cover
+FROM audios
+INNER JOIN tags ON audios.tag_id = tags.id
+INNER JOIN artists ON tags.artist_id = artists.id
+INNER JOIN albums ON tags.album_id = albums.id
+INNER JOIN genres ON tags.genre_id = genres.id
+INNER JOIN recents ON audios.id = recents.audio_id
+ORDER BY date DESC
+";
+}

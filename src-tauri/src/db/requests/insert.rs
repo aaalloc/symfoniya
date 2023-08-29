@@ -71,10 +71,10 @@ VALUES (
 
 pub mod recent {
     pub const RECENT_INSERT: &str = "
-INSERT OR IGNORE INTO recents (audio_id, date)
+INSERT OR REPLACE INTO recents (audio_id, date)
 VALUES (
     (SELECT id FROM audios WHERE path = @path),
-    datetime('now')
+    strftime('%Y-%m-%d %H:%M:%f', 'now')
 )
 ";
 }

@@ -21,7 +21,15 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     const getHistory = async () => {
-      const res = await invoke<Audio[]>("get_history")
+      const res = await invoke<Audio[]>("import_audios_history")
+      setHistory(res)
+    }
+    void getHistory()
+  }, [])
+
+  useEffect(() => {
+    const getHistory = async () => {
+      const res = await invoke<Audio[]>("get_audios_history")
       setHistory(res)
     }
     void getHistory()
@@ -67,7 +75,7 @@ const Home: NextPage = () => {
             )
           })
         ) : (
-          <p className="text-center text-2xl font-medium text-slate-600 dark:text-slate-400">
+          <p className="text-center text-lg font-medium text-slate-600 dark:text-slate-400">
             No playlist found
           </p>
         )}
@@ -78,10 +86,10 @@ const Home: NextPage = () => {
       <div className="flex flex-row container mx-auto px-16">
         {history.length !== 0 ? (
           history.map((value) => {
-            return MusicCard(value, context, "history")
+            return MusicCard(value, context, "recent")
           })
         ) : (
-          <p className="text-center text-2xl font-medium text-slate-600 dark:text-slate-400">
+          <p className="text-center text-lg font-medium text-slate-600 dark:text-slate-400">
             No history found
           </p>
         )}
