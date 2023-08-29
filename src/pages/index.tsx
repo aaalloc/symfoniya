@@ -1,19 +1,31 @@
 /* eslint-disable @next/next/no-img-element */
-import "keen-slider/keen-slider.min.css"
-
+import { invoke } from "@tauri-apps/api/tauri"
 import type { NextPage } from "next"
 import Router from "next/router"
+import { useEffect, useState } from "react"
 import { useContext } from "react"
 
 import { AppContext } from "@/components/AppContext"
+import { Audio } from "@/components/types/audio"
 import { useGlobalShortcut } from "@/hooks/tauri/shortcuts"
 import { byteToImage } from "@/lib/utils"
 
+import { MusicCard } from "./music"
+
 const Home: NextPage = () => {
-  const { playlists } = useContext(AppContext)
+  const [history, setHistory] = useState<Audio[]>([])
+  const context = useContext(AppContext)
   useGlobalShortcut("CommandOrControl+P", () => {
     console.log("Ctrl+P was pressed!")
   })
+
+  useEffect(() => {
+    const getHistory = async () => {
+      const res = await invoke<Audio[]>("get_history")
+      setHistory(res)
+    }
+    void getHistory()
+  }, [context.audio])
 
   return (
     <div className="h-full flex flex-col gap-6">
@@ -21,8 +33,8 @@ const Home: NextPage = () => {
         Hello !
       </h1>
       <div className="flex flex-row container mx-auto px-16">
-        {playlists.length !== 0 ? (
-          playlists.map((value, index) => {
+        {context.playlists.length !== 0 ? (
+          context.playlists.map((value, index) => {
             return (
               <div
                 key={index}
@@ -63,6 +75,17 @@ const Home: NextPage = () => {
       <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
         Listen again
       </h1>
+      <div className="flex flex-row container mx-auto px-16">
+        {history.length !== 0 ? (
+          history.map((value) => {
+            return MusicCard(value, context, "history")
+          })
+        ) : (
+          <p className="text-center text-2xl font-medium text-slate-600 dark:text-slate-400">
+            No history found
+          </p>
+        )}
+      </div>
     </div>
   )
 }

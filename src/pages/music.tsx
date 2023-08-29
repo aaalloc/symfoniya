@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/context-menu"
 import { byteToImage, cn, format_duration, isObjectEmpty } from "@/lib/utils"
 
-export function MusicComponent(audio: Audio, context: appContext, name: string) {
+export function MusicCard(audio: Audio, context: appContext, name: string) {
   return (
     <ContextMenu key={audio.id}>
       <ContextMenuTrigger>
@@ -122,7 +122,7 @@ export default function Music({ name }: { name: string }) {
       <div className="h-3/4 overflow-y-auto">
         <div className="container flex flex-col gap-2 items-stretch">
           {context.audioList.map((value) => {
-            return MusicComponent(value, context, name)
+            return MusicCard(value, context, name)
           })}
         </div>
       </div>
