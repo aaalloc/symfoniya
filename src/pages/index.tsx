@@ -31,6 +31,8 @@ const Home: NextPage = () => {
     const getHistory = async () => {
       const res = await invoke<Audio[]>("get_audios_history")
       setHistory(res)
+      // apprently history is 0 lol, needs to fix asap
+      // i hate useEffect
     }
     void getHistory()
   }, [context.audio])
