@@ -33,7 +33,7 @@ export function MusicCard(audio: Audio, context: appContext, name: string) {
               playlist: name,
             })
             context.setCurrentPlaylistListening(name)
-            await update_after_play(context, name)
+            await update_after_play(context, name, true)
             await play(context, audio, true)
           }}
           id={`audio-${audio.id}`}
