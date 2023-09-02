@@ -28,8 +28,9 @@ import {
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
 
+import { Playlist } from "../types/playlist"
 const formSchema = z.object({
-  playlist_name: z.string().min(2).max(50),
+  playlist_name: z.string().min(2).max(16),
 })
 
 export function CreatePlaylist() {
@@ -43,11 +44,15 @@ export function CreatePlaylist() {
     },
   })
 
-  // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
     await invoke("create_playlist", { name: values.playlist_name })
-    if (!playlists.includes(values.playlist_name)) {
-      setPlaylist([...playlists, values.playlist_name])
+    if (!playlists.some((playlist) => playlist.name === values.playlist_name)) {
+      const newPlaylist: Playlist = {
+        name: values.playlist_name,
+        count: 0,
+        cover: [] as number[],
+      }
+      setPlaylist([...playlists, newPlaylist])
       toast({
         title: "Playlist",
         description: `${values.playlist_name} created !`,

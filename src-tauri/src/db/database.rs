@@ -7,7 +7,10 @@ mod insert;
 mod schema;
 #[path = "./requests/select.rs"]
 mod select;
-use crate::music::audio::{_Audio, _Tag};
+use crate::{
+    api::playlist::Playlist,
+    music::audio::{_Audio, _Tag},
+};
 use rusqlite::{named_params, Connection};
 use std::fs;
 use tauri::AppHandle;
@@ -135,20 +138,6 @@ pub fn add_playlist(db: &Connection, playlist_name: &str) -> Result<(), rusqlite
     Ok(())
 }
 
-pub fn retrieve_playlist(db: &Connection) -> Result<Vec<String>, rusqlite::Error> {
-    let mut statement = db.prepare(select::playlist::PLAYLIST_SELECT)?;
-    let mut results = statement.query([])?;
-    let mut playlists = Vec::new();
-    while let Some(result) = results.next()? {
-        let result: String = result.get(0)?;
-        if playlists.contains(&result) {
-            continue;
-        }
-        playlists.push(result);
-    }
-    Ok(playlists)
-}
-
 pub fn is_in_playlist(
     db: &Connection,
     playlist_name: &str,
@@ -211,5 +200,71 @@ pub fn get_audios_from_playlist(
 
     audios.sort_by(|a, b| a.path.cmp(&b.path));
     audios.dedup_by(|a, b| a.path == b.path);
+    Ok(audios)
+}
+
+pub fn get_playlist_info(db: &Connection) -> Result<Vec<Playlist>, rusqlite::Error> {
+    let mut statement = db.prepare(select::playlist::PLAYLIST_INFO_SELECT)?;
+    let mut results = statement.query([])?;
+    let mut playlists_info: Vec<Playlist> = Vec::new();
+    while let Some(result) = results.next()? {
+        let playlist_info = Playlist {
+            name: result.get(0)?,
+            count: result.get(1)?,
+            // if cover is null, return empty string
+            cover: result.get(2).unwrap_or(Vec::new()),
+        };
+        playlists_info.push(playlist_info);
+    }
+    Ok(playlists_info)
+}
+
+pub fn delete_audio(db: &Connection, path: &str) -> Result<(), rusqlite::Error> {
+    let mut statement = db.prepare(delete::playlist::AUDIO_IN_PLAYLIST_DELETE)?;
+    statement.execute(named_params! {
+        "@path": path
+    })?;
+    statement = db.prepare(delete::audio::AUDIO_DELETE)?;
+    statement.execute(named_params! {
+        "@path": path
+    })?;
+
+    statement = db.prepare(delete::tag::AUDIO_DELETE_TAG)?;
+    statement.execute(named_params! {
+        "@path": path
+    })?;
+
+    Ok(())
+}
+
+pub fn update_recent_history(db: &Connection, path: &str) -> Result<(), rusqlite::Error> {
+    let mut statement = db.prepare(insert::recent::RECENT_INSERT)?;
+    statement.execute(named_params! {
+        "@path": path
+    })?;
+    Ok(())
+}
+
+pub fn get_audios_history(db: &Connection) -> Result<Vec<_Audio>, rusqlite::Error> {
+    let mut statement = db.prepare(select::recent::RECENT_SELECT)?;
+    let audios_iter = statement.query_map([], |row| {
+        Ok(_Audio {
+            path: row.get(0)?,
+            duration: std::time::Duration::from_secs(row.get(1)?),
+            tag: _Tag {
+                title: row.get(2)?,
+                artist: row.get(3)?,
+                album: row.get(4)?,
+                genre: row.get(5)?,
+            },
+            cover: row.get(6)?,
+            format: String::from("mp3"),
+            status: crate::music::audio::AudioStatus::Waiting,
+        })
+    })?;
+    let mut audios = Vec::new();
+    audios_iter
+        .filter(|a| a.is_ok())
+        .for_each(|a| audios.push(a.unwrap()));
     Ok(audios)
 }

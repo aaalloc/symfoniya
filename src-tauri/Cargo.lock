@@ -108,6 +108,7 @@ dependencies = [
  "duration-str",
  "file-format",
  "lofty",
+ "rand 0.8.5",
  "rodio",
  "rusqlite",
  "serde",

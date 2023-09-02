@@ -68,3 +68,13 @@ VALUES (
 )
 ";
 }
+
+pub mod recent {
+    pub const RECENT_INSERT: &str = "
+INSERT OR REPLACE INTO recents (audio_id, date)
+VALUES (
+    (SELECT id FROM audios WHERE path = @path),
+    strftime('%Y-%m-%d %H:%M:%f', 'now')
+)
+";
+}

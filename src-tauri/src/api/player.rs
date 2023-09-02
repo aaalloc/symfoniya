@@ -1,8 +1,14 @@
-use std::sync::{Arc, Mutex};
+use std::{
+    fs::File,
+    sync::{Arc, Mutex},
+};
 
 use tauri::{AppHandle, State};
 
-use crate::music::player::{MusicPlayer, Player};
+use crate::{
+    db::{database, state::DbAccess},
+    music::player::{MusicPlayer, Player},
+};
 
 #[tauri::command]
 pub fn import_from_folders(
@@ -22,13 +28,34 @@ pub fn import_from_folders(
 }
 
 #[tauri::command]
-pub fn play_from_id(id: usize, player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<bool, String> {
+pub fn play_from_id(
+    id: usize,
+    path: String,
+    app_handle: AppHandle,
+    player: State<'_, Arc<Mutex<MusicPlayer>>>,
+) -> Result<bool, String> {
     let mut player = player.lock().unwrap();
-    // TODO FIX: When the user click on the same audio, there is a bug
-    player.update_sink(id);
-    player.set_index(id);
-    player.play();
-    Ok(true)
+    if File::open(&player.audios[id].path).is_err() {
+        println!("File not found: {}", player.audios[id].path);
+        let result = app_handle.db(|db| database::delete_audio(db, &player.audios[id].path));
+        match result {
+            Ok(_) => println!("Audio deleted from db"),
+            Err(e) => println!("Error: {}", e),
+        }
+        //player.playlists.get_mut("all").unwrap().remove(id);
+        for (_, playlist) in player.playlists.iter_mut() {
+            // TODO: fix works but other things around it doesnt ...
+            playlist.remove(id);
+        }
+        Ok(false)
+    } else {
+        if player.current_audio.path != path || player.is_playing {
+            player.update_sink(id);
+        }
+        player.set_index(id);
+        player.play();
+        Ok(true)
+    }
 }
 
 #[tauri::command]

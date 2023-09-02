@@ -2,11 +2,13 @@ use rodio::Sink;
 use std::{collections::HashMap, time::Duration};
 
 use crate::{database, db::state::DbAccess, music::audio::*, update_status};
+use rand::prelude::*;
 use std::time::Instant;
 use tauri::AppHandle;
 pub struct MusicPlayer {
     pub total_time: Duration,
     pub audios: Vec<_Audio>,
+    pub current_audio: _Audio,
     pub is_playing: bool,
     pub playlists: HashMap<String, Vec<_Audio>>,
     sink: Sink,
@@ -28,9 +30,9 @@ pub trait Player {
     fn previous(&mut self);
     fn current_audio_status(&self) -> AudioStatus;
     fn get_audio(&self, index: usize) -> &_Audio;
-    fn get_current_audio(&self) -> &_Audio;
     fn set_volume(&mut self, volume: f32);
     fn get_volume(&self) -> f32;
+    fn shuffle(&mut self, playlist: &str);
     //fn stop(&mut self);
     fn get_index(&self) -> usize;
     fn write_to_db(&self, app_handle: AppHandle);
@@ -59,6 +61,19 @@ impl Player for MusicPlayer {
         MusicPlayer {
             total_time: Duration::new(0, 0),
             audios: Vec::new(),
+            current_audio: _Audio {
+                path: String::new(),
+                duration: Duration::new(0, 0),
+                status: AudioStatus::Waiting,
+                format: String::new(),
+                tag: _Tag {
+                    title: String::new(),
+                    artist: String::new(),
+                    album: String::new(),
+                    genre: String::new(),
+                },
+                cover: Vec::new(),
+            },
             sink: Sink::try_new(&stream_handler).unwrap(),
             is_playing: false,
             stream_handle: stream_handler,
@@ -103,7 +118,8 @@ impl Player for MusicPlayer {
     }
 
     fn play(&mut self) {
-        if !self.sink.empty() {
+        let current_status = self.current_audio_status().get_status();
+        if !self.is_playing && current_status.status == "Stopped" {
             self.sink.play();
         } else {
             self.sink.append(get_decoder(&self.audios[self.index].path));
@@ -113,6 +129,7 @@ impl Player for MusicPlayer {
             let status = &mut item.status;
             update_status!(status, item.duration);
         }
+        self.current_audio = self.audios.get(self.index).unwrap().clone();
         self.is_playing = true;
     }
 
@@ -155,16 +172,19 @@ impl Player for MusicPlayer {
         self.audios.get(index).unwrap()
     }
 
-    fn get_current_audio(&self) -> &_Audio {
-        self.audios.get(self.index).unwrap()
-    }
-
     fn set_volume(&mut self, volume: f32) {
         self.sink.set_volume(volume);
     }
 
     fn get_volume(&self) -> f32 {
         self.sink.volume()
+    }
+
+    fn shuffle(&mut self, playlist: &str) {
+        // shuffle self.playlists[playlist]
+        let mut rng = rand::thread_rng();
+        self.playlists.get_mut(playlist).unwrap().shuffle(&mut rng);
+        self.audios = self.playlists.get(playlist).unwrap().to_vec();
     }
 
     fn write_to_db(&self, app_handle: AppHandle) {

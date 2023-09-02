@@ -5,7 +5,11 @@ use tauri::{AppHandle, State};
 use crate::{
     api::utils::create_audio_list,
     api::utils::Audio,
-    music::player::{MusicPlayer, Player},
+    db::{database, state::DbAccess},
+    music::{
+        audio::Status,
+        player::{MusicPlayer, Player},
+    },
 };
 
 #[tauri::command]
@@ -35,17 +39,14 @@ pub fn retrieve_audios(
 }
 
 #[tauri::command]
-pub fn current_audio_status(
-    player: State<'_, Arc<Mutex<MusicPlayer>>>,
-) -> Result<(String, u64, u64), String> {
+pub fn current_audio_status(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<Status, String> {
     let mut player = player.lock().unwrap();
-    let status = player.current_audio_status();
-    let formated = status.get_status();
+    let status = player.current_audio_status().get_status();
     let index = player.get_index();
-    if formated.1 == formated.2 && formated.0 == "Playing" {
+    if status.current == status.total && status.status == "Playing" {
         player.update_sink(index);
     }
-    Ok(formated)
+    Ok(status)
 }
 
 #[tauri::command]
@@ -73,4 +74,71 @@ pub fn goto_previous(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<usize
     let mut player = player.lock().unwrap();
     player.previous();
     Ok(player.get_index())
+}
+
+#[tauri::command]
+pub fn shuffle(
+    playlist: String,
+    player: State<'_, Arc<Mutex<MusicPlayer>>>,
+) -> Result<Vec<Audio>, String> {
+    let mut player = player.lock().unwrap();
+    player.shuffle(playlist.as_str());
+    Ok(create_audio_list(player, playlist.as_str()))
+}
+
+#[tauri::command]
+pub fn update_history(
+    player: State<'_, Arc<Mutex<MusicPlayer>>>,
+    app_handle: AppHandle,
+) -> Result<(), String> {
+    let mut player = player.lock().unwrap();
+    let result =
+        app_handle.db(|db| database::update_recent_history(db, player.current_audio.path.as_str()));
+    match result {
+        Ok(_) => {
+            player.playlists.insert(
+                "recent".to_string(),
+                app_handle.db(database::get_audios_history).unwrap(),
+            );
+            Ok(())
+        }
+        Err(e) => Err(e.to_string()),
+    }
+}
+
+#[tauri::command]
+pub fn get_audios_history(
+    player: State<'_, Arc<Mutex<MusicPlayer>>>,
+    app_handle: AppHandle,
+) -> Result<Vec<Audio>, String> {
+    let player = player.lock().unwrap();
+    let result = app_handle.db(database::get_audios_history);
+    match result {
+        Ok(audios) => {
+            if !audios.is_empty() {
+                Ok(create_audio_list(player, "recent"))
+            } else {
+                Ok(Vec::new())
+            }
+        }
+        Err(e) => Err(e.to_string()),
+    }
+}
+
+#[tauri::command]
+pub fn import_audios_history(
+    player: State<'_, Arc<Mutex<MusicPlayer>>>,
+    app_handle: AppHandle,
+) -> Result<(), String> {
+    let mut player = player.lock().unwrap();
+    let result = app_handle.db(database::get_audios_history);
+    match result {
+        Ok(audios) => {
+            if !audios.is_empty() {
+                player.playlists.insert("recent".to_string(), audios);
+            }
+            Ok(())
+        }
+        Err(e) => Err(e.to_string()),
+    }
 }

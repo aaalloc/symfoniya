@@ -67,9 +67,17 @@ pub mod table {
     );
     ";
 
+    pub const TABLE_RECENTS: &str = "
+    CREATE TABLE recents (
+        audio_id INTEGER PRIMARY KEY,
+        date DATETIME DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW')),
+        FOREIGN KEY (audio_id) REFERENCES audios (id)
+    );
+    ";
+
     pub fn schema_complete() -> String {
         format!(
-            "{} \n{} \n{} \n{} \n{} \n{} \n{} \n{}",
+            "{} \n{} \n{} \n{} \n{} \n{} \n{} \n{} \n{}",
             TABLE_ARTISTS,
             TABLE_ALBUMS,
             TABLE_GENRES,
@@ -78,6 +86,7 @@ pub mod table {
             TABLE_PLAYLISTS_AUDIO,
             TABLE_PLAYLISTS,
             TABLE_AUDIOS,
+            TABLE_RECENTS
         )
     }
 }

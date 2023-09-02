@@ -28,19 +28,23 @@ fn main() {
             player::import_from_folders,
             player::play_from_id,
             player::pause,
+            player::update_player,
             audio::retrieve_audios,
             audio::current_audio_status,
             audio::set_volume,
             audio::get_volume,
             audio::goto_next,
             audio::goto_previous,
+            audio::shuffle,
             audio::startup_audios_init,
+            audio::update_history,
+            audio::get_audios_history,
+            audio::import_audios_history,
             playlist::create_playlist,
             playlist::add_audio_to_playlist,
             playlist::get_audio_playlist,
             playlist::get_playlists,
-            playlist::is_in_playlist,
-            player::update_player
+            playlist::is_in_playlist
         ])
         .setup(|app| {
             let handle = app.handle();

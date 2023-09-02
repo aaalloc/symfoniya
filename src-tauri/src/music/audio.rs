@@ -43,18 +43,31 @@ pub fn duration_to_string(duration: Duration) -> String {
     format!("{:02}:{:02}:{:02}", hours, minutes, seconds)
 }
 
+#[derive(serde::Serialize)]
+pub struct Status {
+    pub status: String,
+    pub current: u64,
+    pub total: u64,
+}
+
 impl AudioStatus {
-    pub fn get_status(&self) -> (String, u64, u64) {
+    pub fn get_status(&self) -> Status {
         match self {
-            AudioStatus::Waiting => (self.to_string(), 0, 0),
-            AudioStatus::Stopped(instant, duration) => {
-                (self.to_string(), instant.as_secs(), duration.as_secs())
-            }
-            AudioStatus::Playing(instant, duration) => (
-                self.to_string(),
-                instant.elapsed().as_secs(),
-                duration.as_secs(),
-            ),
+            AudioStatus::Waiting => Status {
+                status: self.to_string(),
+                current: 0,
+                total: 0,
+            },
+            AudioStatus::Stopped(instant, duration) => Status {
+                status: self.to_string(),
+                current: instant.as_secs(),
+                total: duration.as_secs(),
+            },
+            AudioStatus::Playing(instant, duration) => Status {
+                status: self.to_string(),
+                current: instant.elapsed().as_secs(),
+                total: duration.as_secs(),
+            },
         }
     }
 }
@@ -115,6 +128,12 @@ impl std::fmt::Display for _Audio {
             self.format,
             self.status
         )
+    }
+}
+
+impl std::cmp::PartialEq for _Audio {
+    fn eq(&self, other: &Self) -> bool {
+        self.path == other.path
     }
 }
 
