@@ -42,10 +42,11 @@ pub fn play_from_id(
             Ok(_) => println!("Audio deleted from db"),
             Err(e) => println!("Error: {}", e),
         }
-        // update the player (Audio list and Playlist hashmap)
-        //player.audios.remove(id);
-        player.playlists.get_mut("all").unwrap().remove(id);
-
+        //player.playlists.get_mut("all").unwrap().remove(id);
+        for (_, playlist) in player.playlists.iter_mut() {
+            // TODO: fix works but other things around it doesnt ...
+            playlist.remove(id);
+        }
         Ok(false)
     } else {
         if player.current_audio.path != path || player.is_playing {
