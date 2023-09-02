@@ -16,8 +16,9 @@ This projet is still in developpement, be aware that some bug may happen.
 ## Features
 - [x] Create playlists
 - [x] Import multiple source folder
-- [x] System queue (play next, play later, shuffle, repeat)*
+- [x] System queue (play next, play later, shuffle, repeat)
 - [ ] Seeking support
+- [ ] Search bar with shortcuts
 - [ ] Download music from YouTube and Spotify
 - [ ] Import playlists from YouTube and Spotify
 
