@@ -30,3 +30,7 @@ export function format_duration(duration: number) {
   }
   return `${minutes}:${seconds}`
 }
+
+export function timeout(delay: number) {
+  return new Promise((res) => setTimeout(res, delay))
+}

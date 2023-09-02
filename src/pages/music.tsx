@@ -29,6 +29,9 @@ export function MusicCard(audio: Audio, context: appContext, name: string) {
           key={audio.id}
           // eslint-disable-next-line @typescript-eslint/no-misused-promises, @typescript-eslint/require-await
           onClick={async () => {
+            if (name === "recent") {
+              return // TODO
+            }
             await invoke("update_player", {
               playlist: name,
             })

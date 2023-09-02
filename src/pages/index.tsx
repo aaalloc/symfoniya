@@ -21,20 +21,17 @@ const Home: NextPage = () => {
   })
 
   useEffect(() => {
-    const getHistory = async () => {
+    void (async () => {
       const res = await invoke<Audio[]>("import_audios_history")
       setHistory(res)
-    }
-    void getHistory()
+    })()
   }, [])
 
   useEffect(() => {
-    const getHistory = async () => {
+    void (async () => {
       const res = await invoke<Audio[]>("get_audios_history")
       setHistory(res)
-      console.log(res, history)
-    }
-    void getHistory()
+    })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [context.audio])
 

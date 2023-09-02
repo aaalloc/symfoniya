@@ -70,6 +70,7 @@ async function next(context: appContext) {
   const result = await play_from_id_or_skip(id, context)
   if (result) {
     setAudioById(id)
+    //await invoke("update_history")
   }
 }
 
@@ -86,7 +87,7 @@ export async function play(context: appContext, toPlay: Audio, fromMusicPage = f
     setAudioPlayer(toPlay)
   } else if (result && isPlaying) {
     setAudioPlayer(toPlay)
-    await invoke("update_history")
+    //await invoke("update_history")
   } else {
     next(context)
   }
@@ -105,6 +106,7 @@ async function previous(context: appContext) {
   const result = await play_from_id_or_skip(id, context)
   if (result) {
     setAudioById(id)
+    //await invoke("update_history")
   }
 }
 
@@ -143,6 +145,7 @@ export async function shuffle(
       setCurrentPlaylistListening(name)
     }
     setIsPlaying(true)
+    //await invoke("update_history")
   }
 }
 
@@ -170,6 +173,12 @@ export function Player() {
       clearInterval(timeoutFunction)
     }
   }, [poll_status, status])
+
+  useEffect(() => {
+    ;(async () => {
+      await invoke("update_history")
+    })()
+  }, [audio])
 
   return (
     <div
