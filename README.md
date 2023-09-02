@@ -2,7 +2,7 @@
     <img src=public/symfoniya_logo.png width=138/>
 </p>
 <h1 align="center">Symfoniya</h1>
-<p align="center"><strong>Music player written in Next.js and Rust.</strong></p>
+<p align="center"><strong>Simple elegant music player</strong></p>
 
 ## Note
 This projet is still in developpement, be aware that some bug may happen.
