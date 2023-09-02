@@ -83,7 +83,7 @@ const Home: NextPage = () => {
       <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
         Listen again
       </h1>
-      <div className="grid grid-cols-2 container">
+      <div className="h-2/6 overflow-y-auto grid grid-cols-2 container">
         {history !== null ? (
           history.map((value) => {
             return MusicCard(value, context, "recent")

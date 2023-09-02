@@ -64,12 +64,13 @@ export async function update_after_play(
 }
 
 async function next(context: appContext) {
-  const { setAudioById } = context
+  const { setAudioById, setIsPlaying } = context
   await update_after_play(context)
   const id: number = await invoke("goto_next")
   const result = await play_from_id_or_skip(id, context)
   if (result) {
     setAudioById(id)
+    setIsPlaying(true)
     //await invoke("update_history")
   }
 }
@@ -100,12 +101,13 @@ async function pause(context: appContext) {
 }
 
 async function previous(context: appContext) {
-  const { setAudioById } = context
+  const { setAudioById, setIsPlaying } = context
   await update_after_play(context)
   const id: number = await invoke("goto_previous")
   const result = await play_from_id_or_skip(id, context)
   if (result) {
     setAudioById(id)
+    setIsPlaying(true)
     //await invoke("update_history")
   }
 }
@@ -168,6 +170,7 @@ export function Player() {
     const timeoutFunction = setInterval(poll_status, 1000)
     if (audio.duration === status.current) {
       setIsPlaying(false)
+      next(context)
     }
     return () => {
       clearInterval(timeoutFunction)

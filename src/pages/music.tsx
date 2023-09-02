@@ -99,11 +99,15 @@ export default function Music({ name }: { name: string }) {
         <div className="flex flex-col justify-center gap-2">
           <div className="flex flex-row gap-6">
             <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
-              {name === "all" ? "Music" : name}
+              {name === "all" ? "Musics" : name}
             </h1>
-            <Button variant="ghost" size="icon">
-              <PenBox className="h-6 w-6" />
-            </Button>
+            {name !== "all" ? (
+              <Button variant="ghost" size="icon">
+                <PenBox className="h-6 w-6" />
+              </Button>
+            ) : (
+              ""
+            )}
           </div>
           <p className="text-lg text-muted-foreground mb-2">
             {context.audioList.length ?? 0} songs
@@ -122,7 +126,7 @@ export default function Music({ name }: { name: string }) {
         </div>
       </div>
       {/* 2/4 */}
-      <div className="h-3/4 overflow-y-auto">
+      <div className="h-2/4 overflow-y-auto">
         <div className="container flex flex-col gap-2 items-stretch">
           {context.audioList.map((value) => {
             return MusicCard(value, context, name)
