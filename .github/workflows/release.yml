@@ -1,11 +1,14 @@
 name: 'publish'
 on:
-  push:
-    branches:
-      - release
+  workflow_run:
+    workflows: ["Lint Rust", "Lint Node.js"]
+    branches: [master]
+    types: 
+      - completed
 
 jobs:
   publish-tauri:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     permissions:
       contents: write
     strategy:
