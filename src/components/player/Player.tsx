@@ -178,8 +178,14 @@ export function Player() {
   }, [poll_status, status])
 
   useEffect(() => {
-    ;(async () => {
-      await invoke("update_history")
+    ;(() => {
+      invoke("update_history")
+        .then(() => {
+          console.log("history updated")
+        })
+        .catch((err) => {
+          console.log("history error", err)
+        })
     })()
   }, [audio])
 

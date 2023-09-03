@@ -16,8 +16,16 @@ import { MusicCard } from "./music"
 const Home: NextPage = () => {
   const [history, setHistory] = useState<Audio[]>([])
   const context = useContext(AppContext)
-  useGlobalShortcut("CommandOrControl+P", () => {
-    console.log("Ctrl+P was pressed!")
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  useGlobalShortcut("CommandOrControl+O", () => {
+    console.log("eeeee")
+    invoke("speed_up")
+      .then((res) => {
+        console.log(res)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   })
 
   useEffect(() => {

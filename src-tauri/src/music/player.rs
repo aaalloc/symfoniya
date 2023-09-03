@@ -33,6 +33,7 @@ pub trait Player {
     fn set_volume(&mut self, volume: f32);
     fn get_volume(&self) -> f32;
     fn shuffle(&mut self, playlist: &str);
+    fn speed_up(&mut self);
     //fn stop(&mut self);
     fn get_index(&self) -> usize;
     fn write_to_db(&self, app_handle: AppHandle);
@@ -185,6 +186,12 @@ impl Player for MusicPlayer {
         let mut rng = rand::thread_rng();
         self.playlists.get_mut(playlist).unwrap().shuffle(&mut rng);
         self.audios = self.playlists.get(playlist).unwrap().to_vec();
+    }
+
+    fn speed_up(&mut self) {
+        if self.is_playing {
+            self.sink.set_speed(self.sink.speed() * 1.1);
+        }
     }
 
     fn write_to_db(&self, app_handle: AppHandle) {

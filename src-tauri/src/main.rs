@@ -14,6 +14,7 @@ use tauri::{Manager, State};
 
 mod api;
 fn main() {
+    env_logger::init();
     let (_stream, _stream_handle) = OutputStream::try_default().unwrap();
     // leak the stream to keep it alive, otherwise it will be dropped and no more audio !!!!
     // this is not a good thing but I think it is a good workaround for now ...
@@ -39,6 +40,7 @@ fn main() {
             audio::startup_audios_init,
             audio::update_history,
             audio::get_audios_history,
+            audio::speed_up,
             audio::import_audios_history,
             playlist::create_playlist,
             playlist::add_audio_to_playlist,
