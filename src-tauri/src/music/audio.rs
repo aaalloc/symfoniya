@@ -184,10 +184,8 @@ pub fn get_audios(audios: &mut Vec<_Audio>, path: &str, app_handle: &AppHandle) 
     let paths = std::fs::read_dir(path).unwrap();
     for path in paths {
         let p = &path.unwrap().path().to_str().unwrap().to_string();
-        if audios
-            .iter()
-            .any(|audio| audio.path.split('/').last().unwrap() == p.split('/').last().unwrap())
-        {
+        if audios.iter().any(|audio| audio.path == *p) {
+            println!("Audio already in audios");
             continue;
         }
         let format = FileFormat::from_file(p);
