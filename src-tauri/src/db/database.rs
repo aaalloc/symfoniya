@@ -11,6 +11,7 @@ use crate::{
     api::playlist::Playlist,
     music::audio::{_Audio, _Tag},
 };
+use log::info;
 use rusqlite::{named_params, Connection};
 use std::fs;
 use tauri::AppHandle;
@@ -24,7 +25,7 @@ pub fn initialize_database(app_handle: &AppHandle) -> Result<Connection, rusqlit
         .path_resolver()
         .app_data_dir()
         .expect("The app data directory should exist.");
-    println!("app_dir: {:?}", app_dir);
+    info!("app_dir: {:?}", app_dir);
     fs::create_dir_all(&app_dir).expect("The app data directory should be created.");
     let sqlite_path = app_dir.join("symfoniya.sqlite");
 

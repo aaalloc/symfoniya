@@ -3,6 +3,7 @@ use std::{
     sync::{Arc, Mutex},
 };
 
+use log::{error, info};
 use tauri::{AppHandle, State};
 
 use crate::{
@@ -22,7 +23,7 @@ pub fn import_from_folders(
         total_imported += player.import_from_folders(&folder, &app_handle);
     }
     player.write_to_db(app_handle);
-    println!("{}", player);
+    info!("{}", player);
     drop(player);
     Ok(total_imported)
 }
@@ -36,11 +37,11 @@ pub fn play_from_id(
 ) -> Result<bool, String> {
     let mut player = player.lock().unwrap();
     if File::open(&player.audios[id].path).is_err() {
-        println!("File not found: {}", player.audios[id].path);
+        info!("File not found: {}", player.audios[id].path);
         let result = app_handle.db(|db| database::delete_audio(db, &player.audios[id].path));
         match result {
-            Ok(_) => println!("Audio deleted from db"),
-            Err(e) => println!("Error: {}", e),
+            Ok(_) => info!("Audio deleted from db"),
+            Err(e) => error!("Error: {}", e),
         }
         //player.playlists.get_mut("all").unwrap().remove(id);
         for (_, playlist) in player.playlists.iter_mut() {

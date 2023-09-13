@@ -1,4 +1,4 @@
-use log::{info, warn};
+use log::{error, info, warn};
 use std::sync::{Arc, Mutex};
 use tauri::{AppHandle, State};
 
@@ -22,7 +22,7 @@ pub fn startup_audios_init(
     match total_from_db {
         Ok(total) => Ok(total),
         Err(e) => {
-            println!("{}", e);
+            error!("{}", e);
             Ok(0)
         }
     }

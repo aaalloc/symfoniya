@@ -3,6 +3,12 @@
     windows_subsystem = "windows"
 )]
 
+#[cfg(debug_assertions)]
+const LOG_TARGETS: [LogTarget; 2] = [LogTarget::Stdout, LogTarget::Webview];
+
+#[cfg(not(debug_assertions))]
+const LOG_TARGETS: [LogTarget; 2] = [LogTarget::Stdout, LogTarget::LogDir];
+
 use std::sync::{Arc, Mutex};
 mod db;
 mod music;
@@ -11,10 +17,10 @@ use db::{database, state::DbState};
 use music::player::MusicPlayer;
 use rodio::OutputStream;
 use tauri::{Manager, State};
+use tauri_plugin_log::{fern::colors::ColoredLevelConfig, LogTarget};
 
 mod api;
 fn main() {
-    env_logger::init();
     let (_stream, _stream_handle) = OutputStream::try_default().unwrap();
     // leak the stream to keep it alive, otherwise it will be dropped and no more audio !!!!
     // this is not a good thing but I think it is a good workaround for now ...
@@ -25,6 +31,12 @@ fn main() {
         .manage(DbState {
             db: Default::default(),
         })
+        .plugin(
+            tauri_plugin_log::Builder::default()
+                .targets(LOG_TARGETS)
+                .with_colors(ColoredLevelConfig::default())
+                .build(),
+        )
         .invoke_handler(tauri::generate_handler![
             player::import_from_folders,
             player::play_from_id,

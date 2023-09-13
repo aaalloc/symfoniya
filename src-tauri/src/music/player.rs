@@ -1,3 +1,4 @@
+use log::info;
 use rodio::Sink;
 use std::{collections::HashMap, time::Duration};
 
@@ -198,6 +199,6 @@ impl Player for MusicPlayer {
         for audio in self.audios.iter() {
             app_handle.db(|db| database::add_audio(audio, db)).unwrap();
         }
-        println!("{} audios added", self.audios.len());
+        info!("{} audios added", self.audios.len());
     }
 }
