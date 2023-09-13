@@ -48,7 +48,7 @@ const Home: NextPage = () => {
       <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
         Hello !
       </h1>
-      <div className="flex flex-row container mx-auto px-16">
+      <div className="overflow-x-auto flex flex-row container mx-auto px-16">
         {context.playlists.length !== 0 ? (
           context.playlists.map((value, index) => {
             return (
