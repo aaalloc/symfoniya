@@ -17,7 +17,8 @@ This projet is still in developpement, be aware that some bug may happen.
 - [x] Create playlists
 - [x] Import multiple source folder
 - [x] System queue (play next, play later, shuffle, repeat)
-- [ ] Seeking support ([rodio doesn't support it](https://www.google.com/search?client=firefox-b-d&q=rodio+seeking), may using [react-native-track-player](https://github.com/doublesymmetry/react-native-track-player) instead)
+- [ ] Seeking support ([rodio doesn't support it](https://github.com/RustAudio/rodio/issues/176), may using [react-native-track-player](https://github.com/doublesymmetry/react-native-track-player) instead)
+- [ ] Nav button for playlists in Home screen (may use [keen-slider](https://keen-slider.io/)
 - [ ] Search bar with shortcuts
 - [ ] Download music from YouTube and Spotify
 - [ ] Import playlists from YouTube and Spotify
