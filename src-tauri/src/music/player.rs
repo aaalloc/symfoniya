@@ -90,15 +90,18 @@ impl Player for MusicPlayer {
     }
 
     fn import_from_folders(&mut self, path: &str, app_handle: &AppHandle) -> usize {
+        info!("Importing from {}", path);
         let value = get_audios(self.audios.as_mut(), path, app_handle);
         self.audios.sort_by(|a, b| a.path.cmp(&b.path));
         self.playlists
             .insert("all".to_string(), self.audios.clone());
         self.update_total_time();
+        info!("{}", log::as_display!(self));
         value
     }
 
     fn import_from_db(&mut self, app_handle: &AppHandle) -> Result<usize, rusqlite::Error> {
+        info!("Importing from db");
         let value = app_handle.db(|db| database::get_audios(db, self.audios.as_mut()));
         self.playlists
             .insert("all".to_string(), self.audios.clone());
@@ -133,6 +136,7 @@ impl Player for MusicPlayer {
         }
         self.current_audio = self.audios.get(self.index).unwrap().clone();
         self.is_playing = true;
+        info!("Playing {}", self.current_audio.path);
     }
 
     fn pause(&mut self) {
@@ -144,6 +148,7 @@ impl Player for MusicPlayer {
             }
             self.is_playing = false;
         }
+        info!("Paused {}", self.current_audio.path);
     }
 
     fn update_sink(&mut self, index: usize) {
@@ -176,6 +181,7 @@ impl Player for MusicPlayer {
 
     fn set_volume(&mut self, volume: f32) {
         self.sink.set_volume(volume);
+        info!("Volume set to {}", volume);
     }
 
     fn get_volume(&self) -> f32 {
@@ -183,7 +189,6 @@ impl Player for MusicPlayer {
     }
 
     fn shuffle(&mut self, playlist: &str) {
-        // shuffle self.playlists[playlist]
         let mut rng = rand::thread_rng();
         self.playlists.get_mut(playlist).unwrap().shuffle(&mut rng);
         self.audios = self.playlists.get(playlist).unwrap().to_vec();

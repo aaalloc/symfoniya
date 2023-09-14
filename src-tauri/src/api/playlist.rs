@@ -1,5 +1,6 @@
 use std::sync::{Arc, Mutex};
 
+use log::error;
 use tauri::{AppHandle, State};
 
 use crate::{
@@ -21,7 +22,10 @@ pub fn create_playlist(name: String, app_handle: AppHandle) -> Result<(), String
     let result = app_handle.db(|db| database::add_playlist(db, &name));
     match result {
         Ok(_) => Ok(()),
-        Err(e) => Err(e.to_string()),
+        Err(e) => {
+            error!("{}", e);
+            Err(e.to_string())
+        }
     }
 }
 
@@ -36,7 +40,10 @@ pub fn add_audio_to_playlist(
         app_handle.db(|db| database::insert_audio_in_playlist(db, state, &playlist, &path));
     match result {
         Ok(_) => Ok(()),
-        Err(e) => Err(e.to_string()),
+        Err(e) => {
+            error!("{}", e);
+            Err(e.to_string())
+        }
     }
 }
 
@@ -49,7 +56,10 @@ pub fn is_in_playlist(
     let result = app_handle.db(|db| database::is_in_playlist(db, &playlist, &path));
     match result {
         Ok(state) => Ok(state),
-        Err(e) => Err(e.to_string()),
+        Err(e) => {
+            error!("{}", e);
+            Err(e.to_string())
+        }
     }
 }
 
@@ -58,7 +68,10 @@ pub fn get_playlists(app_handle: AppHandle) -> Result<Vec<Playlist>, String> {
     let result = app_handle.db(database::get_playlist_info);
     match result {
         Ok(list) => Ok(list),
-        Err(e) => Err(e.to_string()),
+        Err(e) => {
+            error!("{}", e);
+            Err(e.to_string())
+        }
     }
 }
 
@@ -92,7 +105,10 @@ pub fn get_audio_playlist(
                     Ok(create_audio_list(player, str))
                 }
             }
-            Err(e) => Err(e.to_string()),
+            Err(e) => {
+                error!("{}", e);
+                Err(e.to_string())
+            }
         }
     }
 }

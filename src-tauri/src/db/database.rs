@@ -88,7 +88,7 @@ pub fn add_audio(audio: &_Audio, db: &Connection) -> Result<(), rusqlite::Error>
         "@album": audio.tag.album,
         "@genre": audio.tag.genre,
     })?;
-
+    info!("{} added to db", audio.path);
     Ok(())
 }
 

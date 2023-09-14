@@ -23,7 +23,6 @@ pub fn import_from_folders(
         total_imported += player.import_from_folders(&folder, &app_handle);
     }
     player.write_to_db(app_handle);
-    info!("{}", player);
     drop(player);
     Ok(total_imported)
 }

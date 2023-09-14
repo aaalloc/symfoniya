@@ -186,13 +186,16 @@ pub fn get_audios(audios: &mut Vec<_Audio>, path: &str, app_handle: &AppHandle) 
     for path in paths {
         let p = &path.unwrap().path().to_str().unwrap().to_string();
         if audios.iter().any(|audio| audio.path == *p) {
-            info!("Audio already in audios");
+            info!("Audio already in list");
             continue;
         }
         let format = FileFormat::from_file(p);
         let format = match format {
             Ok(format) => format,
-            Err(_) => continue,
+            Err(format) => {
+                info!("Unsupported format {:?}", format);
+                continue;
+            }
         };
         if match format.kind() {
             Kind::Audio => {
@@ -207,7 +210,7 @@ pub fn get_audios(audios: &mut Vec<_Audio>, path: &str, app_handle: &AppHandle) 
                         count += 1;
                     }
                     Err(e) => {
-                        error!("Error: {}", e);
+                        error!("{}", e);
                         return 0;
                     }
                 }
