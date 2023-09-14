@@ -1,5 +1,5 @@
+use log::{error, info, warn};
 use std::sync::{Arc, Mutex};
-
 use tauri::{AppHandle, State};
 
 use crate::{
@@ -22,7 +22,7 @@ pub fn startup_audios_init(
     match total_from_db {
         Ok(total) => Ok(total),
         Err(e) => {
-            println!("{}", e);
+            error!("{}", e);
             Ok(0)
         }
     }
@@ -91,6 +91,7 @@ pub fn update_history(
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
     app_handle: AppHandle,
 ) -> Result<(), String> {
+    info!("update history call");
     let mut player = player.lock().unwrap();
     let result =
         app_handle.db(|db| database::update_recent_history(db, player.current_audio.path.as_str()));
@@ -102,7 +103,10 @@ pub fn update_history(
             );
             Ok(())
         }
-        Err(e) => Err(e.to_string()),
+        Err(e) => {
+            warn!("update history failed: {}", e);
+            Err(e.to_string())
+        }
     }
 }
 
@@ -141,4 +145,11 @@ pub fn import_audios_history(
         }
         Err(e) => Err(e.to_string()),
     }
+}
+
+#[tauri::command]
+pub fn speed_up(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<(), String> {
+    let mut player = player.lock().unwrap();
+    player.speed_up();
+    Ok(())
 }

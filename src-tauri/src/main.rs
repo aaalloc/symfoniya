@@ -3,6 +3,12 @@
     windows_subsystem = "windows"
 )]
 
+#[cfg(debug_assertions)]
+const LOG_TARGETS: [LogTarget; 2] = [LogTarget::Stdout, LogTarget::Webview];
+
+#[cfg(not(debug_assertions))]
+const LOG_TARGETS: [LogTarget; 2] = [LogTarget::Stdout, LogTarget::LogDir];
+
 use std::sync::{Arc, Mutex};
 mod db;
 mod music;
@@ -11,6 +17,7 @@ use db::{database, state::DbState};
 use music::player::MusicPlayer;
 use rodio::OutputStream;
 use tauri::{Manager, State};
+use tauri_plugin_log::{fern::colors::ColoredLevelConfig, LogTarget};
 
 mod api;
 fn main() {
@@ -24,6 +31,12 @@ fn main() {
         .manage(DbState {
             db: Default::default(),
         })
+        .plugin(
+            tauri_plugin_log::Builder::default()
+                .targets(LOG_TARGETS)
+                .with_colors(ColoredLevelConfig::default())
+                .build(),
+        )
         .invoke_handler(tauri::generate_handler![
             player::import_from_folders,
             player::play_from_id,
@@ -39,6 +52,7 @@ fn main() {
             audio::startup_audios_init,
             audio::update_history,
             audio::get_audios_history,
+            audio::speed_up,
             audio::import_audios_history,
             playlist::create_playlist,
             playlist::add_audio_to_playlist,

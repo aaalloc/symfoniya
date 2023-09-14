@@ -1,6 +1,7 @@
 use duration_str::parse;
 use file_format::{FileFormat, Kind};
 use lofty::{Accessor, AudioFile, Probe, Tag, TagType, TaggedFileExt};
+use log::{error, info};
 use rodio::Decoder;
 use std::time::Instant;
 use std::{fs::File, io::BufReader, time::Duration};
@@ -152,7 +153,7 @@ pub fn create_audio(path: &str, format: FileFormat) -> _Audio {
     };
     // picture can be None
     let picture = tag.pictures().get(0);
-    println!("{:?}", picture);
+    info!("{:?}", picture);
     let cover = match picture {
         Some(picture) => picture.data().to_vec(),
         None => Vec::new(),
@@ -185,19 +186,22 @@ pub fn get_audios(audios: &mut Vec<_Audio>, path: &str, app_handle: &AppHandle) 
     for path in paths {
         let p = &path.unwrap().path().to_str().unwrap().to_string();
         if audios.iter().any(|audio| audio.path == *p) {
-            println!("Audio already in audios");
+            info!("Audio already in list");
             continue;
         }
         let format = FileFormat::from_file(p);
         let format = match format {
             Ok(format) => format,
-            Err(_) => continue,
+            Err(format) => {
+                info!("Unsupported format {:?}", format);
+                continue;
+            }
         };
         if match format.kind() {
             Kind::Audio => {
                 match app_handle.db(|db| database::is_audio_in_db(db, p)) {
                     Ok(true) => {
-                        println!("Audio already in db");
+                        info!("Audio already in db");
                     }
                     Ok(false) => {
                         let audio = create_audio(p, format);
@@ -206,7 +210,7 @@ pub fn get_audios(audios: &mut Vec<_Audio>, path: &str, app_handle: &AppHandle) 
                         count += 1;
                     }
                     Err(e) => {
-                        println!("Error: {}", e);
+                        error!("{}", e);
                         return 0;
                     }
                 }

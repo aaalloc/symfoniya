@@ -88,6 +88,20 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
     }
   }
 
+  const log = async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const log_console = await import("tauri-plugin-log-api")
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    await log_console.attachConsole()
+  }
+
+  useEffect(() => {
+    // need to a better way to do this
+    log().catch((error) => {
+      console.error(error)
+    })
+  }, [])
+
   useEffect(() => {
     invoke<number>("startup_audios_init")
       .then((response) => {
