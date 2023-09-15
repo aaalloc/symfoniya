@@ -215,11 +215,13 @@ fn check_audio_format(
 pub fn get_audios(audios: &mut Vec<_Audio>, path: &str, app_handle: &AppHandle) -> usize {
     let mut count = 0;
     let paths = std::fs::read_dir(PathBuf::from(path));
+    info!("Init dir read");
     match paths {
         Ok(paths) => {
             for path in paths {
                 match path {
                     Ok(path) => {
+                        info!("{:?}", path);
                         let p = &path.path().into_os_string().into_string();
                         match p {
                             Ok(p) => {
