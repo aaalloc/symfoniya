@@ -1,10 +1,8 @@
 name: 'publish'
 on:
-  workflow_run:
-    workflows: ["Lint Rust"]
-    branches: [master]
-    types: 
-      - completed
+  push:
+    tags:
+      - 'app-v0.*'
 env:
   counter: 0
 jobs:
@@ -18,21 +16,6 @@ jobs:
 
     runs-on: ${{ matrix.platform }}
     steps:
-      - name: Wait for Node lint to succeed
-        uses: lewagon/wait-on-check-action@v1.3.1
-        with:
-          ref: ${{ github.ref }}
-          check-name: 'Lint Node.js'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 10
-      - name: Wait for Rust lint to succeed
-        uses: lewagon/wait-on-check-action@v1.3.1
-        with:
-          ref: ${{ github.ref }}
-          check-name: 'Lint Rust'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 10
-      - uses: actions/checkout@v3
       - name: setup node
         uses: actions/setup-node@v3
         with:
