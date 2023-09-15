@@ -4,6 +4,13 @@ name: Lint Node.js
 
 on:
   push:
+    paths-ignore:
+      - "src/**"
+      - "package.json"
+      - "package-lock.json"
+      - "yarn.lock"
+      - "pnpm-lock.yaml"
+      - "README.md"
     branches:
       - master
   pull_request:
