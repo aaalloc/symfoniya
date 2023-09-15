@@ -5,16 +5,14 @@ name: Lint Node.js
 on:
   push:
     paths-ignore:
-      - "src/**"
-      - "package.json"
-      - "package-lock.json"
-      - "yarn.lock"
-      - "pnpm-lock.yaml"
+      - ".github/workflows/**"
+      - "src-tauri/**"
       - "README.md"
     branches:
       - master
   pull_request:
     paths-ignore:
+      - ".github/workflows/**"
       - "src-tauri/**"
       - "README.md"
 
