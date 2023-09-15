@@ -5,6 +5,7 @@ name: Lint Rust
 on:
   push:
     paths-ignore:
+      - ".github/workflows/**"
       - "src/**"
       - "package.json"
       - "package-lock.json"
@@ -15,6 +16,7 @@ on:
       - master
   pull_request:
     paths-ignore:
+      - ".github/workflows/**"
       - "src/**"
       - "package.json"
       - "package-lock.json"
