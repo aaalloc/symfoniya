@@ -3,6 +3,7 @@ use file_format::{FileFormat, Kind};
 use lofty::{Accessor, AudioFile, Probe, Tag, TagType, TaggedFileExt};
 use log::{error, info};
 use rodio::Decoder;
+use std::path::PathBuf;
 use std::time::Instant;
 use std::{fs::File, io::BufReader, time::Duration};
 use tauri::AppHandle;
@@ -115,6 +116,7 @@ pub struct _Audio {
 }
 
 pub fn get_decoder(path: &String) -> Decoder<BufReader<File>> {
+    let path = PathBuf::from(path);
     let file = BufReader::new(File::open(path).unwrap());
     Decoder::new(file).unwrap()
 }
@@ -180,44 +182,76 @@ pub fn create_audio(path: &str, format: FileFormat) -> _Audio {
     }
 }
 
+fn check_audio_format(
+    format: FileFormat,
+    p: &str,
+    audios: &mut Vec<_Audio>,
+    app_handle: &AppHandle,
+    count: &mut usize,
+) -> bool {
+    match format.kind() {
+        Kind::Audio => {
+            match app_handle.db(|db| database::is_audio_in_db(db, p)) {
+                Ok(true) => {
+                    info!("Audio already in db");
+                }
+                Ok(false) => {
+                    let audio = create_audio(p, format);
+                    app_handle.db(|db| database::add_audio(&audio, db)).unwrap();
+                    audios.push(audio);
+                    *count += 1;
+                }
+                Err(e) => {
+                    error!("{}", e);
+                    return false;
+                }
+            }
+            true
+        }
+        _ => false,
+    }
+}
+
 pub fn get_audios(audios: &mut Vec<_Audio>, path: &str, app_handle: &AppHandle) -> usize {
     let mut count = 0;
-    let paths = std::fs::read_dir(path).unwrap();
-    for path in paths {
-        let p = &path.unwrap().path().to_str().unwrap().to_string();
-        if audios.iter().any(|audio| audio.path == *p) {
-            info!("Audio already in list");
-            continue;
-        }
-        let format = FileFormat::from_file(p);
-        let format = match format {
-            Ok(format) => format,
-            Err(format) => {
-                info!("Unsupported format {:?}", format);
-                continue;
-            }
-        };
-        if match format.kind() {
-            Kind::Audio => {
-                match app_handle.db(|db| database::is_audio_in_db(db, p)) {
-                    Ok(true) => {
-                        info!("Audio already in db");
-                    }
-                    Ok(false) => {
-                        let audio = create_audio(p, format);
-                        app_handle.db(|db| database::add_audio(&audio, db)).unwrap();
-                        audios.push(audio);
-                        count += 1;
+    let paths = std::fs::read_dir(PathBuf::from(path));
+    match paths {
+        Ok(paths) => {
+            for path in paths {
+                match path {
+                    Ok(path) => {
+                        let p = &path.path().into_os_string().into_string();
+                        match p {
+                            Ok(p) => {
+                                if audios.iter().any(|audio| audio.path == *p) {
+                                    info!("Audio already in list");
+                                    continue;
+                                }
+                                let format = FileFormat::from_file(p);
+                                let format = match format {
+                                    Ok(format) => format,
+                                    Err(format) => {
+                                        info!("Unsupported format {:?}", format);
+                                        continue;
+                                    }
+                                };
+                                check_audio_format(format, p, audios, app_handle, &mut count);
+                            }
+                            Err(e) => {
+                                error!("{:?}", e);
+                            }
+                        }
                     }
                     Err(e) => {
                         error!("{}", e);
-                        return 0;
                     }
                 }
-                true
             }
-            _ => false,
-        } {}
+            count
+        }
+        Err(e) => {
+            error!("{}", e);
+            0
+        }
     }
-    count
 }
