@@ -225,11 +225,16 @@ pub fn get_audios(audios: &mut Vec<_Audio>, path: &str, app_handle: &AppHandle) 
                         let p = &path.path().into_os_string().into_string();
                         match p {
                             Ok(p) => {
+                                if p.contains(".ini") {
+                                    // see https://github.com/mmalecot/file-format/issues/36
+                                    continue;
+                                }
                                 if audios.iter().any(|audio| audio.path == *p) {
                                     info!("Audio already in list");
                                     continue;
                                 }
                                 let format = FileFormat::from_file(p);
+                                info!("{:?}", format);
                                 let format = match format {
                                     Ok(format) => format,
                                     Err(format) => {
