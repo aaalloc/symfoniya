@@ -1,6 +1,6 @@
 use log::info;
 use rodio::Sink;
-use std::{collections::HashMap, time::Duration};
+use std::{collections::HashMap, path::PathBuf, time::Duration};
 
 use crate::{database, db::state::DbAccess, music::audio::*, update_status};
 use rand::prelude::*;
@@ -20,7 +20,7 @@ pub struct MusicPlayer {
 pub trait Player {
     fn new(stream_handler: rodio::OutputStreamHandle) -> Self;
     fn add_audio(&mut self, audio: _Audio) -> bool;
-    fn import_from_folders(&mut self, path: &str, app_handle: &AppHandle) -> usize;
+    fn import_from_folders(&mut self, path: PathBuf, app_handle: &AppHandle) -> usize;
     fn import_from_db(&mut self, app_handle: &AppHandle) -> Result<usize, rusqlite::Error>;
     fn set_index(&mut self, index: usize);
     fn update_total_time(&mut self);
@@ -89,8 +89,8 @@ impl Player for MusicPlayer {
         true
     }
 
-    fn import_from_folders(&mut self, path: &str, app_handle: &AppHandle) -> usize {
-        info!("Importing from {}", path);
+    fn import_from_folders(&mut self, path: PathBuf, app_handle: &AppHandle) -> usize {
+        info!("Importing from {}", path.display());
         let value = get_audios(self.audios.as_mut(), path, app_handle);
         self.audios.sort_by(|a, b| a.path.cmp(&b.path));
         self.playlists

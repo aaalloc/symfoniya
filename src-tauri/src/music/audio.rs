@@ -3,7 +3,7 @@ use file_format::{FileFormat, Kind};
 use lofty::{Accessor, AudioFile, Probe, Tag, TagType, TaggedFile, TaggedFileExt};
 use log::{error, info};
 use rodio::Decoder;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::time::Instant;
 use std::{fs::File, io::BufReader, time::Duration};
 use tauri::AppHandle;
@@ -140,7 +140,7 @@ impl std::cmp::PartialEq for _Audio {
     }
 }
 
-fn gen_tag(path: &str) -> TaggedFile {
+fn gen_tag(path: &PathBuf) -> TaggedFile {
     let tagged_file = Probe::open(path);
     match tagged_file {
         Ok(tagged_file) => match tagged_file.read() {
@@ -160,8 +160,8 @@ fn gen_tag(path: &str) -> TaggedFile {
     }
 }
 
-pub fn create_audio(path: &str, format: FileFormat) -> _Audio {
-    let tagged_file = gen_tag(path);
+pub fn create_audio(path: PathBuf, format: FileFormat) -> _Audio {
+    let tagged_file = gen_tag(&path);
     let properties = tagged_file.properties();
     let duration = properties.duration();
     let time = parse(&(duration.as_secs().to_string() + "s")).unwrap();
@@ -178,7 +178,7 @@ pub fn create_audio(path: &str, format: FileFormat) -> _Audio {
         None => Vec::new(),
     };
     _Audio {
-        path: path.to_string(),
+        path: path.as_os_str().to_str().unwrap().to_string(),
         duration: time,
         format: match format.short_name() {
             Some(name) => name.to_string(),
@@ -189,7 +189,7 @@ pub fn create_audio(path: &str, format: FileFormat) -> _Audio {
             title: tag
                 .title()
                 .as_deref()
-                .unwrap_or(path.split('/').last().unwrap())
+                .unwrap_or(path.file_stem().unwrap().to_str().unwrap_or("Unknown"))
                 .to_string(),
             artist: tag.artist().as_deref().unwrap_or("Unknown").to_string(),
             album: tag.album().as_deref().unwrap_or("Unknown").to_string(),
@@ -201,19 +201,20 @@ pub fn create_audio(path: &str, format: FileFormat) -> _Audio {
 
 fn check_audio_format(
     format: FileFormat,
-    p: &str,
+    p: &Path,
     audios: &mut Vec<_Audio>,
     app_handle: &AppHandle,
     count: &mut usize,
 ) -> bool {
     match format.kind() {
         Kind::Audio => {
-            match app_handle.db(|db| database::is_audio_in_db(db, p)) {
+            match app_handle.db(|db| database::is_audio_in_db(db, p.as_os_str().to_str().unwrap()))
+            {
                 Ok(true) => {
                     info!("Audio already in db");
                 }
                 Ok(false) => {
-                    let audio = create_audio(p, format);
+                    let audio = create_audio(p.to_path_buf(), format);
                     app_handle.db(|db| database::add_audio(&audio, db)).unwrap();
                     audios.push(audio);
                     *count += 1;
@@ -229,9 +230,9 @@ fn check_audio_format(
     }
 }
 
-pub fn get_audios(audios: &mut Vec<_Audio>, path: &str, app_handle: &AppHandle) -> usize {
+pub fn get_audios(audios: &mut Vec<_Audio>, pathbuf: PathBuf, app_handle: &AppHandle) -> usize {
     let mut count = 0;
-    let paths = std::fs::read_dir(PathBuf::from(path));
+    let paths = std::fs::read_dir(pathbuf);
     info!("Init dir read");
     match paths {
         Ok(paths) => {
@@ -242,10 +243,10 @@ pub fn get_audios(audios: &mut Vec<_Audio>, path: &str, app_handle: &AppHandle) 
                         let p = &path.path().into_os_string().into_string();
                         match p {
                             Ok(p) => {
-                                // if p.contains(".ini") {
-                                //     // see https://github.com/mmalecot/file-format/issues/36
-                                //     continue;
-                                // }
+                                if p.contains(".ini") {
+                                    // see https://github.com/mmalecot/file-format/issues/36
+                                    continue;
+                                }
                                 if audios.iter().any(|audio| audio.path == *p) {
                                     info!("Audio already in list");
                                     continue;
@@ -259,7 +260,13 @@ pub fn get_audios(audios: &mut Vec<_Audio>, path: &str, app_handle: &AppHandle) 
                                         continue;
                                     }
                                 };
-                                check_audio_format(format, p, audios, app_handle, &mut count);
+                                check_audio_format(
+                                    format,
+                                    &PathBuf::from(p),
+                                    audios,
+                                    app_handle,
+                                    &mut count,
+                                );
                             }
                             Err(e) => {
                                 error!("{:?}", e);

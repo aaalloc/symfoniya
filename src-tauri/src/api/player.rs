@@ -1,5 +1,6 @@
 use std::{
     fs::File,
+    path::PathBuf,
     sync::{Arc, Mutex},
 };
 
@@ -20,7 +21,8 @@ pub fn import_from_folders(
     let mut player = player.lock().unwrap();
     let mut total_imported = 0;
     for folder in folders {
-        total_imported += player.import_from_folders(&folder, &app_handle);
+        let folder_path = PathBuf::from(&folder);
+        total_imported += player.import_from_folders(folder_path, &app_handle);
     }
     player.write_to_db(app_handle);
     drop(player);
