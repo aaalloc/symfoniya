@@ -13,7 +13,7 @@ use crate::{
 };
 use log::info;
 use rusqlite::{named_params, Connection};
-use std::fs;
+use std::{fs, path::Path};
 use tauri::AppHandle;
 
 const CURRENT_DB_VERSION: u32 = 1;
@@ -73,7 +73,7 @@ pub fn add_audio(audio: &_Audio, db: &Connection) -> Result<(), rusqlite::Error>
         "@album": audio.tag.album,
         "@genre": audio.tag.genre,
     })?;
-    let folder = audio.path.rsplit_once('/').unwrap().0;
+    let folder = Path::new(&audio.path).parent().unwrap().to_str().unwrap();
     let mut folder_statement = db.prepare(insert::folder::FOLDER_INSERT)?;
     folder_statement.execute(named_params! { "@path": folder })?;
 
