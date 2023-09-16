@@ -3,17 +3,6 @@
 name: Lint Rust
 
 on:
-  push:
-    paths-ignore:
-      - ".github/workflows/**"
-      - "src/**"
-      - "package.json"
-      - "package-lock.json"
-      - "yarn.lock"
-      - "pnpm-lock.yaml"
-      - "README.md"
-    branches:
-      - master
   pull_request:
     paths-ignore:
       - ".github/workflows/**"
