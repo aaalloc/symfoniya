@@ -3,13 +3,6 @@
 name: Lint Node.js
 
 on:
-  push:
-    paths-ignore:
-      - ".github/workflows/**"
-      - "src-tauri/**"
-      - "README.md"
-    branches:
-      - master
   pull_request:
     paths-ignore:
       - ".github/workflows/**"
