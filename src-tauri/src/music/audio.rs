@@ -1,6 +1,6 @@
 use duration_str::parse;
 use file_format::{FileFormat, Kind};
-use lofty::{Accessor, AudioFile, Probe, Tag, TagType, TaggedFileExt};
+use lofty::{Accessor, AudioFile, Probe, Tag, TagType, TaggedFile, TaggedFileExt};
 use log::{error, info};
 use rodio::Decoder;
 use std::path::PathBuf;
@@ -140,11 +140,28 @@ impl std::cmp::PartialEq for _Audio {
     }
 }
 
+fn gen_tag(path: &str) -> TaggedFile {
+    let tagged_file = Probe::open(path);
+    match tagged_file {
+        Ok(tagged_file) => match tagged_file.read() {
+            Ok(t) => {
+                info!("{:?}", t.properties());
+                t
+            }
+            Err(e) => {
+                error!("{}", e);
+                panic!("{}", e);
+            }
+        },
+        Err(e) => {
+            error!("{}", e);
+            panic!("{}", e);
+        }
+    }
+}
+
 pub fn create_audio(path: &str, format: FileFormat) -> _Audio {
-    let tagged_file = Probe::open(path)
-        .expect("ERROR: Bad path provided!")
-        .read()
-        .expect("ERROR: Failed to read file!");
+    let tagged_file = gen_tag(path);
     let properties = tagged_file.properties();
     let duration = properties.duration();
     let time = parse(&(duration.as_secs().to_string() + "s")).unwrap();
@@ -225,10 +242,10 @@ pub fn get_audios(audios: &mut Vec<_Audio>, path: &str, app_handle: &AppHandle) 
                         let p = &path.path().into_os_string().into_string();
                         match p {
                             Ok(p) => {
-                                if p.contains(".ini") {
-                                    // see https://github.com/mmalecot/file-format/issues/36
-                                    continue;
-                                }
+                                // if p.contains(".ini") {
+                                //     // see https://github.com/mmalecot/file-format/issues/36
+                                //     continue;
+                                // }
                                 if audios.iter().any(|audio| audio.path == *p) {
                                     info!("Audio already in list");
                                     continue;
