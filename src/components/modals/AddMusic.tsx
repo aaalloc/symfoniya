@@ -122,15 +122,11 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          className=" 
-                w-full 
-                space-y-4
-                transition ease-in-out delay-90 hover:opacity-90 duration-150"
-          variant="outline"
-        >
-          Add musics
-        </Button>
+        <div className="container_gradient cursor-pointer transition-all">
+          <div className="hover:brightness-95 dark:hover:brightness-125 transition-all flex justify-center items-center gradient text-center text-sm bg-white dark:bg-gray-900 font-medium h-10 px-4 py-2">
+            Add musics
+          </div>
+        </div>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
