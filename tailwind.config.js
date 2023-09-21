@@ -16,6 +16,13 @@ module.exports = {
       },
     },
     extend: {
+      willChange: {
+        'filter': 'filter',
+      },
+      backgroundImage: {
+        "button-gradient":
+          "linear-gradient(43deg, #00C5DF 0%, #FFC700 46%, #F2371F 100%)",
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
