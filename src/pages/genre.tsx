@@ -1,39 +1,41 @@
-// import { Howl } from "howler"
 import { readBinaryFile } from "@tauri-apps/api/fs"
-import { convertFileSrc } from "@tauri-apps/api/tauri"
-import { Howl } from "howler"
 import { useRouter } from "next/router"
+import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 
-const filePath = "/home/yanovskyy/Musique/Putty Boy Strut.mp3"
-const assetUrl = convertFileSrc(filePath)
-const e = await readBinaryFile(filePath)
-
 const GenrePage = () => {
+  const [urlAUdio, setUrlAudio] = useState<string>("")
   const router = useRouter()
   const data = router.query
   console.log(data.playlist)
 
   return (
-    <Button
-      variant="ghost"
-      onClick={() => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-        // const sound = new Howl({
-        //   src: [assetUrl],
-        // }) // Origin http://localhost:1420 is not allowed
-        // // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        // sound.play()
-        const sound = new Audio(assetUrl)
-        void sound.play().then(() => {
-          console.log("ok")
-        })
-      }}
-      className="w-full justify-start font-normal"
-    >
-      ok
-    </Button>
+    <>
+      <Button
+        variant="ghost"
+        onClick={() => {
+          const filePath = "/home/yanovskyy/Musique/Shinigami.m4a"
+          void readBinaryFile(filePath)
+            .catch((err) => {
+              console.error(err)
+            })
+            .then((res) => {
+              const fileBlob = new Blob([res as ArrayBuffer], { type: "audio/mpeg" })
+              const reader = new FileReader()
+              reader.readAsDataURL(fileBlob)
+              const url = URL.createObjectURL(fileBlob)
+              setUrlAudio(url)
+            })
+        }}
+        className="w-full justify-start font-normal"
+      >
+        ok
+      </Button>
+      <audio controls>
+        <source src={urlAUdio} type="audio/mpeg" />
+      </audio>
+    </>
   )
 }
 
