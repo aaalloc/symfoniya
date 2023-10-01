@@ -23,6 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { useToast } from "@/components/ui/use-toast"
+import { cn } from "@/lib/utils"
 
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
 
@@ -119,18 +120,34 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
         })
       })
   }
+  const gradient = "bg-gradient-to-r to-[#00C5DF] via-[#FFC700] from-[#F2371F]"
+  const gradient_blurred =
+    "bg-gradient-to-r to-[#00C5DF]/40 via-[#FFC700]/40 from-[#F2371F]/40"
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          className=" 
-                w-full 
-                space-y-4
-                transition ease-in-out delay-90 hover:opacity-90 duration-150"
-          variant="outline"
-        >
-          Add musics
-        </Button>
+        <button className="flex justify-center text-center items-center">
+          <div className="relative group">
+            <div
+              className={cn(
+                "absolute -inset-0.5 rounded-2xl blur-lg group-hover:blur-lg  transition duration-500 group-hover:duration-200 will-change-filter overflow-hidden",
+                gradient_blurred,
+              )}
+            />
+            <div className="relative group-hover:scale-105 duration-500 group-hover:duration-200">
+              <div
+                className={cn(
+                  "block inset-0.5 rounded-xl p-[3px] transition",
+                  gradient,
+                )}
+              >
+                <div className="w-56 px-4 py-[10px] text-sm font-medium color-white bg-white dark:bg-gray-900 text-black dark:text-white rounded-lg">
+                  Add musics
+                </div>
+              </div>
+            </div>
+          </div>
+        </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
