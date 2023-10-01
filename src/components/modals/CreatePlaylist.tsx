@@ -27,7 +27,6 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
-import { cn } from "@/lib/utils"
 
 import { Playlist } from "../types/playlist"
 const formSchema = z.object({
@@ -67,35 +66,18 @@ export function CreatePlaylist() {
     form.reset()
   }
 
-  const gradient = "bg-gradient-to-r to-[#00C5DF] via-[#FFC700] from-[#F2371F]"
-  const gradient_blurred =
-    "bg-gradient-to-r to-[#00C5DF]/50 via-[#FFC700]/50 from-[#F2371F]/50"
-
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button className="flex justify-center text-center items-center">
-          <div className="relative group">
-            <div
-              className={cn(
-                "absolute -inset-0.5 rounded-2xl blur-lg  group-hover:blur-lg  transition duration-500 group-hover:duration-200 will-change-filter overflow-hidden",
-                gradient_blurred,
-              )}
-            />
-            <div className="relative group-hover:scale-105 duration-500 group-hover:duration-200">
-              <div
-                className={cn(
-                  "block inset-0.5 rounded-xl p-[3px] transition",
-                  gradient,
-                )}
-              >
-                <div className="w-56 px-4 py-[10px] text-sm font-medium color-white bg-white dark:bg-gray-900 text-black dark:text-white rounded-lg">
-                  Create playlist
-                </div>
-              </div>
-            </div>
-          </div>
-        </button>
+        <Button
+          className=" 
+                  w-full 
+                  space-y-4
+                  transition ease-in-out delay-90 hover:opacity-90 duration-150"
+          variant="outline"
+        >
+          Create playlist
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

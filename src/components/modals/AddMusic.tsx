@@ -14,7 +14,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import GlowingGradientBorderButton from "@/components/ui/gradient_button"
 import {
   Table,
   TableBody,
@@ -123,7 +122,7 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
   }
   const gradient = "bg-gradient-to-r to-[#00C5DF] via-[#FFC700] from-[#F2371F]"
   const gradient_blurred =
-    "bg-gradient-to-r to-[#00C5DF]/50 via-[#FFC700]/50 from-[#F2371F]/50"
+    "bg-gradient-to-r to-[#00C5DF]/40 via-[#FFC700]/40 from-[#F2371F]/40"
   return (
     <Dialog>
       <DialogTrigger asChild>
