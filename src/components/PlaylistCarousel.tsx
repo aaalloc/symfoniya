@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import "keen-slider/keen-slider.min.css"
 
 import { useKeenSlider } from "keen-slider/react"
@@ -23,12 +24,12 @@ export const PlaylistCarousel = ({
   const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>(
     {
       slides: {
-        perView: 6,
+        perView: 4,
       },
       breakpoints: {
         "(max-width: 1279px)": {
           slides: {
-            perView: 5,
+            perView: 4,
           },
         },
         "(max-width: 1023px)": {
@@ -51,7 +52,7 @@ export const PlaylistCarousel = ({
     },
     [WheelControls],
   )
-
+  console.log(instanceRef.current)
   return (
     <div className="flex flex-col gap-2">
       <div className="flex justify-between items-center">

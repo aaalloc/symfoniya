@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { KeenSliderInstance } from "keen-slider/react"
 
 export const PlaylistCarouselControls = ({
@@ -10,8 +11,9 @@ export const PlaylistCarouselControls = ({
   return (
     <div className="flex gap-2">
       <button
-        onClick={(e: any) => {
-          e.stopPropagation() || instanceRef.current?.prev()
+        onClick={(e) => {
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-confusing-void-expression
+          void e.stopPropagation() || instanceRef.current?.prev()
         }}
         disabled={currentSlide === 0}
         className={`h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center
@@ -34,10 +36,13 @@ export const PlaylistCarouselControls = ({
       </button>
       <button
         onClick={(e: any) => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
           e.stopPropagation() || instanceRef.current?.next()
         }}
         disabled={
-          currentSlide === (instanceRef.current?.track.details.slides.length ?? 0) - 1
+          false
+          // bellow is null only when charging the web completly or after a refresh made by user
+          //currentSlide === instanceRef.current.track.details.slides.length - 1
         }
         className={`h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center
         transition ease-in-out duration-150 hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-50
