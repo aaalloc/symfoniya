@@ -47,22 +47,24 @@ const Home: NextPage = () => {
       <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
         Hello !
       </h1>
-      <div className="container">
+      <div className="flex flex-row container mx-auto">
         <PlaylistCarousel title="Your latest playlists" playlists={context.playlists} />
       </div>
       <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
         Listen again
       </h1>
-      <div className="h-2/6 overflow-y-auto grid grid-cols-2 container">
-        {history !== null ? (
-          history.map((value) => {
-            return MusicCard(value, context, "recent")
-          })
-        ) : (
-          <p className="text-center text-lg font-medium text-slate-600 dark:text-slate-400">
-            No history found
-          </p>
-        )}
+      <div className="h-2/6 flex flex-col container">
+        <div className="grid grid-cols-2 overflow-y-auto justify-between">
+          {history !== null ? (
+            history.map((value) => {
+              return MusicCard(value, context, "recent")
+            })
+          ) : (
+            <p className="text-center text-lg font-medium text-slate-600 dark:text-slate-400">
+              No history found
+            </p>
+          )}
+        </div>
       </div>
     </div>
   )

@@ -1,21 +1,16 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { KeenSliderInstance } from "keen-slider/react"
+import "@egjs/react-flicking/dist/flicking.css"
 
-export const PlaylistCarouselControls = ({
-  instanceRef,
-  currentSlide,
-}: {
-  instanceRef: React.MutableRefObject<KeenSliderInstance | null>
-  currentSlide: number
-}) => {
+import Flicking from "@egjs/react-flicking"
+export function PlaylistCarouselControls(flickerRef: React.RefObject<Flicking>) {
   return (
     <div className="flex gap-2">
       <button
-        onClick={(e) => {
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-confusing-void-expression
-          void e.stopPropagation() || instanceRef.current?.prev()
+        onClick={() => {
+          flickerRef.flickerRef.current.prev()
         }}
-        disabled={currentSlide === 0}
+        disabled={false}
         className={`h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center
         transition ease-in-out duration-150 hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-50
         disabled:cursor-not-allowed`}
@@ -35,15 +30,10 @@ export const PlaylistCarouselControls = ({
         </svg>
       </button>
       <button
-        onClick={(e: any) => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-          e.stopPropagation() || instanceRef.current?.next()
+        onClick={() => {
+          flickerRef.flickerRef.current.next()
         }}
-        disabled={
-          false
-          // bellow is null only when charging the web completly or after a refresh made by user
-          //currentSlide === instanceRef.current.track.details.slides.length - 1
-        }
+        disabled={false}
         className={`h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center
         transition ease-in-out duration-150 hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-50
         disabled:cursor-not-allowed`}

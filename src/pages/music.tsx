@@ -42,7 +42,7 @@ export function MusicCard(audio: Audio, context: appContext, name: string) {
           id={`audio-${audio.id}`}
           className="hover:cursor-pointer p-4 rounded-lg transition ease-in-out delay-90 dark:hover:bg-gray-900 hover:bg-gray-50 duration-150 flex items-center space-x-8"
         >
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <img
               className="h-14 w-14 rounded-md"
               src={byteToImage(audio.cover)}

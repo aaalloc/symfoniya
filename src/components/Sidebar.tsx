@@ -48,7 +48,7 @@ export function Sidebar({ className: className }: { className?: string }) {
       component: <User className="mr-2 h-4 w-4" />,
       onClick: () =>
         Router.push({
-          pathname: "/genre",
+          pathname: "/",
         }),
     },
     {
