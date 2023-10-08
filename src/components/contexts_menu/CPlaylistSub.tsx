@@ -7,7 +7,6 @@ import { AppContext } from "@/components/AppContext"
 import { CreatePlaylist } from "@/components/modals/CreatePlaylist"
 import { Audio } from "@/components/types/audio"
 import { Playlist } from "@/components/types/playlist"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
   Command,
   CommandEmpty,
@@ -20,6 +19,8 @@ import {
   ContextMenuSubContent,
   ContextMenuSubTrigger,
 } from "@/components/ui/context-menu"
+
+import { LabeledCheckbox } from "../ui/labeled-checkbox"
 
 type PlaylistCheckedState = Record<string, Record<string, boolean>>
 
@@ -64,44 +65,38 @@ function PlaylistCommandItem(props: { playlist: string; value: Audio; name: stri
   const { playlistCheckedState, setPlaylistCheckedState } = useContext(AppContext)
   return (
     <CommandItem key={props.playlist}>
-      <div className="flex items-center space-x-2">
-        <Checkbox
-          id={props.playlist}
-          defaultChecked={
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            (playlistCheckedState[props.playlist] &&
-              playlistCheckedState[props.playlist][props.value.id]) ??
-            false
+      <LabeledCheckbox
+        id={props.playlist}
+        defaultChecked={
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          (playlistCheckedState[props.playlist] &&
+            playlistCheckedState[props.playlist][props.value.id]) ??
+          false
+        }
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        onCheckedChange={async (state) => {
+          await invoke("add_audio_to_playlist", {
+            state: state,
+            playlist: props.playlist,
+            path: props.value.path,
+          })
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises, @typescript-eslint/no-floating-promises
+          fetchPlaylistCheckedState(playlists, audioList, setPlaylistCheckedState)
+          if (props.name === props.playlist) {
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
+            setAudiosFromPlaylist(props.playlist, audioList, setAudioList)
           }
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          onCheckedChange={async (state) => {
-            await invoke("add_audio_to_playlist", {
-              state: state,
-              playlist: props.playlist,
-              path: props.value.path,
+          invoke<Playlist[]>("get_playlists")
+            .then((response) => {
+              setPlaylist(response)
             })
-            // eslint-disable-next-line @typescript-eslint/no-misused-promises, @typescript-eslint/no-floating-promises
-            fetchPlaylistCheckedState(playlists, audioList, setPlaylistCheckedState)
-            if (props.name === props.playlist) {
-              // eslint-disable-next-line @typescript-eslint/no-floating-promises
-              setAudiosFromPlaylist(props.playlist, audioList, setAudioList)
-            }
-            invoke<Playlist[]>("get_playlists")
-              .then((response) => {
-                setPlaylist(response)
-              })
-              .catch((error) => {
-                console.error(error)
-              })
-          }}
-        />
-        <label
-          htmlFor="terms"
-          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        >
-          {props.playlist}
-        </label>
-      </div>
+            .catch((error) => {
+              console.error(error)
+            })
+        }}
+      >
+        {props.playlist}
+      </LabeledCheckbox>
     </CommandItem>
   )
 }
