@@ -4,16 +4,25 @@ function cn(...classes: string[]) {
   return classes.filter(Boolean).join(" ")
 }
 
-export default function GlowingGradientBorderButton({ text }: { text: string }) {
+export default function GlowingGradientBorderButton({
+  children,
+  onClick,
+}: {
+  children: React.ReactNode
+  onClick?: () => void
+}) {
   const gradient = "bg-gradient-to-r to-[#00C5DF] via-[#FFC700] from-[#F2371F]"
   const gradient_blurred =
-    "bg-gradient-to-r to-[#00C5DF]/60 via-[#FFC700]/60 from-[#F2371F]/60"
+    "bg-gradient-to-r to-[#00C5DF]/40 via-[#FFC700]/40 from-[#F2371F]/40"
   return (
-    <button className="flex justify-center text-center items-center">
+    <button
+      className="flex justify-center text-center items-center w-full"
+      onClick={onClick}
+    >
       <div className="relative group">
         <div
           className={cn(
-            "absolute -inset-0.5 rounded-2xl blur-[20px] group-hover:blur-lg  transition duration-500 group-hover:duration-200 will-change-filter overflow-hidden",
+            "absolute -inset-0.5 rounded-2xl blur-lg group-hover:blur-lg  transition duration-500 group-hover:duration-200 will-change-filter overflow-hidden",
             gradient_blurred,
           )}
         />
@@ -22,7 +31,7 @@ export default function GlowingGradientBorderButton({ text }: { text: string }) 
             className={cn("block inset-0.5 rounded-xl p-[3px] transition", gradient)}
           >
             <div className="w-56 px-4 py-[10px] text-sm font-medium color-white bg-white dark:bg-gray-900 text-black dark:text-white rounded-lg">
-              {text}
+              {children}
             </div>
           </div>
         </div>
