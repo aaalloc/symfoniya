@@ -3,7 +3,9 @@
 import "@egjs/react-flicking/dist/flicking.css"
 
 import Flicking from "@egjs/react-flicking"
-export function PlaylistCarouselControls(flickerRef: React.RefObject<Flicking>) {
+export function PlaylistCarouselControls(flickerRef: {
+  flickerRef: React.RefObject<Flicking>
+}) {
   return (
     <div className="flex gap-2">
       <button
