@@ -1,7 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
 import "@egjs/react-flicking/dist/flicking.css"
 
 import Flicking from "@egjs/react-flicking"
+import Image from "next/image"
 import Router from "next/router"
 import { useRef } from "react"
 
@@ -31,6 +31,8 @@ export const PlaylistCarousel = ({
           align="prev"
           circular={true}
           horizontal={true}
+          autoResize={true}
+          useResizeObserver={true}
         >
           {playlists.length !== 0 ? (
             playlists.map((value, index) => {
@@ -48,14 +50,16 @@ export const PlaylistCarousel = ({
                   className="panel shrink-0 flex flex-col gap-4 items-center justify-start cursor-pointer hover:bg-gray-50 duration-150
               delay-90 dark:hover:bg-gray-900 p-4 rounded-lg transition ease-in-out"
                 >
-                  <img
+                  <Image
                     src={byteToImage(value.cover)}
                     //style={{ filter: "hue-rotate(100deg)" }}
-                    className={`h-52 w-52 aspect-square rounded-lg ${
+                    className={`aspect-square rounded-lg ${
                       value.cover.length === 0
                         ? "dark:invert dark:relative mix-blend-mode-overlay"
                         : ""
                     }`}
+                    height={208}
+                    width={208}
                     alt={value.name}
                   />
                   <div className="flex flex-col w-full px-1">

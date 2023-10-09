@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-misused-promises */
-/* eslint-disable @next/next/no-img-element */
 import { invoke } from "@tauri-apps/api/tauri"
 import { PenBox, Shuffle } from "lucide-react"
+import Image from "next/image"
 import { useContext, useEffect } from "react"
 
 import { AppContext, appContext } from "@/components/AppContext"
@@ -43,9 +43,11 @@ export function MusicCard(audio: Audio, context: appContext, name: string) {
           className="hover:cursor-pointer p-4 rounded-lg transition ease-in-out delay-90 dark:hover:bg-gray-900 hover:bg-gray-50 duration-150 flex items-center space-x-8"
         >
           <div className="shrink-0">
-            <img
-              className="h-14 w-14 rounded-md"
+            <Image
+              className="rounded-md"
               src={byteToImage(audio.cover)}
+              height={56}
+              width={56}
               alt=""
             />
           </div>
@@ -87,14 +89,16 @@ export default function Music({ name }: { name: string }) {
   return (
     <div className="h-full flex flex-col gap-10">
       <div className="flex flex-row container gap-x-12">
-        <img
-          className="h-56 w-56 object-cover rounded-lg"
+        <Image
+          className="object-cover rounded-lg"
           src={
             isObjectEmpty(context.audioList)
               ? byteToImage([] as number[])
               : byteToImage(context.audioList[0].cover)
           }
           alt="playlist"
+          height={224}
+          width={224}
         />
         <div className="flex flex-col justify-center gap-2">
           <div className="flex flex-row gap-6">
