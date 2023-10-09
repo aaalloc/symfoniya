@@ -3,7 +3,7 @@ import "@egjs/react-flicking/dist/flicking.css"
 
 import Flicking from "@egjs/react-flicking"
 import Router from "next/router"
-import { createRef } from "react"
+import { useRef } from "react"
 
 import { byteToImage } from "@/lib/utils"
 
@@ -17,7 +17,7 @@ export const PlaylistCarousel = ({
   playlists: Playlist[]
   title: string
 }) => {
-  const flickingRef: React.RefObject<Flicking> = createRef()
+  const flickingRef: React.MutableRefObject<Flicking | null> = useRef(null)
   return (
     <div className="flex flex-col gap-y-2">
       <div className="flex justify-between items-center gap-2">
@@ -30,6 +30,7 @@ export const PlaylistCarousel = ({
           renderOnlyVisible={true}
           align="prev"
           circular={true}
+          horizontal={true}
         >
           {playlists.length !== 0 ? (
             playlists.map((value, index) => {
@@ -49,6 +50,7 @@ export const PlaylistCarousel = ({
                 >
                   <img
                     src={byteToImage(value.cover)}
+                    //style={{ filter: "hue-rotate(100deg)" }}
                     className={`h-52 w-52 aspect-square rounded-lg ${
                       value.cover.length === 0
                         ? "dark:invert dark:relative mix-blend-mode-overlay"
