@@ -10,7 +10,7 @@ export function PlaylistCarouselControls(flickerRef: {
     <div className="flex gap-2">
       <button
         onClick={() => {
-          flickerRef.flickerRef.current.prev()
+          void flickerRef.flickerRef.current?.prev()
         }}
         disabled={false}
         className={`h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center
@@ -33,7 +33,7 @@ export function PlaylistCarouselControls(flickerRef: {
       </button>
       <button
         onClick={() => {
-          flickerRef.flickerRef.current.next()
+          void flickerRef.flickerRef.current?.next()
         }}
         disabled={false}
         className={`h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center
