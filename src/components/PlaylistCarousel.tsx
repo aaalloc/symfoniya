@@ -49,7 +49,11 @@ export const PlaylistCarousel = ({
                 >
                   <img
                     src={byteToImage(value.cover)}
-                    className="h-52 w-52 aspect-square rounded-lg"
+                    className={`h-52 w-52 aspect-square rounded-lg ${
+                      value.cover.length === 0
+                        ? "dark:invert dark:relative mix-blend-mode-overlay"
+                        : ""
+                    }`}
                     alt={value.name}
                   />
                   <div className="flex flex-col w-full px-1">
