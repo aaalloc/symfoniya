@@ -1,4 +1,5 @@
 import { readBinaryFile } from "@tauri-apps/api/fs"
+import { convertFileSrc } from "@tauri-apps/api/tauri"
 import { useRouter } from "next/router"
 import { useState } from "react"
 
@@ -16,16 +17,21 @@ const GenrePage = () => {
         variant="ghost"
         onClick={() => {
           const filePath = "/home/yanovskyy/Musique/Shinigami.m4a"
-          void readBinaryFile(filePath)
+          fetch(convertFileSrc(filePath))
+            .then((res) => {
+              // create blob url from response
+              res
+                .blob()
+                .then((blob) => {
+                  const url = URL.createObjectURL(blob)
+                  setUrlAudio(url)
+                })
+                .catch((err) => {
+                  console.error(err)
+                })
+            })
             .catch((err) => {
               console.error(err)
-            })
-            .then((res) => {
-              const fileBlob = new Blob([res as ArrayBuffer], { type: "audio/mpeg" })
-              const reader = new FileReader()
-              reader.readAsDataURL(fileBlob)
-              const url = URL.createObjectURL(fileBlob)
-              setUrlAudio(url)
             })
         }}
         className="w-full justify-start font-normal"
