@@ -43,31 +43,21 @@ const Home: NextPage = () => {
       <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
         Listen again
       </h1>
-      <div className="flex flex-col container">
-        <div className="grid grid-cols-4">
-          <Flicking
-            ref={flickingRef}
-            renderOnlyVisible={true}
-            align="prev"
-            circular={true}
-            useResizeObserver={true}
-            useFractionalSize={true}
-          >
-            {history !== null ? (
-              // group of 2
-              history.map((value, index) => {
-                return (
-                  <div className="panel" key={index}>
-                    <MusicCard audio={value} context={context} name="recent" />
-                  </div>
-                )
-              })
-            ) : (
-              <p className="text-center text-lg font-medium text-slate-600 dark:text-slate-400">
-                No history found
-              </p>
-            )}
-          </Flicking>
+      <div className="h-2/6 flex flex-col container">
+        <div className="grid grid-cols-2 overflow-y-auto justify-between">
+          {history !== null ? (
+            history.map((value, index) => {
+              return (
+                <div className="panel" key={index}>
+                  <MusicCard audio={value} context={context} name="recent" />
+                </div>
+              )
+            })
+          ) : (
+            <p className="text-center text-lg font-medium text-slate-600 dark:text-slate-400">
+              No history found
+            </p>
+          )}
         </div>
       </div>
     </div>
