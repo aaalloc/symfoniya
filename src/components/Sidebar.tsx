@@ -46,7 +46,10 @@ export function Sidebar({ className: className }: { className?: string }) {
     {
       label: "Genre",
       component: <User className="mr-2 h-4 w-4" />,
-      onClick: () => Router.push("/"),
+      onClick: () =>
+        Router.push({
+          pathname: "/",
+        }),
     },
     {
       label: "Artists",
