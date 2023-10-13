@@ -1,34 +1,16 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { DialogClose } from "@radix-ui/react-dialog"
-import { ScrollArea } from "@radix-ui/react-scroll-area"
 import { invoke } from "@tauri-apps/api/tauri"
-import { FolderPlus, X, Youtube } from "lucide-react"
+import { FolderInput, X, Youtube } from "lucide-react"
 import { useState } from "react"
 
 import { Audio } from "@/components/types/audio"
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { TableCell, TableRow } from "@/components/ui/table"
 import { useToast } from "@/components/ui/use-toast"
 
-import GlowingGradientBorderButton from "../ui/gradient_button"
-import { Input } from "../ui/input"
-import { Label } from "../ui/label"
+// import GlowingGradientBorderButton from "../ui/gradient_button"
+// import { Input } from "../ui/input"
+// import { Label } from "../ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
 
@@ -81,17 +63,21 @@ export function MusicPath(props: { value: string; onRemove: (value: string) => v
   )
 }
 
+function cn(...classes: string[]) {
+  return classes.filter(Boolean).join(" ")
+}
+
 export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
   const { toast } = useToast()
   const [arr_path, setPath] = useState<string[]>([])
-  const removePath = (path: string) => {
-    //console.log(path)
-    setPath(
-      arr_path.filter((value) => {
-        return value !== path
-      }),
-    )
-  }
+  // const removePath = (path: string) => {
+  //   //console.log(path)
+  //   setPath(
+  //     arr_path.filter((value) => {
+  //       return value !== path
+  //     }),
+  //   )
+  // }
 
   const choose_path = async () => {
     const import_dialog = await import("@tauri-apps/api/dialog")
@@ -107,6 +93,7 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
       )
       const updated_paths = [...arr_path, ...paths_to_add]
       setPath(updated_paths)
+      handle_submit()
     }
   }
 
@@ -132,90 +119,61 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
         })
       })
   }
+
+  const gradient = "bg-gradient-to-r to-[#00C5DF] via-[#FFC700] from-[#F2371F]"
+  const gradient_blurred =
+    "bg-gradient-to-r to-[#00C5DF]/40 via-[#FFC700]/40 from-[#F2371F]/40"
+
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <GlowingGradientBorderButton>Add musics</GlowingGradientBorderButton>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[410px]">
-        <DialogHeader>
-          <DialogTitle>Add musics</DialogTitle>
-          <DialogDescription>
-            Add musics from folders (you can select multiple folders) or from YouTube
-            button.
-          </DialogDescription>
-        </DialogHeader>
-        {/* value={path == null ? "Something happened ..." : path} */}
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Paths</TableHead>
-              </TableRow>
-            </TableHeader>
-            {/* <TableCaption>Path selected</TableCaption> */}
-            {/* patch w-1 when path to big*/}
-            <ScrollArea className="h-36">
-              <TableBody>
-                {typeof arr_path === "string" ? (
-                  <MusicPath value={arr_path} onRemove={removePath} />
-                ) : arr_path.length === 0 ? (
-                  <MusicPath
-                    key={0}
-                    value={"No paths selected"}
-                    onRemove={removePath}
-                  />
-                ) : (
-                  arr_path.map((value, i) => (
-                    <MusicPath key={i} value={value} onRemove={removePath} />
-                  ))
+    <Popover disableAutoFocus={false}>
+      <PopoverTrigger asChild>
+        <button className="flex justify-center text-center items-center w-full">
+          <div className="relative group">
+            <div
+              className={cn(
+                "absolute -inset-0.5 rounded-2xl blur-lg group-hover:blur-lg  transition duration-500 group-hover:duration-200 will-change-filter overflow-hidden",
+                gradient_blurred,
+              )}
+            />
+            <div className="relative group-hover:scale-105 duration-500 group-hover:duration-200">
+              <div
+                className={cn(
+                  "block inset-0.5 rounded-xl p-[3px] transition",
+                  gradient,
                 )}
-              </TableBody>
-            </ScrollArea>
-          </Table>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={choose_path}>
-            <FolderPlus />
-          </Button>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline">
-                <Youtube />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80">
-              <div className="grid gap-4">
-                <div className="space-y-2">
-                  <h4 className="font-medium leading-none">Youtube</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Give a YouTube link to download the music
-                  </p>
-                </div>
-                <div className="grid gap-2">
-                  <div className="grid grid-cols-3 items-center gap-4">
-                    <Label htmlFor="link">Link</Label>
-                    <Input
-                      id="link"
-                      defaultValue="https://www.youtube.com/"
-                      className="col-span-3 h-8"
-                    />
-                  </div>
+              >
+                <div className="w-56 px-4 py-[10px] text-sm font-medium color-white bg-white dark:bg-gray-900 text-black dark:text-white rounded-lg">
+                  Add musics
                 </div>
               </div>
-            </PopoverContent>
-          </Popover>
-          <DialogClose>
-            <Button
-              onClick={handle_submit}
-              disabled={!(arr_path.length > 0)}
-              type="submit"
-            >
-              Import musics
-            </Button>
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+            </div>
+          </div>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-64">
+        <div className="grid gap-4">
+          <button
+            onClick={choose_path}
+            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+          >
+            <div className="flex items-center gap-x-4">
+              <FolderInput />
+              <p className="text-start text-sm text-muted-foreground">Select folders</p>
+            </div>
+          </button>
+          <button
+            onClick={choose_path}
+            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+          >
+            <div className="flex items-center gap-x-4">
+              <Youtube />
+              <p className="text-start text-sm text-muted-foreground">
+                Download from YouTube
+              </p>
+            </div>
+          </button>
+        </div>
+      </PopoverContent>
+    </Popover>
   )
 }

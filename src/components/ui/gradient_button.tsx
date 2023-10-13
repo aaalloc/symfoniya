@@ -15,10 +15,7 @@ export default function GlowingGradientBorderButton({
   const gradient_blurred =
     "bg-gradient-to-r to-[#00C5DF]/40 via-[#FFC700]/40 from-[#F2371F]/40"
   return (
-    <button
-      className="flex justify-center text-center items-center w-full"
-      onClick={onClick}
-    >
+    <button className="flex justify-center text-center items-center w-full">
       <div className="relative group">
         <div
           className={cn(
