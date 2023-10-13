@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import "@egjs/react-flicking/dist/flicking.css"
 
-import Flicking from "@egjs/react-flicking"
 import { invoke } from "@tauri-apps/api/tauri"
 import type { NextPage } from "next"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { useContext } from "react"
 
 import { AppContext } from "@/components/AppContext"
