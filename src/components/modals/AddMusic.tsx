@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import { DialogClose } from "@radix-ui/react-dialog"
 import { ScrollArea } from "@radix-ui/react-scroll-area"
 import { invoke } from "@tauri-apps/api/tauri"
-import { FolderPlus, X } from "lucide-react"
+import { FolderPlus, X, Youtube } from "lucide-react"
 import { useState } from "react"
 
 import { Audio } from "@/components/types/audio"
@@ -88,6 +89,7 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
       }),
     )
   }
+
   const choose_path = async () => {
     const import_dialog = await import("@tauri-apps/api/dialog")
     const import_path = await import("@tauri-apps/api/path")
@@ -103,6 +105,10 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
       const updated_paths = [...arr_path, ...paths_to_add]
       setPath(updated_paths)
     }
+  }
+
+  const choose_ytb = async () => {
+    // TODO: implement
   }
 
   const handle_submit = () => {
@@ -128,7 +134,7 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
       <DialogTrigger asChild>
         <GlowingGradientBorderButton>Add musics</GlowingGradientBorderButton>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[400px]">
+      <DialogContent className="sm:max-w-[410px]">
         <DialogHeader>
           <DialogTitle>Add musics</DialogTitle>
           <DialogDescription>
@@ -136,51 +142,35 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
           </DialogDescription>
         </DialogHeader>
         {/* value={path == null ? "Something happened ..." : path} */}
-        {arr_path.length === 0 ? (
-          <div
-            // eslint-disable-next-line @typescript-eslint/no-misused-promises
-            onClick={choose_path}
-            className="cursor-pointer grid h-[200px] items-center justify-center rounded-md border border-dashed text-sm"
-          >
-            <div className="items-center">
-              <p className="text-sm text-muted-foreground">
-                Select a or multiple folder path{" "}
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Path</TableHead>
-                </TableRow>
-              </TableHeader>
-              {/* <TableCaption>Path selected</TableCaption> */}
-              {/* patch w-1 when path to big*/}
-              <ScrollArea className="h-36">
-                <TableBody>
-                  {typeof arr_path === "string" ? (
-                    <MusicPath value={arr_path} onRemove={removePath} />
-                  ) : (
-                    arr_path.map((value, i) => (
-                      <MusicPath key={i} value={value} onRemove={removePath} />
-                    ))
-                  )}
-                </TableBody>
-              </ScrollArea>
-            </Table>
-          </div>
-        )}
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Path</TableHead>
+              </TableRow>
+            </TableHeader>
+            {/* <TableCaption>Path selected</TableCaption> */}
+            {/* patch w-1 when path to big*/}
+            <ScrollArea className="h-36">
+              <TableBody>
+                {typeof arr_path === "string" ? (
+                  <MusicPath value={arr_path} onRemove={removePath} />
+                ) : (
+                  arr_path.map((value, i) => (
+                    <MusicPath key={i} value={value} onRemove={removePath} />
+                  ))
+                )}
+              </TableBody>
+            </ScrollArea>
+          </Table>
+        </div>
         <DialogFooter>
-          {arr_path.length === 0 ? (
-            <></>
-          ) : (
-            // eslint-disable-next-line @typescript-eslint/no-misused-promises
-            <Button variant="outline" onClick={choose_path}>
-              <FolderPlus />
-            </Button>
-          )}
+          <Button variant="outline" onClick={choose_path}>
+            <FolderPlus />
+          </Button>
+          <Button variant="outline" onClick={choose_ytb}>
+            <Youtube />
+          </Button>
           <DialogClose>
             <Button
               onClick={handle_submit}
