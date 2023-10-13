@@ -31,7 +31,6 @@ const Home: NextPage = () => {
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [context.audio])
-  const flickingRef = useRef<Flicking>(null)
   return (
     <div className="h-full flex flex-col gap-6">
       <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
