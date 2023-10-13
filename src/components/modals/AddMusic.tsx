@@ -27,6 +27,9 @@ import {
 import { useToast } from "@/components/ui/use-toast"
 
 import GlowingGradientBorderButton from "../ui/gradient_button"
+import { Input } from "../ui/input"
+import { Label } from "../ui/label"
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
 
 async function get_audios(): Promise<Audio[]> {
@@ -138,7 +141,8 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
         <DialogHeader>
           <DialogTitle>Add musics</DialogTitle>
           <DialogDescription>
-            Add musics from folders (you can select multiple folders) or from YouTube.
+            Add musics from folders (you can select multiple folders) or from YouTube
+            button.
           </DialogDescription>
         </DialogHeader>
         {/* value={path == null ? "Something happened ..." : path} */}
@@ -146,7 +150,7 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Path</TableHead>
+                <TableHead>Paths</TableHead>
               </TableRow>
             </TableHeader>
             {/* <TableCaption>Path selected</TableCaption> */}
@@ -155,6 +159,12 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
               <TableBody>
                 {typeof arr_path === "string" ? (
                   <MusicPath value={arr_path} onRemove={removePath} />
+                ) : arr_path.length === 0 ? (
+                  <MusicPath
+                    key={0}
+                    value={"No paths selected"}
+                    onRemove={removePath}
+                  />
                 ) : (
                   arr_path.map((value, i) => (
                     <MusicPath key={i} value={value} onRemove={removePath} />
@@ -168,9 +178,33 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
           <Button variant="outline" onClick={choose_path}>
             <FolderPlus />
           </Button>
-          <Button variant="outline" onClick={choose_ytb}>
-            <Youtube />
-          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline">
+                <Youtube />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
+              <div className="grid gap-4">
+                <div className="space-y-2">
+                  <h4 className="font-medium leading-none">Youtube</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Give a YouTube link to download the music
+                  </p>
+                </div>
+                <div className="grid gap-2">
+                  <div className="grid grid-cols-3 items-center gap-4">
+                    <Label htmlFor="link">Link</Label>
+                    <Input
+                      id="link"
+                      defaultValue="https://www.youtube.com/"
+                      className="col-span-3 h-8"
+                    />
+                  </div>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
           <DialogClose>
             <Button
               onClick={handle_submit}
