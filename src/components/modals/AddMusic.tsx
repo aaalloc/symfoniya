@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -110,6 +111,7 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
         toast({
           title: "Musics added",
           description: `${value} musics discovered`,
+          variant: "success",
         })
         void wrapper_setter_audio(props.setter)
       })
@@ -117,6 +119,7 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
         toast({
           title: "Musics added",
           description: "Something went wrong",
+          variant: "destructive",
         })
       })
   }
@@ -125,9 +128,12 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
       <DialogTrigger asChild>
         <GlowingGradientBorderButton>Add musics</GlowingGradientBorderButton>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[400px]">
         <DialogHeader>
           <DialogTitle>Add musics</DialogTitle>
+          <DialogDescription>
+            Add musics from folders (you can select multiple folders) or from YouTube.
+          </DialogDescription>
         </DialogHeader>
         {/* value={path == null ? "Something happened ..." : path} */}
         {arr_path.length === 0 ? (
