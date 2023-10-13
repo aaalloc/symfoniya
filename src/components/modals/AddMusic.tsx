@@ -125,7 +125,7 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
     "bg-gradient-to-r to-[#00C5DF]/40 via-[#FFC700]/40 from-[#F2371F]/40"
 
   return (
-    <Popover disableAutoFocus={false}>
+    <Popover>
       <PopoverTrigger asChild>
         <button className="flex justify-center text-center items-center w-full">
           <div className="relative group">
