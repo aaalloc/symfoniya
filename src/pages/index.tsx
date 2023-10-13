@@ -43,7 +43,7 @@ const Home: NextPage = () => {
       <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
         Listen again
       </h1>
-      <div className="h-2/6 flex flex-col container">
+      <div className="h-[23%] flex flex-col container">
         <div className="grid grid-cols-2 overflow-y-auto justify-between">
           {history !== null ? (
             history.map((value, index) => {
