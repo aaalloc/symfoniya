@@ -48,7 +48,7 @@ export const MusicCard = ({
             await play(context, audio, true)
           }}
           id={`audio-${audio.id}`}
-          className="hover:cursor-pointer p-4 rounded-lg transition ease-in-out delay-90 dark:hover:bg-gray-900 hover:bg-gray-50 duration-150 flex items-center space-x-8"
+          className="hover:cursor-pointer p-4 rounded-lg transition ease-in-out delay-90 dark:hover:bg-gray-900 hover:bg-gray-50 duration-150 flex items-center space-x-8 w-full"
         >
           <div className="shrink-0">
             <Image
@@ -60,7 +60,7 @@ export const MusicCard = ({
             />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-lg font-semibold">{audio.title}</p>
+            <p className="text-lg font-semibold truncate">{audio.title}</p>
             <p className="text-sm text-muted-foreground">{audio.artist}</p>
           </div>
           <p className="">{format_duration(audio.duration)}</p>
