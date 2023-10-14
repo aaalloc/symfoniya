@@ -1,16 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
-import "@egjs/react-flicking/dist/flicking.css"
-
 import { invoke } from "@tauri-apps/api/tauri"
 import type { NextPage } from "next"
 import { useEffect, useState } from "react"
 import { useContext } from "react"
 
 import { AppContext } from "@/components/AppContext"
+import { MusicsGrid } from "@/components/MusicsGrid"
 import { PlaylistCarousel } from "@/components/PlaylistCarousel"
 import { Audio } from "@/components/types/audio"
-
-import { MusicCard } from "./music"
 
 const Home: NextPage = () => {
   const [history, setHistory] = useState<Audio[]>([])
@@ -41,22 +38,8 @@ const Home: NextPage = () => {
       <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
         Listen again
       </h1>
-      <div className="h-[23%] flex flex-col container">
-        <div className="grid grid-cols-2 overflow-y-auto justify-between">
-          {history !== null ? (
-            history.map((value, index) => {
-              return (
-                <div className="panel" key={index}>
-                  <MusicCard audio={value} context={context} name="recent" />
-                </div>
-              )
-            })
-          ) : (
-            <p className="text-center text-lg font-medium text-slate-600 dark:text-slate-400">
-              No history found
-            </p>
-          )}
-        </div>
+      <div className="flex flex-row container">
+        <MusicsGrid audios={history} />
       </div>
     </div>
   )
