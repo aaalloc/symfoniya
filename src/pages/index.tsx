@@ -35,11 +35,8 @@ const Home: NextPage = () => {
       <div className="flex flex-row container">
         <PlaylistCarousel title="Your latest playlists" playlists={context.playlists} />
       </div>
-      <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
-        Listen again
-      </h1>
       <div className="flex flex-row container">
-        <MusicsGrid audios={history} />
+        <MusicsGrid title="Listen again" audios={history} />
       </div>
     </div>
   )
