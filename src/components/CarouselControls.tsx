@@ -3,7 +3,7 @@
 import "@egjs/react-flicking/dist/flicking.css"
 
 import Flicking from "@egjs/react-flicking"
-export function PlaylistCarouselControls(flickerRef: {
+export function CarouselControls(flickerRef: {
   flickerRef: React.RefObject<Flicking>
 }) {
   return (
