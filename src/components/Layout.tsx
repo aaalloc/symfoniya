@@ -27,7 +27,7 @@ export default function Layout({ children }: { children: React.ReactElement }) {
         <Toaster />
         <div className="flex divide-x h-full pb-12">
           <Sidebar className="basis-1/6" />
-          <div className="flex-1 flex flex-col gap-4 h-full w-full items-stretch">
+          <div className="flex-1 flex flex-col pr-[-300px] gap-4 h-full w-full items-stretch">
             <div className="flex justify-normal items-center px-[18rem]">
               <SearchBar />
               <Button

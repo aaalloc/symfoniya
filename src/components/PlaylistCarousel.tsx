@@ -7,7 +7,7 @@ import { useRef } from "react"
 
 import { byteToImage } from "@/lib/utils"
 
-import { PlaylistCarouselControls } from "./PlaylistCarouselControls"
+import { CarouselControls } from "./CarouselControls"
 import { Playlist } from "./types/playlist"
 
 export const PlaylistCarousel = ({
@@ -22,7 +22,7 @@ export const PlaylistCarousel = ({
     <div className="flex flex-col gap-y-2 w-full">
       <div className="flex justify-between items-center gap-2">
         <p className="text-lg font-medium tracking-tight lg:text-xl">{title}</p>
-        <PlaylistCarouselControls flickerRef={flickingRef} />
+        <CarouselControls flickerRef={flickingRef} />
       </div>
       <Flicking
         ref={flickingRef}
