@@ -25,8 +25,8 @@ export const MusicsGrid = ({ audios, title }: { audios?: Audio[]; title: string 
     : []
 
   return (
-    <div className="flex flex-col gap-2 w-full">
-      <div className="flex justify-between items-center gap-2">
+    <div className="flex flex-col gap-4 w-full">
+      <div className="flex justify-between items-center">
         <p className="text-lg tracking-tight lg:text-4xl font-extrabold">{title}</p>
         <CarouselControls flickerRef={flickingRef} />
       </div>
