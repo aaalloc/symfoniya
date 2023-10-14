@@ -8,17 +8,19 @@ import { AppContext } from "./AppContext"
 
 const itemsPerCol = 3
 
-export const MusicsGrid = ({ audios }: { audios: Audio[] }) => {
+export const MusicsGrid = ({ audios }: { audios?: Audio[] }) => {
   const context = useContext(AppContext)
 
-  const audiosInCols = audios.reduce<Audio[][]>((acc, curr, i) => {
-    const colIndex = Math.floor(i / itemsPerCol)
-    if (!acc[colIndex]) {
-      acc[colIndex] = []
-    }
-    acc[colIndex].push(curr)
-    return acc
-  }, [])
+  const audiosInCols = audios
+    ? audios.reduce<Audio[][]>((acc, curr, i) => {
+        const colIndex = Math.floor(i / itemsPerCol)
+        if (!acc[colIndex]) {
+          acc[colIndex] = []
+        }
+        acc[colIndex].push(curr)
+        return acc
+      }, [])
+    : []
 
   return (
     <div className="w-full">
