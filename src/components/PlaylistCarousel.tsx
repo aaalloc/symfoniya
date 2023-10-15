@@ -19,7 +19,7 @@ export const PlaylistCarousel = ({
 }) => {
   const flickingRef = useRef<Flicking>(null)
   return (
-    <div className="z-[-1] flex flex-col gap-y-4 w-full">
+    <div className="z-[0] flex flex-col gap-y-4 w-full">
       <div className="flex justify-between items-center gap-2">
         <p className="text-lg font-medium tracking-tight lg:text-xl">{title}</p>
         <CarouselControls flickerRef={flickingRef} />

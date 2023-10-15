@@ -156,6 +156,8 @@ body {
 
 @layer base {
   :root {
+    --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    --shadow-muted: 0 0.5rem 1rem rgba(246, 246, 246, 0.05);
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
