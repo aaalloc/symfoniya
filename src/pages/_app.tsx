@@ -4,6 +4,7 @@ import "@/styles/globals.scss"
 import {
   ActionId,
   ActionImpl,
+  createAction,
   KBarAnimator,
   KBarPortal,
   KBarPositioner,
@@ -12,7 +13,9 @@ import {
   KBarSearch,
   useMatches,
 } from "kbar"
+import { HomeIcon } from "lucide-react"
 import type { AppProps } from "next/app"
+import { useRouter } from "next/router"
 import { ThemeProvider } from "next-themes"
 import * as React from "react"
 
@@ -22,26 +25,53 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 import NoSSR from "@/components/utilities/NoSSR"
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const actions = [
+  const history = useRouter()
+  const initialActions = [
     {
-      id: "blog",
-      name: "Blog",
-      shortcut: ["b"],
-      keywords: "writing words",
-      perform: () => (window.location.pathname = "blog"),
+      id: "homeAction",
+      name: "Home",
+      shortcut: ["h"],
+      keywords: "back",
+      section: "Navigation",
+      perform: () => history.push("/"),
+      icon: <HomeIcon />,
     },
     {
-      id: "contact",
+      id: "docsAction",
+      name: "Docs",
+      shortcut: ["g", "d"],
+      keywords: "help",
+      section: "Navigation",
+      perform: () => history.push("/docs"),
+    },
+    {
+      id: "contactAction",
       name: "Contact",
       shortcut: ["c"],
-      keywords: "email",
-      perform: () => (window.location.pathname = "contact"),
+      keywords: "email hello",
+      section: "Navigation",
+      perform: () => window.open("mailto:timchang@hey.com", "_blank"),
     },
+    {
+      id: "twitterAction",
+      name: "Twitter",
+      shortcut: ["g", "t"],
+      keywords: "social contact dm",
+      section: "Navigation",
+      perform: () => window.open("https://twitter.com/timcchang", "_blank"),
+    },
+    createAction({
+      name: "Github",
+      shortcut: ["g", "h"],
+      keywords: "sourcecode",
+      section: "Navigation",
+      perform: () => window.open("https://github.com/timc1/kbar", "_blank"),
+    }),
   ]
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <KBarProvider actions={actions}>
+      <KBarProvider actions={initialActions}>
         <CommandBar />
         <TooltipProvider>
           <NoSSR>
@@ -77,7 +107,6 @@ const groupNameStyle = {
   padding: "8px 16px",
   fontSize: "10px",
   textTransform: "uppercase" as const,
-  opacity: 0.5,
 }
 
 function CommandBar() {
@@ -103,7 +132,9 @@ function RenderResults() {
       items={results}
       onRender={({ item, active }) =>
         typeof item === "string" ? (
-          <div style={groupNameStyle}>{item}</div>
+          <div className="bg-background" style={groupNameStyle}>
+            {item}
+          </div>
         ) : (
           <ResultItem
             action={item}
