@@ -1,5 +1,7 @@
 import { invoke } from "@tauri-apps/api/tauri"
-import { useRouter } from "next/router"
+import { Action, useRegisterActions } from "kbar"
+import { ListMusic } from "lucide-react"
+import Router, { useRouter } from "next/router"
 import { createContext, useEffect, useState } from "react"
 
 import { Audio, AudioStatus } from "@/components/types/audio"
@@ -61,6 +63,27 @@ interface appContext {
 
 export type { appContext }
 
+function usePlaylistsKBarFill(playlists: Playlist[]) {
+  const to_add: Action[] = []
+  playlists.map((playlist) => {
+    to_add.push({
+      id: `playlist-${playlist.name}`,
+      name: playlist.name,
+      keywords: playlist.name,
+      perform: () => {
+        void Router.push({
+          pathname: "/playlist",
+          query: { playlist: playlist.name },
+        })
+      },
+      section: "Playlists",
+      icon: <ListMusic />,
+      priority: 2,
+    })
+  })
+  return to_add
+}
+
 const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
   const router = useRouter()
   const { toast } = useToast()
@@ -68,6 +91,7 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
   const [audioList, setAudioList] = useState<Audio[]>([] as Audio[])
   const [oldAudioList, setOldAudioList] = useState<Audio[]>([] as Audio[])
   const [playlists, setPlaylist] = useState<Playlist[]>([] as Playlist[])
+
   const [playlistCheckedState, setPlaylistCheckedState] = useState(
     {} as PlaylistCheckedState,
   )
@@ -76,7 +100,6 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
   )
   const [isPlaying, setIsPlaying] = useState(false)
   const [status, setStatus] = useState({ current: 0 } as AudioStatus)
-
   const setAudioById = (id: number) => {
     const playlistPage = router.query.playlist as string
     if (currentPlaylistListening === playlistPage) {
@@ -125,7 +148,9 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
         console.error(error)
       })
   }, [])
-
+  // maybe a cleaner way to do this
+  const playlistKbarFill = usePlaylistsKBarFill(playlists)
+  useRegisterActions([...playlistKbarFill].filter(Boolean), [playlistKbarFill])
   return (
     <AppContext.Provider
       value={{
