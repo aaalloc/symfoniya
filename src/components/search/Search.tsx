@@ -10,7 +10,7 @@ import {
   useMatches,
   useRegisterActions,
 } from "kbar"
-import { HomeIcon, SunMoon } from "lucide-react"
+import { HomeIcon, Moon, Sun, SunMoon } from "lucide-react"
 import { useRouter } from "next/router"
 import { useTheme } from "next-themes"
 import * as React from "react"
@@ -50,6 +50,7 @@ export function Search() {
       section: "Navigation",
       perform: () => history.push("/"),
       icon: <HomeIcon />,
+      priority: 3,
     },
     {
       id: "themeAction",
@@ -58,6 +59,7 @@ export function Search() {
       keywords: "theme",
       section: "Preferences",
       icon: <SunMoon />,
+      priority: 1,
     },
     {
       id: "darkTheme",
@@ -68,6 +70,7 @@ export function Search() {
         setTheme("dark")
       },
       parent: "themeAction",
+      icon: <Moon />,
     },
     {
       id: "lightTheme",
@@ -78,6 +81,7 @@ export function Search() {
         setTheme("light")
       },
       parent: "themeAction",
+      icon: <Sun />,
     },
   ]
 

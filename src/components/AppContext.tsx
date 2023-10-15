@@ -78,6 +78,7 @@ function usePlaylistsKBarFill(playlists: Playlist[]) {
       },
       section: "Playlists",
       icon: <ListMusic />,
+      priority: 2,
     })
   })
   return to_add
@@ -147,7 +148,7 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
         console.error(error)
       })
   }, [])
-
+  // maybe a cleaner way to do this
   const playlistKbarFill = usePlaylistsKBarFill(playlists)
   useRegisterActions([...playlistKbarFill].filter(Boolean), [playlistKbarFill])
   return (
