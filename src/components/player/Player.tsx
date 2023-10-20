@@ -10,7 +10,7 @@ import { useEffect } from "react"
 import { useContext } from "react"
 
 import { AppContext, appContext } from "@/components/AppContext"
-import { Audio, AudioStatus } from "@/components/types/audio"
+import { Audio } from "@/components/types/audio"
 import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
 import { format_duration, isObjectEmpty } from "@/lib/utils"
@@ -157,17 +157,12 @@ export function Player() {
   const { isPlaying, setIsPlaying } = useContext(AppContext)
   const { setStatus, status } = useContext(AppContext)
   const { audio } = useContext(AppContext)
-  const poll_status = async () => {
-    const status: AudioStatus = await invoke("current_audio_status")
-    console.debug(status)
-    setStatus(status)
-  }
 
   useEffect(() => {
     if (!isPlaying) {
       return
     }
-    const timeoutFunction = setInterval(poll_status, 1000)
+    const timeoutFunction = setInterval(setStatus, 1000)
     if (audio.duration === status.current) {
       setIsPlaying(false)
       next(context)
@@ -175,7 +170,7 @@ export function Player() {
     return () => {
       clearInterval(timeoutFunction)
     }
-  }, [poll_status, status])
+  }, [setStatus, status])
 
   useEffect(() => {
     ;(() => {
