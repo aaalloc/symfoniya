@@ -15,7 +15,7 @@ const AppContext = createContext({
   audio: {} as Audio,
   setAudioPlayer: {} as (audio: Audio) => void,
   status: {} as AudioStatus,
-  setStatus: {} as (status: AudioStatus) => void,
+  updateStatus: {} as () => void,
   audioList: [] as Audio[],
   setAudioList: {} as (audioList: Audio[]) => void,
   oldAudioList: [] as Audio[],
@@ -40,7 +40,7 @@ interface appContext {
   audio: Audio
   setAudioPlayer: (audio: Audio) => void
   status: AudioStatus
-  setStatus: (status: AudioStatus) => void
+  updateStatus: (status: AudioStatus) => void
   audioList: Audio[]
   setAudioList: (audioList: Audio[]) => void
   oldAudioList: Audio[]
@@ -99,7 +99,7 @@ const useUpdatePlaylist = () => {
 const useUpdateStatus = () => {
   const [status, _setStatus] = useState<AudioStatus>({ current: 0 } as AudioStatus)
 
-  const setStatus = () => {
+  const updateStatus = () => {
     void invoke("current_audio_status")
       .then((response) => {
         _setStatus(response as AudioStatus)
@@ -109,7 +109,7 @@ const useUpdateStatus = () => {
         _setStatus({ current: 0, total: 0, status: "stopped" } as AudioStatus)
       })
   }
-  return [status, setStatus] as const
+  return [status, updateStatus] as const
 }
 
 const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
@@ -128,7 +128,7 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
   )
   const [isPlaying, setIsPlaying] = useState(false)
 
-  const [status, setStatus] = useUpdateStatus()
+  const [status, updateStatus] = useUpdateStatus()
   const setAudioById = (id: number) => {
     const playlistPage = router.query.playlist as string
     if (currentPlaylistListening === playlistPage) {
@@ -184,7 +184,7 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
         audio,
         setAudioPlayer,
         status,
-        setStatus,
+        updateStatus,
         oldAudioList,
         setOldAudioList,
         audioList,

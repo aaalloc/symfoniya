@@ -155,22 +155,24 @@ export function Player() {
   const router = useRouter()
   const context = useContext(AppContext)
   const { isPlaying, setIsPlaying } = useContext(AppContext)
-  const { setStatus, status } = useContext(AppContext)
+  const { status, updateStatus } = useContext(AppContext)
   const { audio } = useContext(AppContext)
 
   useEffect(() => {
-    if (!isPlaying) {
-      return
-    }
-    const timeoutFunction = setInterval(setStatus, 1000)
-    if (audio.duration === status.current) {
-      setIsPlaying(false)
-      next(context)
-    }
+    const timeoutFunction = setInterval(() => {
+      if (!isPlaying) {
+        return
+      }
+      updateStatus()
+      if (audio.duration === status.current) {
+        setIsPlaying(false)
+        next(context)
+      }
+    }, 1000)
     return () => {
       clearInterval(timeoutFunction)
     }
-  }, [setStatus, status])
+  }, [updateStatus])
 
   useEffect(() => {
     ;(() => {
