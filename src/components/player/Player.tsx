@@ -6,11 +6,11 @@
 import { invoke } from "@tauri-apps/api/tauri"
 import { Pause, Play, Repeat, Shuffle, SkipBack, SkipForward } from "lucide-react"
 import { useRouter } from "next/router"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useContext } from "react"
 
 import { AppContext, appContext } from "@/components/AppContext"
-import { Audio } from "@/components/types/audio"
+import { Audio, AudioStatus } from "@/components/types/audio"
 import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
 import { format_duration, isObjectEmpty } from "@/lib/utils"
@@ -77,11 +77,12 @@ async function next(context: appContext) {
 
 export async function play(context: appContext, toPlay: Audio, fromMusicPage = false) {
   const { isPlaying, setIsPlaying, setAudioPlayer } = context
-  const { status } = context
-  if (status.current === toPlay.duration) {
-    console.log("resetting current")
-    status.current = 0
-  }
+  // const { getStatus } = context
+  // const status = getStatus()
+  // if (status.current === toPlay.duration) {
+  //   console.log("resetting current")
+  //   status.current = 0
+  // }
   const result = await play_from_id_or_skip(toPlay.id, context, fromMusicPage)
   if (result && !isPlaying) {
     setIsPlaying(true)
@@ -155,7 +156,11 @@ export function Player() {
   const router = useRouter()
   const context = useContext(AppContext)
   const { isPlaying, setIsPlaying } = useContext(AppContext)
-  const { status, updateStatus } = useContext(AppContext)
+  const [status, updateStatus] = useState<AudioStatus>({
+    current: 0,
+    total: 0,
+    status: "stopped",
+  } as AudioStatus)
   const { audio } = useContext(AppContext)
 
   useEffect(() => {
@@ -163,16 +168,25 @@ export function Player() {
       if (!isPlaying) {
         return
       }
-      updateStatus()
+      void invoke("current_audio_status")
+        .then((response) => {
+          console.log(response)
+          updateStatus(response as AudioStatus)
+        })
+        .catch((error) => {
+          console.error(error)
+          updateStatus({ current: 0, total: 0, status: "stopped" } as AudioStatus)
+        })
       if (audio.duration === status.current) {
         setIsPlaying(false)
+        status.current = 0
         next(context)
       }
     }, 1000)
     return () => {
       clearInterval(timeoutFunction)
     }
-  }, [updateStatus])
+  }, [isPlaying, audio])
 
   useEffect(() => {
     ;(() => {

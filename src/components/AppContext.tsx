@@ -4,7 +4,7 @@ import { ListMusic } from "lucide-react"
 import Router, { useRouter } from "next/router"
 import { createContext, useEffect, useState } from "react"
 
-import { Audio, AudioStatus } from "@/components/types/audio"
+import { Audio } from "@/components/types/audio"
 import { Playlist } from "@/components/types/playlist"
 import { Toast, ToasterToast, useToast } from "@/components/ui/use-toast"
 import { isObjectEmpty } from "@/lib/utils"
@@ -14,8 +14,6 @@ type PlaylistCheckedState = Record<string, Record<string, boolean>>
 const AppContext = createContext({
   audio: {} as Audio,
   setAudioPlayer: {} as (audio: Audio) => void,
-  status: {} as AudioStatus,
-  updateStatus: {} as () => void,
   audioList: [] as Audio[],
   setAudioList: {} as (audioList: Audio[]) => void,
   oldAudioList: [] as Audio[],
@@ -39,8 +37,6 @@ const AppContext = createContext({
 interface appContext {
   audio: Audio
   setAudioPlayer: (audio: Audio) => void
-  status: AudioStatus
-  updateStatus: (status: AudioStatus) => void
   audioList: Audio[]
   setAudioList: (audioList: Audio[]) => void
   oldAudioList: Audio[]
@@ -96,22 +92,6 @@ const useUpdatePlaylist = () => {
   return [playlist, setPlaylist] as const
 }
 
-const useUpdateStatus = () => {
-  const [status, _setStatus] = useState<AudioStatus>({ current: 0 } as AudioStatus)
-
-  const updateStatus = () => {
-    void invoke("current_audio_status")
-      .then((response) => {
-        _setStatus(response as AudioStatus)
-      })
-      .catch((error) => {
-        console.error(error)
-        _setStatus({ current: 0, total: 0, status: "stopped" } as AudioStatus)
-      })
-  }
-  return [status, updateStatus] as const
-}
-
 const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
   const router = useRouter()
   const { toast } = useToast()
@@ -128,7 +108,6 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
   )
   const [isPlaying, setIsPlaying] = useState(false)
 
-  const [status, updateStatus] = useUpdateStatus()
   const setAudioById = (id: number) => {
     const playlistPage = router.query.playlist as string
     if (currentPlaylistListening === playlistPage) {
@@ -183,8 +162,6 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
       value={{
         audio,
         setAudioPlayer,
-        status,
-        updateStatus,
         oldAudioList,
         setOldAudioList,
         audioList,
