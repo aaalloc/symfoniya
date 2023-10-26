@@ -162,31 +162,34 @@ export function Player() {
     status: "stopped",
   } as AudioStatus)
   const { audio } = useContext(AppContext)
+  const wupdate_status = () => {
+    void invoke("current_audio_status")
+      .then((response) => {
+        console.log(response)
+        updateStatus(response as AudioStatus)
+      })
+      .catch((error) => {
+        console.error(error)
+        updateStatus({ current: 0, total: 0, status: "stopped" } as AudioStatus)
+      })
+  }
 
   useEffect(() => {
     const timeoutFunction = setInterval(() => {
       if (!isPlaying) {
         return
       }
-      void invoke("current_audio_status")
-        .then((response) => {
-          console.log(response)
-          updateStatus(response as AudioStatus)
-        })
-        .catch((error) => {
-          console.error(error)
-          updateStatus({ current: 0, total: 0, status: "stopped" } as AudioStatus)
-        })
+      wupdate_status()
       if (audio.duration === status.current) {
-        setIsPlaying(false)
         status.current = 0
+        setIsPlaying(false)
         next(context)
       }
     }, 1000)
     return () => {
       clearInterval(timeoutFunction)
     }
-  }, [isPlaying, audio])
+  }, [wupdate_status, status])
 
   useEffect(() => {
     ;(() => {
