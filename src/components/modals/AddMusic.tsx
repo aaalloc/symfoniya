@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { invoke } from "@tauri-apps/api/tauri"
-import { FolderInput, X, Youtube } from "lucide-react"
+import { Download, FolderInput, X } from "lucide-react"
 import { useState } from "react"
 
 import { Audio } from "@/components/types/audio"
@@ -93,16 +93,12 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
       )
       const updated_paths = [...arr_path, ...paths_to_add]
       setPath(updated_paths)
-      handle_submit()
+      handle_submit(updated_paths)
     }
   }
 
-  const choose_ytb = async () => {
-    // TODO: implement
-  }
-
-  const handle_submit = () => {
-    invoke<string>("import_from_folders", { folders: arr_path })
+  const handle_submit = (updated_paths: string[]) => {
+    invoke<string>("import_from_folders", { folders: updated_paths })
       .then((value) => {
         toast({
           title: "Musics added",
@@ -166,9 +162,9 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
             className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
           >
             <div className="flex items-center gap-x-4">
-              <Youtube />
+              <Download />
               <p className="text-start text-sm text-muted-foreground">
-                Download from YouTube
+                Download musics
               </p>
             </div>
           </button>
