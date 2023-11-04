@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
+import { listen } from "@tauri-apps/api/event"
 import { invoke } from "@tauri-apps/api/tauri"
 import { Download, FolderInput, X } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { Audio } from "@/components/types/audio"
 import { Button } from "@/components/ui/button"
@@ -97,6 +98,27 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
     }
   }
 
+  const download_from_web = async () => {
+    await invoke("download_audio_from_links", {
+      url: "https://www.youtube.com/playlist?list=PLJd4XqDX1pmzwbJ6r1aoGGMsSDT_aiiTr",
+    })
+  }
+
+  useEffect(() => {
+    const unlisten = listen("result_from_download", (event) => {
+      console.log(event)
+    })
+    return () => {
+      unlisten
+        .then((f) => {
+          f()
+        })
+        .catch((e) => {
+          console.error(e)
+        })
+    }
+  }, [])
+
   const handle_submit = (updated_paths: string[]) => {
     invoke<string>("import_from_folders", { folders: updated_paths })
       .then((value) => {
@@ -158,7 +180,7 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
             </div>
           </button>
           <button
-            onClick={choose_path}
+            onClick={download_from_web}
             className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
           >
             <div className="flex items-center gap-x-4">
