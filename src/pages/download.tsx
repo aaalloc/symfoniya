@@ -65,11 +65,17 @@ const DownloadPage = () => {
     const unlisten = listen("result_from_download", (event) => {
       const value = event.payload as Item
       if (value.type === TypeItem[TypeItem.Result]) {
-        const handle = event.payload as MusicItem
+        const response = event.payload as MusicItem
         toast({
-          title: "Music Download",
-          description: `${handle.title} successfully downloaded`,
+          title: "Music download",
+          description: `${response.title} successfully downloaded`,
           variant: "success",
+        })
+      } else if (value.type === TypeItem[TypeItem.Awaiting]) {
+        const response = event.payload as TotalItem
+        toast({
+          title: "Music download",
+          description: `Awaiting ${response.total} download`,
         })
       }
     })
