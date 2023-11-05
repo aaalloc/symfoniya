@@ -14,7 +14,11 @@ mod db;
 mod music;
 use crate::{api::*, music::player::Player};
 use db::{database, state::DbState};
-use music::{player::MusicPlayer, ytdlp_wrapper::AsyncProcInputTx};
+use music::{
+    async_process::{async_process_model, AsyncProcInputTx},
+    player::MusicPlayer,
+};
+
 use rodio::OutputStream;
 use tauri::{Manager, State};
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, LogTarget};
@@ -92,16 +96,4 @@ fn main() {
         })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
-}
-
-async fn async_process_model(
-    mut input_rx: mpsc::Receiver<Vec<String>>,
-    output_tx: mpsc::Sender<Vec<String>>,
-) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    while let Some(input) = input_rx.recv().await {
-        let output = input;
-        output_tx.send(output).await?;
-    }
-
-    Ok(())
 }
