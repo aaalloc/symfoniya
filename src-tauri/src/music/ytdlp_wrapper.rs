@@ -7,7 +7,7 @@ use super::async_process::AsyncProcInputTx;
 pub enum ResultFromDownload {
     Result(MusicItem),
     Awaiting(TotalItem),
-    Error(String),
+    Error(ErrorItem),
 }
 
 #[derive(serde::Serialize, Clone)]
@@ -22,19 +22,24 @@ pub struct MusicItem {
     pub link: String,
 }
 
+#[derive(serde::Serialize, Clone, Debug)]
+pub struct ErrorItem {
+    pub error: String,
+}
+
 impl std::fmt::Display for MusicItem {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{}: {}", self.title, self.link)
     }
 }
 
-fn retrieve_possible_links(url: &str) -> Vec<MusicItem> {
+fn retrieve_possible_links(url: &str) -> Result<Vec<MusicItem>, Error> {
     let mut links: Vec<MusicItem> = Vec::new();
     let retrieved = YoutubeDl::new(url)
         .socket_timeout("15")
         .flat_playlist(true)
         .run();
-    let res = retrieved.unwrap();
+    let res = retrieved?;
     match res {
         YoutubeDlOutput::Playlist(pl) => {
             for video in pl.entries.unwrap() {
@@ -52,7 +57,7 @@ fn retrieve_possible_links(url: &str) -> Vec<MusicItem> {
         }
     }
     println!("Playlist: {:?}", links);
-    links
+    Ok(links)
 }
 
 async fn download_audio(url: &str, path: &str) -> Result<YoutubeDlOutput, Error> {
@@ -82,7 +87,20 @@ pub async fn download_audio_from_links(
     path: String,
     state: tauri::State<'_, AsyncProcInputTx>,
 ) -> Result<(), String> {
-    let links = retrieve_possible_links(&url);
+    let res_links = retrieve_possible_links(&url);
+    let links = match res_links {
+        Ok(links) => links,
+        Err(e) => {
+            let async_proc_input_tx = state.inner.lock().await;
+            async_proc_input_tx
+                .send(ResultFromDownload::Error(ErrorItem {
+                    error: e.to_string(),
+                }))
+                .await
+                .unwrap();
+            return Err(e.to_string());
+        }
+    };
     let async_proc_input_tx = state.inner.lock().await;
     async_proc_input_tx
         .send(ResultFromDownload::Awaiting(TotalItem {
@@ -114,7 +132,9 @@ pub async fn download_audio_from_links(
             Err(e) => {
                 let async_proc_input_tx = state.inner.lock().await;
                 async_proc_input_tx
-                    .send(ResultFromDownload::Error(e.to_string()))
+                    .send(ResultFromDownload::Error(ErrorItem {
+                        error: e.to_string(),
+                    }))
                     .await
                     .unwrap();
             }

@@ -9,7 +9,13 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
-import { Item, MusicItem, TotalItem, TypeItem } from "@/components/types/download_audio"
+import {
+  ErrorItem,
+  Item,
+  MusicItem,
+  TotalItem,
+  TypeItem,
+} from "@/components/types/download_audio"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -76,6 +82,13 @@ const DownloadPage = () => {
         toast({
           title: "Music download",
           description: `Awaiting ${response.total} download`,
+        })
+      } else if (value.type === TypeItem[TypeItem.Error]) {
+        const response = event.payload as ErrorItem
+        toast({
+          title: "Music download",
+          description: `Error: ${response.error}`,
+          variant: "destructive",
         })
       }
     })
