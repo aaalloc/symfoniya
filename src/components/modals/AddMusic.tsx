@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { listen } from "@tauri-apps/api/event"
+import { PopoverClose } from "@radix-ui/react-popover"
 import { invoke } from "@tauri-apps/api/tauri"
 import { Download, FolderInput, X } from "lucide-react"
-import { useEffect, useState } from "react"
+import Router from "next/router"
+import { useState } from "react"
 
 import { Audio } from "@/components/types/audio"
 import { Button } from "@/components/ui/button"
@@ -71,14 +72,6 @@ function cn(...classes: string[]) {
 export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
   const { toast } = useToast()
   const [arr_path, setPath] = useState<string[]>([])
-  // const removePath = (path: string) => {
-  //   //console.log(path)
-  //   setPath(
-  //     arr_path.filter((value) => {
-  //       return value !== path
-  //     }),
-  //   )
-  // }
 
   const choose_path = async () => {
     const import_dialog = await import("@tauri-apps/api/dialog")
@@ -97,27 +90,6 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
       handle_submit(updated_paths)
     }
   }
-
-  const download_from_web = async () => {
-    await invoke("download_audio_from_links", {
-      url: "https://www.youtube.com/playlist?list=PLJd4XqDX1pmzwbJ6r1aoGGMsSDT_aiiTr",
-    })
-  }
-
-  useEffect(() => {
-    const unlisten = listen("result_from_download", (event) => {
-      console.log(event)
-    })
-    return () => {
-      unlisten
-        .then((f) => {
-          f()
-        })
-        .catch((e) => {
-          console.error(e)
-        })
-    }
-  }, [])
 
   const handle_submit = (updated_paths: string[]) => {
     invoke<string>("import_from_folders", { folders: updated_paths })
@@ -170,7 +142,7 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
       </PopoverTrigger>
       <PopoverContent className="w-64">
         <div className="grid gap-4">
-          <button
+          <PopoverClose
             onClick={choose_path}
             className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
           >
@@ -178,9 +150,9 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
               <FolderInput />
               <p className="text-start text-sm text-muted-foreground">Select folders</p>
             </div>
-          </button>
-          <button
-            onClick={download_from_web}
+          </PopoverClose>
+          <PopoverClose
+            onClick={() => Router.push("/download")}
             className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
           >
             <div className="flex items-center gap-x-4">
@@ -189,7 +161,7 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
                 Download musics
               </p>
             </div>
-          </button>
+          </PopoverClose>
         </div>
       </PopoverContent>
     </Popover>

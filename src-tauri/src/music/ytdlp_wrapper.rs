@@ -3,14 +3,15 @@ use youtube_dl::{Error, YoutubeDl, YoutubeDlOutput};
 
 use super::async_process::AsyncProcInputTx;
 #[derive(serde::Serialize, Clone)]
+#[serde(tag = "type")]
 pub enum ResultFromDownload {
-    Item(MusicItem),
-    Awaiting(TotalDownload),
+    Result(MusicItem),
+    Awaiting(TotalItem),
     Error(String),
 }
 
 #[derive(serde::Serialize, Clone)]
-pub struct TotalDownload {
+pub struct TotalItem {
     pub total: usize,
     pub musics: Vec<MusicItem>,
 }
@@ -54,8 +55,8 @@ fn retrieve_possible_links(url: &str) -> Vec<MusicItem> {
     links
 }
 
-async fn download_audio(link: &str) -> Result<YoutubeDlOutput, Error> {
-    YoutubeDl::new(link)
+async fn download_audio(url: &str, path: &str) -> Result<YoutubeDlOutput, Error> {
+    YoutubeDl::new(url)
         .socket_timeout("15")
         .extract_audio(true)
         .extra_arg("-x")
@@ -69,7 +70,7 @@ async fn download_audio(link: &str) -> Result<YoutubeDlOutput, Error> {
         .extra_arg("--audio-format")
         .extra_arg("mp3")
         .extra_arg("-P")
-        .extra_arg("/home/yanovskyy/Musique/test")
+        .extra_arg(path)
         .extra_arg("--no-simulate")
         .extra_arg("--no-progress")
         .run_async().await
@@ -78,12 +79,13 @@ async fn download_audio(link: &str) -> Result<YoutubeDlOutput, Error> {
 #[tauri::command]
 pub async fn download_audio_from_links(
     url: String,
+    path: String,
     state: tauri::State<'_, AsyncProcInputTx>,
 ) -> Result<(), String> {
     let links = retrieve_possible_links(&url);
     let async_proc_input_tx = state.inner.lock().await;
     async_proc_input_tx
-        .send(ResultFromDownload::Awaiting(TotalDownload {
+        .send(ResultFromDownload::Awaiting(TotalItem {
             total: links.len(),
             musics: links.clone(),
         }))
@@ -92,14 +94,15 @@ pub async fn download_audio_from_links(
     drop(async_proc_input_tx);
     let mut futures = futures::stream::FuturesUnordered::new();
     links.iter().for_each(|link| {
-        futures.push(async move { download_audio(&link.link).await });
+        let path = path.clone();
+        futures.push(async move { download_audio(&link.link, &path).await });
     });
     while let Some(res) = futures.next().await {
         match res {
             Ok(YoutubeDlOutput::SingleVideo(video)) => {
                 let async_proc_input_tx = state.inner.lock().await;
                 async_proc_input_tx
-                    .send(ResultFromDownload::Item(MusicItem {
+                    .send(ResultFromDownload::Result(MusicItem {
                         title: video.title.unwrap(),
                         link: video.webpage_url.unwrap(),
                     }))
