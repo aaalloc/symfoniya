@@ -8,20 +8,20 @@
 This projet is still in developpement, be aware that some bug may happen.
 
 ## Gallery
-![Home](public/white_home_screen.png)
-![Home](public/black_home_screen.png)
-![Musics](public/musics_screen.png)
-![Playlist example screen](public/playlist_screen.png)
+![Home](public/home.png)
+![Musics](public/musics.png)
+![KBar](public/kbar.png)
+![Night Theme](public/night_theme.png)
 
 ## Features
 - [x] Create playlists
 - [x] Import multiple source folder
 - [x] System queue (play next, play later, shuffle, repeat)
-- [ ] Seeking support ([rodio doesn't support it](https://github.com/RustAudio/rodio/issues/176), may using [react-native-track-player](https://github.com/doublesymmetry/react-native-track-player) instead)
-- [ ] Nav button for playlists in Home screen (may use [keen-slider](https://keen-slider.io/)
-- [ ] Search bar with shortcuts
-- [ ] Download music from YouTube and Spotify
-- [ ] Import playlists from YouTube and Spotify
+- [ ] Seeking support ([rodio doesn't support it](https://github.com/RustAudio/rodio/issues/176)
+- [x] Nav button for playlists in Home screen (using [Flicking](https://naver.github.io/egjs-flicking/))
+- [x] Search bar with shortcuts
+- [x] Download music from YouTube and Spotify
+- [x] Import playlists from YouTube and Spotify (need to finish Download page, see yt-dlp branch)
 
 ## Getting Started
 
