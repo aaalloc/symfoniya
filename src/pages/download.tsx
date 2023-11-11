@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -16,7 +17,10 @@ import {
   TotalItem,
   TypeItem,
 } from "@/components/types/download_audio"
+import taskdata from "@/components/types/tasks"
 import { Button } from "@/components/ui/button"
+import { columns } from "@/components/ui/columns"
+import { DataTable } from "@/components/ui/data-table"
 import {
   Form,
   FormControl,
@@ -27,6 +31,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
+import { UserNav } from "@/components/ui/user-nav"
 import { cn } from "@/lib/utils"
 
 const formSchema = z.object({
@@ -104,66 +109,69 @@ const DownloadPage = () => {
   }, [])
 
   return (
-    <div className="h-full flex flex-col gap-6">
-      <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
-        Download
-      </h1>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(download_from_web)}
-          className="flex-column flex container gap-x-4"
-        >
-          <FormField
-            control={form.control}
-            name="url"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <div className="grid w-full max-w-sm items-center gap-1.5">
-                    <Label htmlFor="music_url">Music URL</Label>
-                    <Input
-                      className="w-64"
-                      id="music_url"
-                      placeholder="Enter music URL..."
-                      {...field}
-                    />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="path"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <div className="grid w-full max-w-sm items-center gap-1.5">
-                    <Label htmlFor="filepath">Save destination</Label>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-64 justify-start text-left font-normal",
-                        !field.value && "text-muted-foreground",
-                      )}
-                      id="filepath"
-                      onClick={() => choose_path(field.onChange)}
-                      {...field}
-                    >
-                      <Folder className="mr-2 h-4 w-4" />
-                      {!field.value ? "Select a path" : field.value}
-                    </Button>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit">Download</Button>
-        </form>
-      </Form>
-    </div>
+    <>
+      <div className="h-full flex flex-col gap-6">
+        <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl container">
+          Download
+        </h1>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(download_from_web)}
+            className="flex-column flex container gap-x-4"
+          >
+            <FormField
+              control={form.control}
+              name="url"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <div className="grid w-full max-w-sm items-center gap-1.5">
+                      <Label htmlFor="music_url">Music URL</Label>
+                      <Input
+                        className="w-64"
+                        id="music_url"
+                        placeholder="Enter music URL..."
+                        {...field}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="path"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <div className="grid w-full max-w-sm items-center gap-1.5">
+                      <Label htmlFor="filepath">Save destination</Label>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-64 justify-start text-left font-normal",
+                          !field.value && "text-muted-foreground",
+                        )}
+                        id="filepath"
+                        onClick={() => choose_path(field.onChange)}
+                        {...field}
+                      >
+                        <Folder className="mr-2 h-4 w-4" />
+                        {!field.value ? "Select a path" : field.value}
+                      </Button>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit">Download</Button>
+          </form>
+        </Form>
+        <DataTable data={taskdata} columns={columns} />
+      </div>
+    </>
   )
 }
 
