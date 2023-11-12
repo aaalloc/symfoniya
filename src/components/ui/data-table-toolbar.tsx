@@ -8,7 +8,7 @@
 import { Cross2Icon } from "@radix-ui/react-icons"
 import { Table } from "@tanstack/react-table"
 
-import { priorities, statuses } from "@/components/types/data"
+import { statuses } from "@/components/types/data"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
@@ -37,13 +37,6 @@ export function DataTableToolbar<TData>({ table }: DataTableToolbarProps<TData>)
             column={table.getColumn("status")}
             title="Status"
             options={statuses}
-          />
-        )}
-        {table.getColumn("priority") && (
-          <DataTableFacetedFilter
-            column={table.getColumn("priority")}
-            title="Priority"
-            options={priorities}
           />
         )}
         {isFiltered && (

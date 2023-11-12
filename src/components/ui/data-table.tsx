@@ -30,6 +30,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
+import { DataTableToolbar } from "./data-table-toolbar"
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
@@ -68,7 +70,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4 container">
-      {/* <DataTableToolbar table={table} /> */}
+      <DataTableToolbar table={table} />
       <div className="rounded-md border">
         <Table>
           <TableHeader>

@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-misused-promises */
@@ -7,7 +8,7 @@ import { listen } from "@tauri-apps/api/event"
 import { invoke } from "@tauri-apps/api/tauri"
 import { Folder } from "lucide-react"
 import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import { set, useForm } from "react-hook-form"
 import * as z from "zod"
 
 import {
@@ -17,7 +18,7 @@ import {
   TotalItem,
   TypeItem,
 } from "@/components/types/download_audio"
-import taskdata from "@/components/types/tasks"
+import { Task } from "@/components/types/schema"
 import { Button } from "@/components/ui/button"
 import { columns } from "@/components/ui/columns"
 import { DataTable } from "@/components/ui/data-table"
@@ -43,7 +44,7 @@ const formSchema = z.object({
 
 const DownloadPage = () => {
   const { toast } = useToast()
-
+  const [taskdata, setTaskdata] = useState<Task[]>([])
   const choose_path = async (setValue: (value: string) => void) => {
     const import_dialog = await import("@tauri-apps/api/dialog")
     const import_path = await import("@tauri-apps/api/path")
@@ -77,6 +78,17 @@ const DownloadPage = () => {
       const value = event.payload as Item
       if (value.type === TypeItem[TypeItem.Result]) {
         const response = event.payload as MusicItem
+        // to enhance
+        setTaskdata((old) =>
+          old.map((task) =>
+            task.title === response.title
+              ? {
+                ...task,
+                status: "done",
+              }
+              : task,
+          ),
+        )
         toast({
           title: "Music download",
           description: `${response.title} successfully downloaded`,
@@ -84,6 +96,19 @@ const DownloadPage = () => {
         })
       } else if (value.type === TypeItem[TypeItem.Awaiting]) {
         const response = event.payload as TotalItem
+        console.log(response)
+        response.musics.forEach((music) => {
+          setTaskdata((old) => [
+            ...old,
+            {
+              id: "1",
+              title: music.title,
+              duration: new Date(music.duration * 1000).toISOString().substring(11, 19),
+              status: "in progress",
+              label: "Downloading",
+            },
+          ])
+        })
         toast({
           title: "Music download",
           description: `Awaiting ${response.total} download`,

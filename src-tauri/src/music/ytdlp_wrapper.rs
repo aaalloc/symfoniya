@@ -19,6 +19,7 @@ pub struct TotalItem {
 #[derive(serde::Serialize, Clone, Debug)]
 pub struct MusicItem {
     pub title: String,
+    pub duration: serde_json::Value,
     pub link: String,
 }
 
@@ -46,6 +47,7 @@ fn retrieve_possible_links(url: &str) -> Result<Vec<MusicItem>, Error> {
                 links.push(MusicItem {
                     title: video.title.unwrap(),
                     link: video.url.unwrap(),
+                    duration: video.duration.unwrap(),
                 });
             }
         }
@@ -53,6 +55,7 @@ fn retrieve_possible_links(url: &str) -> Result<Vec<MusicItem>, Error> {
             links.push(MusicItem {
                 title: video.title.unwrap(),
                 link: video.webpage_url.unwrap(),
+                duration: video.duration.unwrap(),
             });
         }
     }
@@ -123,6 +126,7 @@ pub async fn download_audio_from_links(
                     .send(ResultFromDownload::Result(MusicItem {
                         title: video.title.unwrap(),
                         link: video.webpage_url.unwrap(),
+                        duration: video.duration.unwrap(),
                     }))
                     .await
                     .unwrap();

@@ -9,37 +9,15 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 
-import { labels, priorities, statuses } from "@/components/types/data"
+import { labels, statuses } from "@/components/types/data"
 import { Task } from "@/components/types/schema"
 import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
 
 import { DataTableColumnHeader } from "./data-table-column-header"
-import { DataTableRowActions } from "./data-table-row-actions"
 
 export const columns: ColumnDef<Task>[] = [
   {
     id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        onCheckedChange={(value) => {
-          table.toggleAllPageRowsSelected(!!value)
-        }}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => {
-          row.toggleSelected(!!value)
-        }}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
     enableSorting: false,
     enableHiding: false,
   },
@@ -69,6 +47,19 @@ export const columns: ColumnDef<Task>[] = [
     },
   },
   {
+    accessorKey: "duration",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Duration" />,
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[500px] truncate font-medium">
+            {row.getValue("duration")}
+          </span>
+        </div>
+      )
+    },
+  },
+  {
     accessorKey: "status",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
     cell: ({ row }) => {
@@ -92,34 +83,5 @@ export const columns: ColumnDef<Task>[] = [
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id))
     },
-  },
-  {
-    accessorKey: "priority",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Priority" />,
-    cell: ({ row }) => {
-      const priority = priorities.find(
-        (priority: { value: unknown }) => priority.value === row.getValue("priority"),
-      )
-
-      if (!priority) {
-        return null
-      }
-
-      return (
-        <div className="flex items-center">
-          {priority.icon && (
-            <priority.icon className="mr-2 h-4 w-4 text-muted-foreground" />
-          )}
-          <span>{priority.label}</span>
-        </div>
-      )
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
-    },
-  },
-  {
-    id: "actions",
-    cell: ({ row }) => <DataTableRowActions row={row} />,
   },
 ]

@@ -11,10 +11,11 @@ interface Item {
 interface MusicItem {
   title: string
   link: string
+  duration: number
 }
 
 interface TotalItem {
-  music: MusicItem[]
+  musics: MusicItem[]
   total: number
 }
 
