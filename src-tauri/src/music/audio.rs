@@ -118,6 +118,7 @@ pub struct _Audio {
 pub fn get_decoder(path: &String) -> Decoder<BufReader<File>> {
     let path = PathBuf::from(path);
     let file = BufReader::new(File::open(path).unwrap());
+    // need to handle error
     Decoder::new(file).unwrap()
 }
 

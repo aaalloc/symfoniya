@@ -54,6 +54,7 @@ fn main() {
             player::play_from_id,
             player::pause,
             player::update_player,
+            player::seek_to,
             audio::retrieve_audios,
             audio::current_audio_status,
             audio::set_volume,
