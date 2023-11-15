@@ -89,11 +89,6 @@ const DownloadPage = () => {
               : task,
           ),
         )
-        toast({
-          title: "Music download",
-          description: `${response.title} successfully downloaded`,
-          variant: "success",
-        })
       } else if (value.type === TypeItem[TypeItem.Awaiting]) {
         const response = event.payload as TotalItem
         console.log(response)
@@ -108,17 +103,6 @@ const DownloadPage = () => {
               label: "Downloading",
             },
           ])
-        })
-        toast({
-          title: "Music download",
-          description: `Awaiting ${response.total} download`,
-        })
-      } else if (value.type === TypeItem[TypeItem.Error]) {
-        const response = event.payload as ErrorItem
-        toast({
-          title: "Music download",
-          description: `Error: ${response.error}`,
-          variant: "destructive",
         })
       }
     })
