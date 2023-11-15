@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -51,8 +52,8 @@ export async function update_after_play(
   const playlist = isObjectEmpty(currentPlaylistListening as unknown as object)
     ? name
     : !fromMusicPage
-    ? currentPlaylistListening
-    : name
+      ? currentPlaylistListening
+      : name
   console.log(playlist)
   await invoke("update_player", {
     playlist: playlist,
@@ -192,7 +193,7 @@ export function Player() {
   }, [wupdate_status, status])
 
   useEffect(() => {
-    ;(() => {
+    ; (() => {
       invoke("update_history")
         .then(() => {
           console.log("history updated")
@@ -210,7 +211,17 @@ export function Player() {
         isObjectEmpty(audio) ? "translate-y-full" : "",
       )}
     >
-      <Progress className="w-full" value={(status.current / status.total) * 100} />
+      <Progress
+        className="w-full"
+        defaultValue={[0]}
+        max={status.total}
+        step={1}
+        value={[status.current]}
+        onValueChange={(value) => {
+          console.log(value)
+          void invoke("seek_to", { position: value[0] })
+        }}
+      />
       <div className="px-8 py-4">
         <div className="flex justify-start items-center w-full h-full">
           <div className="flex items-center">

@@ -17,11 +17,10 @@ This projet is still in developpement, be aware that some bug may happen.
 - [x] Create playlists
 - [x] Import multiple source folder
 - [x] System queue (play next, play later, shuffle, repeat)
-- [ ] Seeking support ([rodio doesn't support it](https://github.com/RustAudio/rodio/issues/176)
+- [x] Seeking support ([big thanks to dvdsk for implementing this on rodio !](https://github.com/RustAudio/rodio/pull/513)
 - [x] Nav button for playlists in Home screen (using [Flicking](https://naver.github.io/egjs-flicking/))
 - [x] Search bar with shortcuts
-- [x] Download music from YouTube and Spotify
-- [x] Import playlists from YouTube and Spotify (need to finish Download page, see yt-dlp branch)
+- [x] Download music from YouTube, Spotify, Soundclound (and maybe others but haven't tested, using [youtube-dl-rs](https://github.com/GyrosOfWar/youtube-dl-rs))
 
 ## Getting Started
 

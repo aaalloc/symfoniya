@@ -11,6 +11,7 @@ use crate::{
     db::{database, state::DbAccess},
     music::player::{MusicPlayer, Player},
 };
+use std::time::Duration;
 
 #[tauri::command]
 pub fn import_from_folders(
@@ -74,5 +75,12 @@ pub fn update_player(
 ) -> Result<(), String> {
     let mut player = player.lock().unwrap();
     player.audios = player.playlists[&playlist].clone();
+    Ok(())
+}
+
+#[tauri::command]
+pub fn seek_to(position: u64, player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<(), String> {
+    let mut player = player.lock().unwrap();
+    player.seek(Duration::from_secs(position));
     Ok(())
 }
