@@ -6,7 +6,7 @@
 import { invoke } from "@tauri-apps/api/tauri"
 import { Pause, Play, Repeat, Shuffle, SkipBack, SkipForward } from "lucide-react"
 import { useRouter } from "next/router"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useContext } from "react"
 
 import { AppContext, appContext } from "@/components/AppContext"
@@ -77,11 +77,12 @@ async function next(context: appContext) {
 
 export async function play(context: appContext, toPlay: Audio, fromMusicPage = false) {
   const { isPlaying, setIsPlaying, setAudioPlayer } = context
-  const { status } = context
-  if (status.current === toPlay.duration) {
-    console.log("resetting current")
-    status.current = 0
-  }
+  // const { getStatus } = context
+  // const status = getStatus()
+  // if (status.current === toPlay.duration) {
+  //   console.log("resetting current")
+  //   status.current = 0
+  // }
   const result = await play_from_id_or_skip(toPlay.id, context, fromMusicPage)
   if (result && !isPlaying) {
     setIsPlaying(true)
@@ -155,27 +156,40 @@ export function Player() {
   const router = useRouter()
   const context = useContext(AppContext)
   const { isPlaying, setIsPlaying } = useContext(AppContext)
-  const { setStatus, status } = useContext(AppContext)
+  const [status, updateStatus] = useState<AudioStatus>({
+    current: 0,
+    total: 0,
+    status: "stopped",
+  } as AudioStatus)
   const { audio } = useContext(AppContext)
-  const poll_status = async () => {
-    const status: AudioStatus = await invoke("current_audio_status")
-    console.debug(status)
-    setStatus(status)
+  const wupdate_status = () => {
+    void invoke("current_audio_status")
+      .then((response) => {
+        console.log(response)
+        updateStatus(response as AudioStatus)
+      })
+      .catch((error) => {
+        console.error(error)
+        updateStatus({ current: 0, total: 0, status: "stopped" } as AudioStatus)
+      })
   }
 
   useEffect(() => {
-    if (!isPlaying) {
-      return
-    }
-    const timeoutFunction = setInterval(poll_status, 1000)
-    if (audio.duration === status.current) {
-      setIsPlaying(false)
-      next(context)
-    }
+    const timeoutFunction = setInterval(() => {
+      if (!isPlaying) {
+        return
+      }
+      wupdate_status()
+      if (audio.duration === status.current) {
+        status.current = 0
+        setIsPlaying(false)
+        next(context)
+      }
+    }, 1000)
     return () => {
       clearInterval(timeoutFunction)
     }
-  }, [poll_status, status])
+  }, [wupdate_status, status])
 
   useEffect(() => {
     ;(() => {

@@ -4,7 +4,7 @@ import { ListMusic } from "lucide-react"
 import Router, { useRouter } from "next/router"
 import { createContext, useEffect, useState } from "react"
 
-import { Audio, AudioStatus } from "@/components/types/audio"
+import { Audio } from "@/components/types/audio"
 import { Playlist } from "@/components/types/playlist"
 import { Toast, ToasterToast, useToast } from "@/components/ui/use-toast"
 import { isObjectEmpty } from "@/lib/utils"
@@ -14,8 +14,6 @@ type PlaylistCheckedState = Record<string, Record<string, boolean>>
 const AppContext = createContext({
   audio: {} as Audio,
   setAudioPlayer: {} as (audio: Audio) => void,
-  status: {} as AudioStatus,
-  setStatus: {} as (status: AudioStatus) => void,
   audioList: [] as Audio[],
   setAudioList: {} as (audioList: Audio[]) => void,
   oldAudioList: [] as Audio[],
@@ -39,8 +37,6 @@ const AppContext = createContext({
 interface appContext {
   audio: Audio
   setAudioPlayer: (audio: Audio) => void
-  status: AudioStatus
-  setStatus: (status: AudioStatus) => void
   audioList: Audio[]
   setAudioList: (audioList: Audio[]) => void
   oldAudioList: Audio[]
@@ -63,7 +59,7 @@ interface appContext {
 
 export type { appContext }
 
-function usePlaylistsKBarFill(playlists: Playlist[]) {
+function preparePlaylistKBar(playlists: Playlist[]) {
   const to_add: Action[] = []
   playlists.map((playlist) => {
     to_add.push({
@@ -84,13 +80,27 @@ function usePlaylistsKBarFill(playlists: Playlist[]) {
   return to_add
 }
 
+
+const useUpdatePlaylist = () => {
+  const [playlist, _setPlaylist] = useState<Playlist[]>([] as Playlist[])
+
+  const setPlaylist = (newPlaylists: Playlist[]) => {
+    _setPlaylist(newPlaylists)
+    console.log(newPlaylists)
+  }
+  const preparedPlaylistKB = preparePlaylistKBar(playlist)
+  useRegisterActions([...preparedPlaylistKB], [preparedPlaylistKB])
+  return [playlist, setPlaylist] as const
+}
+
 const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
   const router = useRouter()
   const { toast } = useToast()
   const [audio, setAudioPlayer] = useState<Audio>({} as Audio)
   const [audioList, setAudioList] = useState<Audio[]>([] as Audio[])
   const [oldAudioList, setOldAudioList] = useState<Audio[]>([] as Audio[])
-  const [playlists, setPlaylist] = useState<Playlist[]>([] as Playlist[])
+
+  const [playlists, setPlaylist] = useUpdatePlaylist()
 
   const [playlistCheckedState, setPlaylistCheckedState] = useState(
     {} as PlaylistCheckedState,
@@ -99,7 +109,7 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
     {} as string,
   )
   const [isPlaying, setIsPlaying] = useState(false)
-  const [status, setStatus] = useState({ current: 0 } as AudioStatus)
+
   const setAudioById = (id: number) => {
     const playlistPage = router.query.playlist as string
     if (currentPlaylistListening === playlistPage) {
@@ -147,17 +157,14 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
       .catch((error) => {
         console.error(error)
       })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  // maybe a cleaner way to do this
-  const playlistKbarFill = usePlaylistsKBarFill(playlists)
-  useRegisterActions([...playlistKbarFill].filter(Boolean), [playlistKbarFill])
+      
   return (
     <AppContext.Provider
       value={{
         audio,
         setAudioPlayer,
-        status,
-        setStatus,
         oldAudioList,
         setOldAudioList,
         audioList,
