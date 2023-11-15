@@ -80,6 +80,7 @@ function preparePlaylistKBar(playlists: Playlist[]) {
   return to_add
 }
 
+
 const useUpdatePlaylist = () => {
   const [playlist, _setPlaylist] = useState<Playlist[]>([] as Playlist[])
 
@@ -98,6 +99,7 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
   const [audio, setAudioPlayer] = useState<Audio>({} as Audio)
   const [audioList, setAudioList] = useState<Audio[]>([] as Audio[])
   const [oldAudioList, setOldAudioList] = useState<Audio[]>([] as Audio[])
+
   const [playlists, setPlaylist] = useUpdatePlaylist()
 
   const [playlistCheckedState, setPlaylistCheckedState] = useState(
@@ -157,6 +159,7 @@ const AppContextProvider = ({ children }: { children: React.ReactElement }) => {
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+      
   return (
     <AppContext.Provider
       value={{

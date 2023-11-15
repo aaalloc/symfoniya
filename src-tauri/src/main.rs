@@ -9,27 +9,39 @@ const LOG_TARGETS: [LogTarget; 2] = [LogTarget::Stdout, LogTarget::Webview];
 #[cfg(not(debug_assertions))]
 const LOG_TARGETS: [LogTarget; 2] = [LogTarget::Stdout, LogTarget::LogDir];
 
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 mod db;
 mod music;
 use crate::{api::*, music::player::Player};
 use db::{database, state::DbState};
-use music::player::MusicPlayer;
+use music::{
+    async_process::{async_process_model, AsyncProcInputTx},
+    player::MusicPlayer,
+};
+
 use rodio::OutputStream;
 use tauri::{Manager, State};
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, LogTarget};
-
+use tokio::sync::mpsc;
 mod api;
+
 fn main() {
     let (_stream, _stream_handle) = OutputStream::try_default().unwrap();
     // leak the stream to keep it alive, otherwise it will be dropped and no more audio !!!!
     // this is not a good thing but I think it is a good workaround for now ...
     let _str = Box::leak(Box::new(_stream));
-    let arc_player = Arc::new(Mutex::new(MusicPlayer::new(_stream_handle)));
+    let arc_player = Arc::new(std::sync::Mutex::new(MusicPlayer::new(_stream_handle)));
+
+    let (async_process_input_tx, async_process_input_rx) = mpsc::channel(1);
+    let (async_process_output_tx, mut async_process_output_rx) = mpsc::channel(1);
+
     tauri::Builder::default()
         .manage(arc_player)
         .manage(DbState {
             db: Default::default(),
+        })
+        .manage(AsyncProcInputTx {
+            inner: tokio::sync::Mutex::new(async_process_input_tx),
         })
         .plugin(
             tauri_plugin_log::Builder::default()
@@ -58,7 +70,8 @@ fn main() {
             playlist::add_audio_to_playlist,
             playlist::get_audio_playlist,
             playlist::get_playlists,
-            playlist::is_in_playlist
+            playlist::is_in_playlist,
+            music::ytdlp_wrapper::download_audio_from_links,
         ])
         .setup(|app| {
             let handle = app.handle();
@@ -66,6 +79,19 @@ fn main() {
             let db =
                 database::initialize_database(&handle).expect("Database initialize should succeed");
             *app_state.db.lock().unwrap() = Some(db);
+
+            tauri::async_runtime::spawn(async move {
+                async_process_model(async_process_input_rx, async_process_output_tx).await
+            });
+
+            tauri::async_runtime::spawn(async move {
+                loop {
+                    if let Some(outputs) = async_process_output_rx.recv().await {
+                        handle.emit_all("result_from_download", outputs).unwrap();
+                    }
+                }
+            });
+
             Ok(())
         })
         .run(tauri::generate_context!())
