@@ -6,10 +6,8 @@ function cn(...classes: string[]) {
 
 export default function GlowingGradientBorderButton({
   children,
-  onClick,
 }: {
   children: React.ReactNode
-  onClick?: () => void
 }) {
   const gradient = "bg-gradient-to-r to-[#00C5DF] via-[#FFC700] from-[#F2371F]"
   const gradient_blurred =
