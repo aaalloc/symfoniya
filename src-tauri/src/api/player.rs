@@ -48,7 +48,12 @@ pub fn play_from_id(
         //player.playlists.get_mut("all").unwrap().remove(id);
         for (_, playlist) in player.playlists.iter_mut() {
             // TODO: fix works but other things around it doesnt ...
-            playlist.remove(id);
+            let panic = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                playlist.remove(id);
+            }));
+            if panic.is_err() {
+                error!("Error: {:?}", panic.unwrap_err());
+            }
         }
         Ok(false)
     } else {

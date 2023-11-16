@@ -235,6 +235,11 @@ pub fn delete_audio(db: &Connection, path: &str) -> Result<(), rusqlite::Error> 
         "@path": path
     })?;
 
+    statement = db.prepare(delete::recent::RECENT_DELETE)?;
+    statement.execute(named_params! {
+        "@path": path
+    })?;
+
     Ok(())
 }
 
