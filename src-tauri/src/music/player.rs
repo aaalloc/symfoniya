@@ -169,11 +169,19 @@ impl Player for MusicPlayer {
     }
 
     fn update_sink(&mut self, index: usize) {
-        let next_audio = self.audios.get_mut(index).unwrap();
-        next_audio.status = AudioStatus::Waiting;
-        let previous_volume = self.sink.volume();
-        self.sink = Sink::try_new(&self.stream_handle).unwrap();
-        self.sink.set_volume(previous_volume);
+        let next_audio = self.audios.get_mut(index);
+        match next_audio {
+            Some(item) => {
+                item.status = AudioStatus::Waiting;
+                let previous_volume = self.sink.volume();
+                self.sink = Sink::try_new(&self.stream_handle).unwrap();
+                self.sink.set_volume(previous_volume);
+            }
+            None => {
+                info!("No audio found at index {}", index);
+                return;
+            }
+        }
     }
 
     fn seek(&mut self, duration: Duration) {
@@ -218,7 +226,13 @@ impl Player for MusicPlayer {
     fn shuffle(&mut self, playlist: &str) {
         let mut rng = rand::thread_rng();
         self.playlists.get_mut(playlist).unwrap().shuffle(&mut rng);
-        self.audios = self.playlists.get(playlist).unwrap().to_vec();
+        match self.playlists.get(playlist) {
+            Some(audios) => self.audios = audios.to_vec(),
+            None => {
+                info!("No playlist found with name {}", playlist);
+                return;
+            }
+        }
     }
 
     fn speed_up(&mut self) {
