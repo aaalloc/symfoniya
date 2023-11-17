@@ -23,7 +23,7 @@ pub fn import_from_folders(
     let mut total_imported = 0;
     for folder in folders {
         let folder_path = PathBuf::from(&folder);
-        total_imported += player.import_from_folders(folder_path, &app_handle);
+        total_imported += player.import_from_folders(folder_path, &app_handle)?;
     }
     player.write_to_db(app_handle);
     drop(player);
