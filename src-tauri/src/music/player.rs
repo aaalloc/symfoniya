@@ -33,7 +33,7 @@ pub trait Player {
     fn update_sink(&mut self, index: usize);
     fn next(&mut self) -> usize;
     fn previous(&mut self);
-    fn seek(&mut self, duration: Duration);
+    fn seek(&mut self, duration: Duration) -> Result<(), rodio::source::SeekError>;
     fn current_audio_status(&self) -> AudioStatus;
     fn get_audio(&self, index: usize) -> &_Audio;
     fn set_volume(&mut self, volume: f32);
@@ -184,14 +184,15 @@ impl Player for MusicPlayer {
         }
     }
 
-    fn seek(&mut self, duration: Duration) {
-        self.sink.try_seek(duration).unwrap();
+    fn seek(&mut self, duration: Duration) -> Result<(), rodio::source::SeekError> {
+        self.sink.try_seek(duration)?;
         if let Some(item) = self.audios.get_mut(self.index) {
             let status = &mut item.status;
             if let AudioStatus::Playing(instant, _) = status {
                 *instant = Instant::now() - duration;
             }
         }
+        Ok(())
     }
 
     fn next(&mut self) -> usize {

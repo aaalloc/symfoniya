@@ -43,7 +43,10 @@ pub fn play_from_id(
         let result = app_handle.db(|db| database::delete_audio(db, &player.audios[id].path));
         match result {
             Ok(_) => info!("Audio deleted from db"),
-            Err(e) => error!("Error: {}", e),
+            Err(e) => {
+                error!("Error: {}", e);
+                return Err(e.to_string());
+            }
         }
         //player.playlists.get_mut("all").unwrap().remove(id);
         for (_, playlist) in player.playlists.iter_mut() {
@@ -86,6 +89,8 @@ pub fn update_player(
 #[tauri::command]
 pub fn seek_to(position: u64, player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<(), String> {
     let mut player = player.lock().unwrap();
-    player.seek(Duration::from_secs(position));
-    Ok(())
+    match player.seek(Duration::from_secs(position)) {
+        Ok(_) => Ok(()),
+        Err(e) => Err(e.to_string()),
+    }
 }
