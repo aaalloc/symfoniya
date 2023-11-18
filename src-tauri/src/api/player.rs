@@ -51,7 +51,7 @@ pub fn play_from_id(
         // player.playlists.get_mut("all").unwrap().remove(id);
         for (_, playlist) in player.playlists.iter_mut() {
             // TODO: fix works but other things around it doesnt ...
-            if playlist.len() > id && playlist.len() > 0 {
+            if playlist.len() > id && !playlist.is_empty() {
                 playlist.remove(id);
             }
         }

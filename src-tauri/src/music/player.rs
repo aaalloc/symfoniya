@@ -178,8 +178,7 @@ impl Player for MusicPlayer {
                 self.sink.set_volume(previous_volume);
             }
             None => {
-                info!("No audio found at index {}", index);
-                return;
+                info!("No audio found at index {}", index)
             }
         }
     }
