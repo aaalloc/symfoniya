@@ -23,3 +23,10 @@ DELETE FROM audios
 WHERE path = @path;
 ";
 }
+
+pub mod recent {
+    pub const RECENT_DELETE: &str = "
+DELETE FROM recents
+WHERE audio_id = (SELECT id FROM audios WHERE path = @path)
+";
+}

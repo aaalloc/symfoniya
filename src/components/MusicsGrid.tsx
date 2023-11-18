@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import Flicking from "@egjs/react-flicking"
 import { useContext, useRef } from "react"
 
@@ -15,13 +16,13 @@ export const MusicsGrid = ({ audios, title }: { audios?: Audio[]; title: string 
 
   const audiosInCols = audios
     ? audios.reduce<Audio[][]>((acc, curr, i) => {
-        const colIndex = Math.floor(i / itemsPerCol)
-        if (!acc[colIndex]) {
-          acc[colIndex] = []
-        }
-        acc[colIndex].push(curr)
-        return acc
-      }, [])
+      const colIndex = Math.floor(i / itemsPerCol)
+      if (!acc[colIndex]) {
+        acc[colIndex] = []
+      }
+      acc[colIndex].push(curr)
+      return acc
+    }, [])
     : []
 
   return (
@@ -31,8 +32,8 @@ export const MusicsGrid = ({ audios, title }: { audios?: Audio[]; title: string 
         <CarouselControls flickerRef={flickingRef} />
       </div>
       <Flicking panelsPerView={3} autoResize={true} ref={flickingRef} align="prev">
-        {Boolean(audiosInCols) && audiosInCols.length ? (
-          audiosInCols.map((col, colIndex) => {
+        {Boolean(audiosInCols) && audiosInCols.length
+          ? audiosInCols.map((col, colIndex) => {
             return (
               <div className="flicking-panel" key={colIndex}>
                 {col.map((value, index) => (
@@ -46,12 +47,14 @@ export const MusicsGrid = ({ audios, title }: { audios?: Audio[]; title: string 
               </div>
             )
           })
-        ) : (
-          <p className="text-center text-lg font-medium text-slate-600 dark:text-slate-400">
-            No history found
-          </p>
-        )}
+          : () => <></>}
       </Flicking>
+      {Boolean(audiosInCols) && !audiosInCols.length
+        ?
+        <p className="text-lg font-medium text-slate-600 dark:text-slate-400">
+          No history found
+        </p> : <></>
+      }
     </div>
   )
 }

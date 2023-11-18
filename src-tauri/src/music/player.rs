@@ -20,7 +20,11 @@ pub struct MusicPlayer {
 pub trait Player {
     fn new(stream_handler: rodio::OutputStreamHandle) -> Self;
     fn add_audio(&mut self, audio: _Audio) -> bool;
-    fn import_from_folders(&mut self, path: PathBuf, app_handle: &AppHandle) -> usize;
+    fn import_from_folders(
+        &mut self,
+        path: PathBuf,
+        app_handle: &AppHandle,
+    ) -> Result<usize, String>;
     fn import_from_db(&mut self, app_handle: &AppHandle) -> Result<usize, rusqlite::Error>;
     fn set_index(&mut self, index: usize);
     fn update_total_time(&mut self);
@@ -29,7 +33,7 @@ pub trait Player {
     fn update_sink(&mut self, index: usize);
     fn next(&mut self) -> usize;
     fn previous(&mut self);
-    fn seek(&mut self, duration: Duration);
+    fn seek(&mut self, duration: Duration) -> Result<(), rodio::source::SeekError>;
     fn current_audio_status(&self) -> AudioStatus;
     fn get_audio(&self, index: usize) -> &_Audio;
     fn set_volume(&mut self, volume: f32);
@@ -90,15 +94,27 @@ impl Player for MusicPlayer {
         true
     }
 
-    fn import_from_folders(&mut self, path: PathBuf, app_handle: &AppHandle) -> usize {
+    fn import_from_folders(
+        &mut self,
+        path: PathBuf,
+        app_handle: &AppHandle,
+    ) -> Result<usize, String> {
         info!("Importing from {}", path.display());
         let value = get_audios(self.audios.as_mut(), path, app_handle);
-        self.audios.sort_by(|a, b| a.path.cmp(&b.path));
-        self.playlists
-            .insert("all".to_string(), self.audios.clone());
-        self.update_total_time();
-        info!("{}", log::as_display!(self));
-        value
+        match value {
+            Ok(value) => {
+                self.audios.sort_by(|a, b| a.path.cmp(&b.path));
+                self.playlists
+                    .insert("all".to_string(), self.audios.clone());
+                self.update_total_time();
+                info!("{}", log::as_display!(self));
+                Ok(value)
+            }
+            Err(e) => {
+                log::error!("{}", e);
+                Err(e.to_string())
+            }
+        }
     }
 
     fn import_from_db(&mut self, app_handle: &AppHandle) -> Result<usize, rusqlite::Error> {
@@ -153,21 +169,29 @@ impl Player for MusicPlayer {
     }
 
     fn update_sink(&mut self, index: usize) {
-        let next_audio = self.audios.get_mut(index).unwrap();
-        next_audio.status = AudioStatus::Waiting;
-        let previous_volume = self.sink.volume();
-        self.sink = Sink::try_new(&self.stream_handle).unwrap();
-        self.sink.set_volume(previous_volume);
+        let next_audio = self.audios.get_mut(index);
+        match next_audio {
+            Some(item) => {
+                item.status = AudioStatus::Waiting;
+                let previous_volume = self.sink.volume();
+                self.sink = Sink::try_new(&self.stream_handle).unwrap();
+                self.sink.set_volume(previous_volume);
+            }
+            None => {
+                info!("No audio found at index {}", index)
+            }
+        }
     }
 
-    fn seek(&mut self, duration: Duration) {
-        self.sink.try_seek(duration).unwrap();
+    fn seek(&mut self, duration: Duration) -> Result<(), rodio::source::SeekError> {
+        self.sink.try_seek(duration)?;
         if let Some(item) = self.audios.get_mut(self.index) {
             let status = &mut item.status;
             if let AudioStatus::Playing(instant, _) = status {
                 *instant = Instant::now() - duration;
             }
         }
+        Ok(())
     }
 
     fn next(&mut self) -> usize {
@@ -182,8 +206,11 @@ impl Player for MusicPlayer {
     }
 
     fn current_audio_status(&self) -> AudioStatus {
-        let current_audio = self.audios.get(self.index).unwrap();
-        current_audio.status.clone()
+        let current_audio = self.audios.get(self.index);
+        match current_audio {
+            Some(item) => item.status.clone(),
+            None => AudioStatus::Stopped(Duration::new(0, 0), Duration::new(0, 0)),
+        }
     }
 
     fn get_audio(&self, index: usize) -> &_Audio {
@@ -202,7 +229,12 @@ impl Player for MusicPlayer {
     fn shuffle(&mut self, playlist: &str) {
         let mut rng = rand::thread_rng();
         self.playlists.get_mut(playlist).unwrap().shuffle(&mut rng);
-        self.audios = self.playlists.get(playlist).unwrap().to_vec();
+        match self.playlists.get(playlist) {
+            Some(audios) => self.audios = audios.to_vec(),
+            None => {
+                info!("No playlist found with name {}", playlist)
+            }
+        }
     }
 
     fn speed_up(&mut self) {

@@ -231,36 +231,33 @@ fn check_audio_format(
     }
 }
 
-pub fn get_audios(audios: &mut Vec<_Audio>, pathbuf: PathBuf, app_handle: &AppHandle) -> usize {
+pub fn get_audios(
+    audios: &mut Vec<_Audio>,
+    pathbuf: PathBuf,
+    app_handle: &AppHandle,
+) -> Result<usize, std::io::Error> {
     let mut count = 0;
-    let paths = std::fs::read_dir(pathbuf);
+    let paths = std::fs::read_dir(pathbuf)?;
     info!("Init dir read");
-    match paths {
-        Ok(paths) => {
-            for path in paths {
-                match path {
-                    Ok(path) => {
-                        info!("{:?}", path);
-                        let p = &path.path().into_os_string().into_string();
-                        match p {
-                            Ok(p) => {
-                                if p.contains(".ini") {
-                                    // see https://github.com/mmalecot/file-format/issues/36
-                                    continue;
-                                }
-                                if audios.iter().any(|audio| audio.path == *p) {
-                                    info!("Audio already in list");
-                                    continue;
-                                }
-                                let format = FileFormat::from_file(p);
+    for path in paths {
+        match path {
+            Ok(path) => {
+                info!("{:?}", path);
+                let p = &path.path().into_os_string().into_string();
+                match p {
+                    Ok(p) => {
+                        if p.contains(".ini") {
+                            // see https://github.com/mmalecot/file-format/issues/36
+                            continue;
+                        }
+                        if audios.iter().any(|audio| audio.path == *p) {
+                            info!("Audio already in list");
+                            continue;
+                        }
+                        let format = FileFormat::from_file(p);
+                        match format {
+                            Ok(format) => {
                                 info!("{:?}", format);
-                                let format = match format {
-                                    Ok(format) => format,
-                                    Err(format) => {
-                                        info!("Unsupported format {:?}", format);
-                                        continue;
-                                    }
-                                };
                                 check_audio_format(
                                     format,
                                     &PathBuf::from(p),
@@ -270,20 +267,20 @@ pub fn get_audios(audios: &mut Vec<_Audio>, pathbuf: PathBuf, app_handle: &AppHa
                                 );
                             }
                             Err(e) => {
-                                error!("{:?}", e);
+                                error!("{}", e);
+                                continue;
                             }
                         }
                     }
                     Err(e) => {
-                        error!("{}", e);
+                        error!("{:?}", e);
                     }
                 }
             }
-            count
-        }
-        Err(e) => {
-            error!("{}", e);
-            0
+            Err(e) => {
+                error!("{}", e);
+            }
         }
     }
+    Ok(count)
 }

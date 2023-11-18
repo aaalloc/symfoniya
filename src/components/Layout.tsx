@@ -71,7 +71,7 @@ export default function Layout({ children }: { children: React.ReactElement }) {
         <Toaster />
         <div className="flex divide-x h-full">
           <Sidebar className="basis-1/6" />
-          <div className="flex flex-col pr-[-300px] mt-16 h-full w-full items-stretch mt-28">
+          <div className="flex flex-col pr-[-300px] mt-26 h-full w-full items-stretch mt-28">
             {children}
           </div>
         </div>

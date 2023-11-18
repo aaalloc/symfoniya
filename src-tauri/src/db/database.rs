@@ -11,7 +11,7 @@ use crate::{
     api::playlist::Playlist,
     music::audio::{_Audio, _Tag},
 };
-use log::info;
+use log::{error, info};
 use rusqlite::{named_params, Connection};
 use std::{fs, path::Path};
 use tauri::AppHandle;
@@ -222,20 +222,60 @@ pub fn get_playlist_info(db: &Connection) -> Result<Vec<Playlist>, rusqlite::Err
 
 pub fn delete_audio(db: &Connection, path: &str) -> Result<(), rusqlite::Error> {
     let mut statement = db.prepare(delete::playlist::AUDIO_IN_PLAYLIST_DELETE)?;
-    statement.execute(named_params! {
+    match statement.execute(named_params! {
         "@path": path
-    })?;
+    }) {
+        Ok(_) => {
+            info!("deleted audio from playlist");
+            Ok(())
+        }
+        Err(e) => {
+            error!("failed at audio_in_playlist_delete request");
+            rusqlite::Result::Err(e)
+        }
+    }?;
+
+    statement = db.prepare(delete::recent::RECENT_DELETE)?;
+    match statement.execute(named_params! {
+        "@path": path
+    }) {
+        Ok(_) => {
+            info!("deleted recent from db");
+            Ok(())
+        }
+        Err(e) => {
+            error!("failed at recent_delete request");
+            rusqlite::Result::Err(e)
+        }
+    }?;
+
     statement = db.prepare(delete::audio::AUDIO_DELETE)?;
-    statement.execute(named_params! {
+    match statement.execute(named_params! {
         "@path": path
-    })?;
+    }) {
+        Ok(_) => {
+            info!("{} deleted from db", path);
+            Ok(())
+        }
+        Err(e) => {
+            error!("failed at audio_delete request");
+            rusqlite::Result::Err(e)
+        }
+    }?;
 
     statement = db.prepare(delete::tag::AUDIO_DELETE_TAG)?;
-    statement.execute(named_params! {
+    match statement.execute(named_params! {
         "@path": path
-    })?;
-
-    Ok(())
+    }) {
+        Ok(_) => {
+            info!("deleted tags from db");
+            Ok(())
+        }
+        Err(e) => {
+            error!("failed at tag_delete request");
+            rusqlite::Result::Err(e)
+        }
+    }
 }
 
 pub fn update_recent_history(db: &Connection, path: &str) -> Result<(), rusqlite::Error> {

@@ -27,17 +27,32 @@ pub struct Audio {
 
 pub fn create_audio_list(player: MutexGuard<'_, MusicPlayer>, str: &str) -> Vec<Audio> {
     let mut audios = Vec::new();
-    for (id, audio) in player.playlists[str].iter().enumerate() {
-        let cover = audio.cover.clone();
-        audios.push(Audio {
-            path: audio.path.clone(),
-            title: audio.tag.title.clone(),
-            artist: audio.tag.artist.clone(),
-            album: audio.tag.album.clone(),
-            duration: audio.duration.as_secs(),
-            id,
-            cover,
-        });
+    if !str.is_empty() {
+        for (id, audio) in player.playlists[str].iter().enumerate() {
+            let cover = audio.cover.clone();
+            audios.push(Audio {
+                path: audio.path.clone(),
+                title: audio.tag.title.clone(),
+                artist: audio.tag.artist.clone(),
+                album: audio.tag.album.clone(),
+                duration: audio.duration.as_secs(),
+                id,
+                cover,
+            });
+        }
+    } else {
+        for (id, audio) in player.audios.iter().enumerate() {
+            let cover = audio.cover.clone();
+            audios.push(Audio {
+                path: audio.path.clone(),
+                title: audio.tag.title.clone(),
+                artist: audio.tag.artist.clone(),
+                album: audio.tag.album.clone(),
+                duration: audio.duration.as_secs(),
+                id,
+                cover,
+            });
+        }
     }
 
     audios

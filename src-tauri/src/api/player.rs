@@ -23,7 +23,7 @@ pub fn import_from_folders(
     let mut total_imported = 0;
     for folder in folders {
         let folder_path = PathBuf::from(&folder);
-        total_imported += player.import_from_folders(folder_path, &app_handle);
+        total_imported += player.import_from_folders(folder_path, &app_handle)?;
     }
     player.write_to_db(app_handle);
     drop(player);
@@ -38,18 +38,24 @@ pub fn play_from_id(
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
 ) -> Result<bool, String> {
     let mut player = player.lock().unwrap();
-    if File::open(&player.audios[id].path).is_err() {
-        info!("File not found: {}", player.audios[id].path);
-        let result = app_handle.db(|db| database::delete_audio(db, &player.audios[id].path));
+    if File::open(&path).is_err() {
+        info!("File not found: {}", &path);
+        let result = app_handle.db(|db| database::delete_audio(db, &path));
         match result {
             Ok(_) => info!("Audio deleted from db"),
-            Err(e) => error!("Error: {}", e),
+            Err(e) => {
+                error!("Error: {}", e);
+                return Err(e.to_string());
+            }
         }
-        //player.playlists.get_mut("all").unwrap().remove(id);
+        // player.playlists.get_mut("all").unwrap().remove(id);
         for (_, playlist) in player.playlists.iter_mut() {
             // TODO: fix works but other things around it doesnt ...
-            playlist.remove(id);
+            if playlist.len() > id && !playlist.is_empty() {
+                playlist.remove(id);
+            }
         }
+        player.audios.remove(id);
         Ok(false)
     } else {
         if player.current_audio.path != path || player.is_playing {
@@ -81,6 +87,8 @@ pub fn update_player(
 #[tauri::command]
 pub fn seek_to(position: u64, player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<(), String> {
     let mut player = player.lock().unwrap();
-    player.seek(Duration::from_secs(position));
-    Ok(())
+    match player.seek(Duration::from_secs(position)) {
+        Ok(_) => Ok(()),
+        Err(e) => Err(e.to_string()),
+    }
 }
