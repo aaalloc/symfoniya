@@ -232,8 +232,7 @@ impl Player for MusicPlayer {
         match self.playlists.get(playlist) {
             Some(audios) => self.audios = audios.to_vec(),
             None => {
-                info!("No playlist found with name {}", playlist);
-                return;
+                info!("No playlist found with name {}", playlist)
             }
         }
     }
