@@ -20,6 +20,7 @@ use music::{
 };
 
 use rodio::OutputStream;
+use tauri::{CustomMenuItem, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem};
 use tauri::{Manager, State};
 use tauri_plugin_log::{fern::colors::ColoredLevelConfig, LogTarget};
 use tokio::sync::mpsc;
@@ -36,6 +37,28 @@ fn main() {
     let (async_process_output_tx, mut async_process_output_rx) = mpsc::channel(1);
 
     tauri::Builder::default()
+        .system_tray(
+            SystemTray::new().with_menu(
+                SystemTrayMenu::new()
+                    .add_item(CustomMenuItem::new("open".to_string(), "Open Symfoniya"))
+                    .add_native_item(SystemTrayMenuItem::Separator)
+                    .add_item(CustomMenuItem::new("quit".to_string(), "Quit")),
+            ),
+        )
+        .on_system_tray_event(|app, event| {
+            if let SystemTrayEvent::MenuItemClick { id, .. } = event {
+                match id.as_str() {
+                    "quit" => {
+                        std::process::exit(0);
+                    }
+                    "open" => {
+                        let window = app.get_window("main").unwrap();
+                        window.show().unwrap();
+                    }
+                    _ => {}
+                }
+            }
+        })
         .manage(arc_player)
         .manage(DbState {
             db: Default::default(),
@@ -95,6 +118,12 @@ fn main() {
             });
 
             Ok(())
+        })
+        .on_window_event(|event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event.event() {
+                event.window().hide().unwrap();
+                api.prevent_close();
+            }
         })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
