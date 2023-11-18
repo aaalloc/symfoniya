@@ -39,6 +39,14 @@ pub fn retrieve_audios(
 }
 
 #[tauri::command]
+pub fn updated_current_playlist(
+    player: State<'_, Arc<Mutex<MusicPlayer>>>,
+) -> Result<Vec<Audio>, String> {
+    let player = player.lock().unwrap();
+    Ok(create_audio_list(player, ""))
+}
+
+#[tauri::command]
 pub fn current_audio_status(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<Status, String> {
     let mut player = player.lock().unwrap();
     let status = player.current_audio_status().get_status();

@@ -38,9 +38,9 @@ pub fn play_from_id(
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
 ) -> Result<bool, String> {
     let mut player = player.lock().unwrap();
-    if File::open(&player.audios[id].path).is_err() {
-        info!("File not found: {}", player.audios[id].path);
-        let result = app_handle.db(|db| database::delete_audio(db, &player.audios[id].path));
+    if File::open(&path).is_err() {
+        info!("File not found: {}", &path);
+        let result = app_handle.db(|db| database::delete_audio(db, &path));
         match result {
             Ok(_) => info!("Audio deleted from db"),
             Err(e) => {

@@ -28,7 +28,6 @@ async function play_from_id_or_skip(
   const page = Router.query.path
   const { toast } = context
   const { audioList, oldAudioList } = context
-  const { setAudioList, setOldAudioList } = context
   console.log(page)
   try {
     const result: boolean = await invoke("play_from_id", {
@@ -41,13 +40,6 @@ async function play_from_id_or_skip(
         description: `${audioList[id].title} is deleted, skipping to next audio`,
         variant: "destructive",
       })
-      // const new_audio_list = await invoke<Audio[]>("get_audio_playlist", {
-      //   playlist: page as string,
-      // })
-      // setAudioList(new_audio_list)
-      // setOldAudioList(new_audio_list)
-      setAudioList(audioList.filter((audio) => audio.id !== id))
-      setOldAudioList(oldAudioList.filter((audio) => audio.id !== id))
       return false
     }
     return true
@@ -92,6 +84,8 @@ async function next(context: appContext) {
   if (result) {
     setAudioById(id)
     setIsPlaying(true)
+  } else {
+    await next(context)
   }
 }
 
@@ -104,7 +98,7 @@ export async function play(context: appContext, toPlay: Audio, fromMusicPage = f
   } else if (result && isPlaying) {
     setAudioPlayer(toPlay)
   } else {
-    next(context)
+    await next(context)
   }
 }
 
@@ -123,6 +117,8 @@ async function previous(context: appContext) {
     setAudioById(id)
     setIsPlaying(true)
     //await invoke("update_history")
+  } else {
+    await previous(context)
   }
 }
 
@@ -162,6 +158,8 @@ export async function shuffle(
     }
     setIsPlaying(true)
     //await invoke("update_history")
+  } else {
+    await shuffle(name, context, fromMusicPage)
   }
 }
 
