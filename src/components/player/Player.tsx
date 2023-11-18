@@ -7,6 +7,7 @@
 import { invoke } from "@tauri-apps/api/tauri"
 import { Pause, Play, Repeat, Shuffle, SkipBack, SkipForward } from "lucide-react"
 import { useRouter } from "next/router"
+import Router from "next/router"
 import { useEffect, useState } from "react"
 import { useContext } from "react"
 
@@ -24,23 +25,42 @@ async function play_from_id_or_skip(
   context: appContext,
   fromMusicPage = false,
 ) {
+  const page = Router.query.path
   const { toast } = context
-  const { audio, audioList, oldAudioList } = context
+  const { audioList, oldAudioList } = context
   const { setAudioList, setOldAudioList } = context
-  const result: boolean = await invoke("play_from_id", {
-    id: id,
-    path: fromMusicPage ? audioList[id].path : oldAudioList[id].path,
-  })
-  if (!result) {
-    setAudioList(audioList.filter((audio) => audio.id !== id))
-    setOldAudioList(oldAudioList.filter((audio) => audio.id !== id))
+  console.log(page)
+  try {
+    const result: boolean = await invoke("play_from_id", {
+      id: id,
+      path: fromMusicPage ? audioList[id].path : oldAudioList[id].path,
+    })
+    if (!result) {
+      toast({
+        title: "Audio",
+        description: `${audioList[id].title} is deleted, skipping to next audio`,
+        variant: "destructive",
+      })
+      // const new_audio_list = await invoke<Audio[]>("get_audio_playlist", {
+      //   playlist: page as string,
+      // })
+      // setAudioList(new_audio_list)
+      // setOldAudioList(new_audio_list)
+      setAudioList(audioList.filter((audio) => audio.id !== id))
+      setOldAudioList(oldAudioList.filter((audio) => audio.id !== id))
+      return false
+    }
+    return true
+  } catch (error) {
+    console.error(error)
     toast({
       title: "Audio",
-      description: `${audio.title} is deleted, skipping to next audio`,
+      description: `Error playing audio`,
+      variant: "destructive",
     })
     return false
   }
-  return true
+
 }
 
 export async function update_after_play(
@@ -72,25 +92,17 @@ async function next(context: appContext) {
   if (result) {
     setAudioById(id)
     setIsPlaying(true)
-    //await invoke("update_history")
   }
 }
 
 export async function play(context: appContext, toPlay: Audio, fromMusicPage = false) {
   const { isPlaying, setIsPlaying, setAudioPlayer } = context
-  // const { getStatus } = context
-  // const status = getStatus()
-  // if (status.current === toPlay.duration) {
-  //   console.log("resetting current")
-  //   status.current = 0
-  // }
   const result = await play_from_id_or_skip(toPlay.id, context, fromMusicPage)
   if (result && !isPlaying) {
     setIsPlaying(true)
     setAudioPlayer(toPlay)
   } else if (result && isPlaying) {
     setAudioPlayer(toPlay)
-    //await invoke("update_history")
   } else {
     next(context)
   }
@@ -194,13 +206,15 @@ export function Player() {
 
   useEffect(() => {
     ; (() => {
-      invoke("update_history")
-        .then(() => {
-          console.log("history updated")
-        })
-        .catch((err) => {
-          console.log("history error", err)
-        })
+      if (!isObjectEmpty(audio)) {
+        invoke("update_history")
+          .then(() => {
+            console.log("history updated")
+          })
+          .catch((err) => {
+            console.log("history error", err)
+          })
+      }
     })()
   }, [audio])
 

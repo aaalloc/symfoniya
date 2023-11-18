@@ -207,8 +207,11 @@ impl Player for MusicPlayer {
     }
 
     fn current_audio_status(&self) -> AudioStatus {
-        let current_audio = self.audios.get(self.index).unwrap();
-        current_audio.status.clone()
+        let current_audio = self.audios.get(self.index);
+        match current_audio {
+            Some(item) => item.status.clone(),
+            None => AudioStatus::Stopped(Duration::new(0, 0), Duration::new(0, 0)),
+        }
     }
 
     fn get_audio(&self, index: usize) -> &_Audio {

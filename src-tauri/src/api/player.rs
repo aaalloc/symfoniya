@@ -48,16 +48,14 @@ pub fn play_from_id(
                 return Err(e.to_string());
             }
         }
-        //player.playlists.get_mut("all").unwrap().remove(id);
+        // player.playlists.get_mut("all").unwrap().remove(id);
         for (_, playlist) in player.playlists.iter_mut() {
             // TODO: fix works but other things around it doesnt ...
-            let panic = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            if playlist.len() > id && playlist.len() > 0 {
                 playlist.remove(id);
-            }));
-            if panic.is_err() {
-                error!("Error: {:?}", panic.unwrap_err());
             }
         }
+        player.audios.remove(id);
         Ok(false)
     } else {
         if player.current_audio.path != path || player.is_playing {
