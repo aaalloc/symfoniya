@@ -254,15 +254,23 @@ pub fn get_audios(
                             info!("Audio already in list");
                             continue;
                         }
-                        let format = FileFormat::from_file(p)?;
-                        info!("{:?}", format);
-                        check_audio_format(
-                            format,
-                            &PathBuf::from(p),
-                            audios,
-                            app_handle,
-                            &mut count,
-                        );
+                        let format = FileFormat::from_file(p);
+                        match format {
+                            Ok(format) => {
+                                info!("{:?}", format);
+                                check_audio_format(
+                                    format,
+                                    &PathBuf::from(p),
+                                    audios,
+                                    app_handle,
+                                    &mut count,
+                                );
+                            }
+                            Err(e) => {
+                                error!("{}", e);
+                                continue;
+                            }
+                        }
                     }
                     Err(e) => {
                         error!("{:?}", e);
