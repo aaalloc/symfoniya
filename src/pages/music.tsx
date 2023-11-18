@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { invoke } from "@tauri-apps/api/tauri"
-import { PenBox, Shuffle } from "lucide-react"
+import { /*Book,*/ PenBox, Shuffle } from "lucide-react"
 import Image from "next/image"
 import { useContext, useEffect } from "react"
 
@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button"
 import {
   ContextMenu,
   ContextMenuContent,
+  ContextMenuItem,
   ContextMenuSub,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
@@ -70,6 +71,15 @@ export const MusicCard = ({
         <ContextMenuSub>
           <CPlaylistSub value={audio} name={name} />
         </ContextMenuSub>
+        <ContextMenuItem
+          onClick={() => {
+            // print the audio information
+            console.log(audio)
+          }}
+        >
+          {/* <Book className="mr-2 h-4 w-4" /> */}
+          Information
+        </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
   )
