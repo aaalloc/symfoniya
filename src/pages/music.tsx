@@ -10,6 +10,7 @@ import CPlaylistSub, {
   fetchPlaylistCheckedState,
   setAudiosFromPlaylist,
 } from "@/components/contexts_menu/CPlaylistSub"
+import { MusicCardInfo } from "@/components/contexts_menu/MusicCardInfo"
 import { play, shuffle, update_after_play } from "@/components/player/Player"
 import { Audio } from "@/components/types/audio"
 import { Button } from "@/components/ui/button"
@@ -72,13 +73,11 @@ export const MusicCard = ({
           <CPlaylistSub value={audio} name={name} />
         </ContextMenuSub>
         <ContextMenuItem
-          onClick={() => {
-            // print the audio information
-            console.log(audio)
+          onClick={(event) => {
+            event.preventDefault()
           }}
         >
-          {/* <Book className="mr-2 h-4 w-4" /> */}
-          Information
+          <MusicCardInfo audio={audio} />
         </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
