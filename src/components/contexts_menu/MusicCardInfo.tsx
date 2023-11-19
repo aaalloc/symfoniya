@@ -39,7 +39,7 @@ export function MusicCardInfo({ audio }: { audio: Audio }) {
           <div>
             <Label className="text-gray-500 dark:text-gray-300">Folder path</Label>
             <p className="text-gray-400 dark:text-gray-200 break-all line-clamp-1">
-              {audio.path.substring(0, audio.path.lastIndexOf("\\"))}
+              {audio.path.replace(/[/\\][^/\\]*$/, "")}
             </p>
           </div>
         </div>
