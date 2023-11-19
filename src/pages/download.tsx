@@ -96,7 +96,7 @@ const DownloadPage = () => {
           setTaskdata((old) => [
             ...old,
             {
-              id: "1",
+              id: Math.random().toString(36).substring(7),
               title: music.title,
               duration: new Date(music.duration * 1000).toISOString().substring(11, 19),
               status: "in progress",
