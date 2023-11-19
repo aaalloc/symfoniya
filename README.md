@@ -76,6 +76,6 @@ respectively for questions pertaining to either technology.
 
 
 ### Helpers
-- @FranckG28 for solving css issues
+- [FranckG28](https://github.com/FranckG28) for solving css issues
 
 
