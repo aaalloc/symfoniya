@@ -52,7 +52,6 @@ async function play_from_id_or_skip(
     })
     return false
   }
-
 }
 
 export async function update_after_play(
@@ -64,8 +63,8 @@ export async function update_after_play(
   const playlist = isObjectEmpty(currentPlaylistListening as unknown as object)
     ? name
     : !fromMusicPage
-      ? currentPlaylistListening
-      : name
+    ? currentPlaylistListening
+    : name
   console.log(playlist)
   await invoke("update_player", {
     playlist: playlist,
@@ -203,7 +202,7 @@ export function Player() {
   }, [wupdate_status, status])
 
   useEffect(() => {
-    ; (() => {
+    ;(() => {
       if (!isObjectEmpty(audio)) {
         invoke("update_history")
           .then(() => {
@@ -252,9 +251,10 @@ export function Player() {
             <Button variant="ghost" size="icon" onClick={() => next(context)}>
               <SkipForward />
             </Button>
-            <p className="text-sm text-muted-foreground ml-2">
-              {format_duration(status.current)} / {format_duration(audio.duration)}
-            </p>
+            <div className="text-sm text-muted-foreground ml-2 flex gap-1">
+              <p className="w-12 text-right">{format_duration(status.current)}</p> /{" "}
+              <p className="w-12 text-left">{format_duration(status.total)}</p>
+            </div>
           </div>
           <div className="flex flex-col items-center justify-center flex-1">
             <p className="font-semibold leading-tight">{audio.title}</p>
