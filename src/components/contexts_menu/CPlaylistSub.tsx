@@ -1,6 +1,6 @@
 import { CheckedState } from "@radix-ui/react-checkbox"
 import { invoke } from "@tauri-apps/api/tauri"
-import { ListPlus } from "lucide-react"
+// import { ListPlus } from "lucide-react"
 import { useContext } from "react"
 
 import { AppContext } from "@/components/AppContext"
@@ -106,7 +106,7 @@ export default function CPlaylistSub({ value, name }: { value: Audio; name: stri
   return (
     <>
       <ContextMenuSubTrigger>
-        <ListPlus className="mr-2 h-4 w-4" />
+        {/* <ListPlus className="mr-2 h-4 w-4" /> */}
         Add to playlist
       </ContextMenuSubTrigger>
       <ContextMenuSubContent className="p-0">

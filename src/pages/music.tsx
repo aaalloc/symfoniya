@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { invoke } from "@tauri-apps/api/tauri"
-import { PenBox, Shuffle } from "lucide-react"
+import { /*Book,*/ PenBox, Shuffle } from "lucide-react"
 import Image from "next/image"
 import { useContext, useEffect } from "react"
 
@@ -10,12 +10,14 @@ import CPlaylistSub, {
   fetchPlaylistCheckedState,
   setAudiosFromPlaylist,
 } from "@/components/contexts_menu/CPlaylistSub"
+import { MusicCardInfo } from "@/components/contexts_menu/MusicCardInfo"
 import { play, shuffle, update_after_play } from "@/components/player/Player"
 import { Audio } from "@/components/types/audio"
 import { Button } from "@/components/ui/button"
 import {
   ContextMenu,
   ContextMenuContent,
+  ContextMenuItem,
   ContextMenuSub,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
@@ -70,6 +72,13 @@ export const MusicCard = ({
         <ContextMenuSub>
           <CPlaylistSub value={audio} name={name} />
         </ContextMenuSub>
+        <ContextMenuItem
+          onClick={(event) => {
+            event.preventDefault()
+          }}
+        >
+          <MusicCardInfo audio={audio} />
+        </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
   )
