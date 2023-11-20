@@ -71,7 +71,6 @@ function cn(...classes: string[]) {
 
 export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
   const { toast } = useToast()
-  const [arr_path, setPath] = useState<string[]>([])
 
   const choose_path = async () => {
     const import_dialog = await import("@tauri-apps/api/dialog")
@@ -82,16 +81,11 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
       defaultPath: await import_path.audioDir(),
     })
     if (new_paths !== null) {
-      const paths_to_add = (new_paths as string[]).filter(
-        (path: string) => !arr_path.includes(path),
-      )
-      const updated_paths = [...arr_path, ...paths_to_add]
-      setPath(updated_paths)
-      handle_submit(updated_paths)
+      handle_submit(new_paths)
     }
   }
 
-  const handle_submit = (updated_paths: string[]) => {
+  const handle_submit = (updated_paths: string[] | string) => {
     invoke<string>("import_from_folders", { folders: updated_paths })
       .then((value) => {
         toast({
