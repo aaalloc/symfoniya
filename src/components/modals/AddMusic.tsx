@@ -3,7 +3,6 @@ import { PopoverClose } from "@radix-ui/react-popover"
 import { invoke } from "@tauri-apps/api/tauri"
 import { Download, FolderInput, X } from "lucide-react"
 import Router from "next/router"
-import { useState } from "react"
 
 import { Audio } from "@/components/types/audio"
 import { Button } from "@/components/ui/button"
