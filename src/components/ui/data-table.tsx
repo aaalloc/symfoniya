@@ -67,7 +67,10 @@ export function DataTable<TData, TValue>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
-
+  table.getState().pagination = {
+    ...table.getState().pagination,
+    pageSize: 8,
+  }
   return (
     <div className="space-y-4 container">
       <DataTableToolbar table={table} />

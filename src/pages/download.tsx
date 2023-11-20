@@ -31,9 +31,9 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 import { cn } from "@/lib/utils"
-import { Separator } from "@/components/ui/separator"
 
 const formSchema = z.object({
   url: z.string().url(),
@@ -83,9 +83,9 @@ const DownloadPage = () => {
           old.map((task) =>
             task.title === response.title
               ? {
-                  ...task,
-                  status: "done",
-                }
+                ...task,
+                status: "done",
+              }
               : task,
           ),
         )
@@ -124,7 +124,7 @@ const DownloadPage = () => {
           Download
         </h1>
         <p className="text-muted-foreground container">
-          Add songs to your library from Youtube or Soundcloud.
+          Download songs/playlists from Youtube, Soundcloud links.
         </p>
         <div className="container">
           <Form {...form}>
@@ -185,12 +185,12 @@ const DownloadPage = () => {
               </Button>
             </form>
           </Form>
-          <Separator className="container mt-6" />
+          <Separator className="container mt-10" />
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-4">
           <p className="text-lg font-medium tracking-tight lg:text-xl container">
-            Download history
+            History
           </p>
           <DataTable data={taskdata} columns={columns} />
         </div>
