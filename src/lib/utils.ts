@@ -13,9 +13,12 @@ export function isObjectEmpty(objectName: object) {
 }
 
 export function byteToImage(byteArray: number[]) {
+  return noJacketIMG
   if (byteArray.length === 0) return noJacketIMG
-  // performance issue here !!!
-  return `data:image/png;base64,${base64.bytesToBase64(byteArray)}`
+  // performance issue here !!! Because of the recurrent base64 encoding for a lot of image
+  return `data:image/png;base64,${Buffer.from(byteArray).toString("base64")}`
+  // work around but it takes a lot of memory if we have a lot lot lot of image
+  return URL.createObjectURL(new Blob([new Uint8Array(byteArray)]))
 }
 
 export function format_duration(duration: number) {
