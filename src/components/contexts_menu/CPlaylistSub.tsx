@@ -48,14 +48,21 @@ export async function fetchPlaylistCheckedState(
   setPlaylistCheckedState(playlistCheckedState)
 }
 
-export async function setAudiosFromPlaylist(
+export function setAudiosFromPlaylist(
   playlist: string,
   setAudioList: (audioList: Audio[]) => void,
 ) {
-  const res = await invoke<Audio[]>("get_audio_playlist", {
+  invoke<Audio[]>("get_audio_playlist", {
     playlist: playlist,
   })
-  setAudioList(res)
+    .then((response) => {
+      setAudioList(response)
+    })
+    .catch((error) => {
+      console.error(error)
+      setAudioList([])
+    })
+  // setAudioList(res)
 }
 
 function PlaylistCommandItem(props: { playlist: string; value: Audio; name: string }) {
