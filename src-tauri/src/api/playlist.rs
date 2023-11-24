@@ -18,7 +18,7 @@ pub struct Playlist {
 }
 
 #[tauri::command]
-pub fn create_playlist(name: String, app_handle: AppHandle) -> Result<(), String> {
+pub async fn create_playlist(name: String, app_handle: AppHandle) -> Result<(), String> {
     let result = app_handle.db(|db| database::add_playlist(db, &name));
     match result {
         Ok(_) => Ok(()),
@@ -30,7 +30,7 @@ pub fn create_playlist(name: String, app_handle: AppHandle) -> Result<(), String
 }
 
 #[tauri::command]
-pub fn add_audio_to_playlist(
+pub async fn add_audio_to_playlist(
     state: bool,
     playlist: String,
     path: String,
@@ -48,7 +48,7 @@ pub fn add_audio_to_playlist(
 }
 
 #[tauri::command]
-pub fn is_in_playlist(
+pub async fn is_in_playlist(
     playlist: String,
     path: String,
     app_handle: AppHandle,
@@ -64,7 +64,7 @@ pub fn is_in_playlist(
 }
 
 #[tauri::command]
-pub fn get_playlists(app_handle: AppHandle) -> Result<Vec<Playlist>, String> {
+pub async fn get_playlists(app_handle: AppHandle) -> Result<Vec<Playlist>, String> {
     let result = app_handle.db(database::get_playlist_info);
     match result {
         Ok(list) => Ok(list),
@@ -76,7 +76,7 @@ pub fn get_playlists(app_handle: AppHandle) -> Result<Vec<Playlist>, String> {
 }
 
 #[tauri::command]
-pub fn get_audio_playlist(
+pub async fn get_audio_playlist(
     playlist: String,
     app_handle: AppHandle,
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
