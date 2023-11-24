@@ -61,7 +61,7 @@ pub mod table {
         title TEXT NOT NULL,
         tag_id INTEGER NOT NULL,
         folder_id INTEGER NOT NULL,
-        cover BLOB,
+        cover TEXT NOT NULL,
         FOREIGN KEY (tag_id) REFERENCES tags (id)
         FOREIGN KEY (folder_id) REFERENCES folders (id)
     );

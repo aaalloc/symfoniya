@@ -50,7 +50,7 @@ export function CreatePlaylist() {
       const newPlaylist: Playlist = {
         name: values.playlist_name,
         count: 0,
-        cover: [] as number[],
+        cover: "" as string,
       }
       setPlaylist([...playlists, newPlaylist])
       toast({

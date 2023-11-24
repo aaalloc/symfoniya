@@ -1,7 +1,7 @@
 import Image from "next/image"
 
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import { byteToImage, format_duration } from "@/lib/utils"
+import { b64imageWrap, format_duration } from "@/lib/utils"
 
 import { Audio } from "../types/audio"
 import { Label } from "../ui/label"
@@ -15,7 +15,7 @@ export function MusicCardInfo({ audio }: { audio: Audio }) {
       <DialogContent className="bg-white dark:bg-gray-800 p-8 rounded-lg flex items-start gap-6 max-w-2xl">
         <Image
           className="rounded-lg object-cover shadow-lg aspect-square"
-          src={byteToImage(audio.cover)}
+          src={b64imageWrap(audio.cover)}
           height={200}
           width={200}
           alt="Album cover"

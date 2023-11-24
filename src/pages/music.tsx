@@ -21,7 +21,7 @@ import {
   ContextMenuSub,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
-import { byteToImage, cn, format_duration, isObjectEmpty } from "@/lib/utils"
+import { b64imageWrap, cn, format_duration, isObjectEmpty } from "@/lib/utils"
 
 export const MusicCard = ({
   audio,
@@ -55,7 +55,7 @@ export const MusicCard = ({
           <div className="shrink-0">
             <Image
               className="rounded-md"
-              src={byteToImage(audio.cover)}
+              src={b64imageWrap(audio.cover)}
               height={56}
               width={56}
               alt=""
@@ -108,8 +108,8 @@ export default function Music({ name }: { name: string }) {
           className="object-cover rounded-lg"
           src={
             isObjectEmpty(context.audioList)
-              ? byteToImage([] as number[])
-              : byteToImage(context.audioList[0].cover)
+              ? b64imageWrap("" as string)
+              : b64imageWrap(context.audioList[0].cover)
           }
           alt="playlist"
           height={224}
