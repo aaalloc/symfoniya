@@ -14,6 +14,7 @@ export function isObjectEmpty(objectName: object) {
 
 export function byteToImage(byteArray: number[]) {
   if (byteArray.length === 0) return noJacketIMG
+  // performance issue here !!!
   return `data:image/png;base64,${base64.bytesToBase64(byteArray)}`
 }
 
