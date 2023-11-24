@@ -85,6 +85,10 @@ export function AddMusic(props: { setter: (audioList: Audio[]) => void }) {
   }
 
   const handle_submit = (updated_paths: string[] | string) => {
+    toast({
+      title: "Adding musics",
+      description: "Adding musics to the library",
+    })
     invoke<string>("import_from_folders", { folders: updated_paths })
       .then((value) => {
         toast({

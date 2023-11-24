@@ -14,7 +14,7 @@ use crate::{
 use std::time::Duration;
 
 #[tauri::command]
-pub fn import_from_folders(
+pub async fn import_from_folders(
     folders: Vec<String>,
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
     app_handle: AppHandle,
