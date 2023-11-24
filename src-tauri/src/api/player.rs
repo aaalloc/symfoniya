@@ -14,7 +14,7 @@ use crate::{
 use std::time::Duration;
 
 #[tauri::command]
-pub fn import_from_folders(
+pub async fn import_from_folders(
     folders: Vec<String>,
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
     app_handle: AppHandle,
@@ -31,7 +31,7 @@ pub fn import_from_folders(
 }
 
 #[tauri::command]
-pub fn play_from_id(
+pub async fn play_from_id(
     id: usize,
     path: String,
     app_handle: AppHandle,
@@ -68,14 +68,14 @@ pub fn play_from_id(
 }
 
 #[tauri::command]
-pub fn pause(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<bool, String> {
+pub async fn pause(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<bool, String> {
     let mut player = player.lock().unwrap();
     player.pause();
     Ok(true)
 }
 
 #[tauri::command]
-pub fn update_player(
+pub async fn update_player(
     playlist: String,
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
 ) -> Result<(), String> {
@@ -85,7 +85,10 @@ pub fn update_player(
 }
 
 #[tauri::command]
-pub fn seek_to(position: u64, player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<(), String> {
+pub async fn seek_to(
+    position: u64,
+    player: State<'_, Arc<Mutex<MusicPlayer>>>,
+) -> Result<(), String> {
     let mut player = player.lock().unwrap();
     match player.seek(Duration::from_secs(position)) {
         Ok(_) => Ok(()),

@@ -50,7 +50,6 @@ export async function fetchPlaylistCheckedState(
 
 export async function setAudiosFromPlaylist(
   playlist: string,
-  audioList: Audio[],
   setAudioList: (audioList: Audio[]) => void,
 ) {
   const res = await invoke<Audio[]>("get_audio_playlist", {
@@ -84,7 +83,7 @@ function PlaylistCommandItem(props: { playlist: string; value: Audio; name: stri
           fetchPlaylistCheckedState(playlists, audioList, setPlaylistCheckedState)
           if (props.name === props.playlist) {
             // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            setAudiosFromPlaylist(props.playlist, audioList, setAudioList)
+            setAudiosFromPlaylist(props.playlist, setAudioList)
           }
           invoke<Playlist[]>("get_playlists")
             .then((response) => {

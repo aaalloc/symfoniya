@@ -13,7 +13,7 @@ use crate::{
 };
 
 #[tauri::command]
-pub fn startup_audios_init(
+pub async fn startup_audios_init(
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
     app_handle: AppHandle,
 ) -> Result<usize, String> {
@@ -29,7 +29,7 @@ pub fn startup_audios_init(
 }
 
 #[tauri::command]
-pub fn retrieve_audios(
+pub async fn retrieve_audios(
     playlists: String,
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
 ) -> Result<Vec<Audio>, String> {
@@ -39,7 +39,7 @@ pub fn retrieve_audios(
 }
 
 #[tauri::command]
-pub fn updated_current_playlist(
+pub async fn updated_current_playlist(
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
 ) -> Result<Vec<Audio>, String> {
     let player = player.lock().unwrap();
@@ -47,7 +47,9 @@ pub fn updated_current_playlist(
 }
 
 #[tauri::command]
-pub fn current_audio_status(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<Status, String> {
+pub async fn current_audio_status(
+    player: State<'_, Arc<Mutex<MusicPlayer>>>,
+) -> Result<Status, String> {
     let mut player = player.lock().unwrap();
     let status = player.current_audio_status().get_status();
     let index = player.get_index();
@@ -58,34 +60,37 @@ pub fn current_audio_status(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Resul
 }
 
 #[tauri::command]
-pub fn set_volume(volume: f32, player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<bool, String> {
+pub async fn set_volume(
+    volume: f32,
+    player: State<'_, Arc<Mutex<MusicPlayer>>>,
+) -> Result<bool, String> {
     let mut player = player.lock().unwrap();
     player.set_volume(volume);
     Ok(true)
 }
 
 #[tauri::command]
-pub fn get_volume(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<f32, String> {
+pub async fn get_volume(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<f32, String> {
     let player = player.lock().unwrap();
     Ok(player.get_volume())
 }
 
 #[tauri::command]
-pub fn goto_next(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<usize, String> {
+pub async fn goto_next(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<usize, String> {
     let mut player = player.lock().unwrap();
     let index = player.next();
     Ok(index)
 }
 
 #[tauri::command]
-pub fn goto_previous(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<usize, String> {
+pub async fn goto_previous(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<usize, String> {
     let mut player = player.lock().unwrap();
     player.previous();
     Ok(player.get_index())
 }
 
 #[tauri::command]
-pub fn shuffle(
+pub async fn shuffle(
     playlist: String,
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
 ) -> Result<Vec<Audio>, String> {
@@ -95,7 +100,7 @@ pub fn shuffle(
 }
 
 #[tauri::command]
-pub fn update_history(
+pub async fn update_history(
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
     app_handle: AppHandle,
 ) -> Result<(), String> {
@@ -119,7 +124,7 @@ pub fn update_history(
 }
 
 #[tauri::command]
-pub fn get_audios_history(
+pub async fn get_audios_history(
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
     app_handle: AppHandle,
 ) -> Result<Vec<Audio>, String> {
@@ -138,7 +143,7 @@ pub fn get_audios_history(
 }
 
 #[tauri::command]
-pub fn import_audios_history(
+pub async fn import_audios_history(
     player: State<'_, Arc<Mutex<MusicPlayer>>>,
     app_handle: AppHandle,
 ) -> Result<(), String> {
@@ -156,7 +161,7 @@ pub fn import_audios_history(
 }
 
 #[tauri::command]
-pub fn speed_up(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<(), String> {
+pub async fn speed_up(player: State<'_, Arc<Mutex<MusicPlayer>>>) -> Result<(), String> {
     let mut player = player.lock().unwrap();
     player.speed_up();
     Ok(())

@@ -88,9 +88,7 @@ export default function Music({ name }: { name: string }) {
   const context = useContext(AppContext)
 
   useEffect(() => {
-    setAudiosFromPlaylist(name, context.audioList, context.setAudioList).catch(
-      console.error,
-    )
+    setAudiosFromPlaylist(name, context.setAudioList).catch(console.error)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name])
 
