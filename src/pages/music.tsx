@@ -148,6 +148,7 @@ export default function Music({ name }: { name: string }) {
       <div className="h-2/4 overflow-y-auto">
         <div className="container flex flex-col gap-2 items-stretch">
           {context.audioList.map((value, index) => {
+            // needs to be lazy loaded
             return <MusicCard key={index} audio={value} context={context} name={name} />
           })}
         </div>

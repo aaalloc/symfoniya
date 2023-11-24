@@ -170,7 +170,7 @@ pub fn resize_image(image: &lofty::Picture) -> Vec<u8> {
     resized
         .write_to(
             &mut std::io::Cursor::new(&mut buf),
-            image::ImageOutputFormat::Jpeg(100),
+            image::ImageOutputFormat::Png,
         )
         .unwrap();
     buf
