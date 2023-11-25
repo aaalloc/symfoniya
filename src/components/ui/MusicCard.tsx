@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { invoke } from "@tauri-apps/api/tauri"
 import Image from "next/image"
-import { lazy } from "react"
 
 import { appContext } from "@/components/AppContext"
 import { MusicCardInfo } from "@/components/contexts_menu/MusicCardInfo"
@@ -16,20 +15,10 @@ import {
 } from "@/components/ui/context-menu"
 import { b64imageWrap, format_duration } from "@/lib/utils"
 
-import CPlaylistSub from "./contexts_menu/CPlaylistSub"
+import CPlaylistSub from "../contexts_menu/CPlaylistSub"
 
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function delayForDemo(promise: any) {
-    return new Promise(resolve => {
-        setTimeout(resolve, 100);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return
-    }).then(() => promise);
-}
 
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-export const MusicCardWrap = lazy(() => delayForDemo(import("./MusicCard")))
 
 export default function MusicCard({
     audio,

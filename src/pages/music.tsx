@@ -12,9 +12,9 @@ import {
   fetchPlaylistCheckedState,
   setAudiosFromPlaylist,
 } from "@/components/contexts_menu/CPlaylistSub"
-import MusicCard from "@/components/MusicCard"
 import { shuffle } from "@/components/player/Player"
 import { Button } from "@/components/ui/button"
+import MusicCard from "@/components/ui/MusicCard"
 import { b64imageWrap, cn, isObjectEmpty } from "@/lib/utils"
 
 export default function Music({ name }: { name: string }) {

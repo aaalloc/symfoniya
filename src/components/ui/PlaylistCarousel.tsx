@@ -8,8 +8,8 @@ import { useRef } from "react"
 
 import { b64imageWrap } from "@/lib/utils"
 
+import { Playlist } from "../types/playlist"
 import { CarouselControls } from "./CarouselControls"
-import { Playlist } from "./types/playlist"
 
 export const PlaylistCarousel = ({
   playlists,
@@ -79,8 +79,8 @@ export function PlaylistCard({
         src={b64imageWrap(playlist.cover)}
         //style={{ filter: "hue-rotate(100deg)" }}
         className={`aspect-square rounded-lg ${playlist.cover.length === 0
-            ? "dark:invert dark:relative mix-blend-mode-overlay"
-            : ""
+          ? "dark:invert dark:relative mix-blend-mode-overlay"
+          : ""
           }`}
         height={208}
         width={208}
