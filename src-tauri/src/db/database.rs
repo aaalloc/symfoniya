@@ -213,7 +213,7 @@ pub fn get_playlist_info(db: &Connection) -> Result<Vec<Playlist>, rusqlite::Err
             name: result.get(0)?,
             count: result.get(1)?,
             // if cover is null, return empty string
-            cover: result.get(2).unwrap_or(Vec::new()),
+            cover: result.get(2).unwrap_or(String::new()),
         };
         playlists_info.push(playlist_info);
     }

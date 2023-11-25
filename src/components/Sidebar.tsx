@@ -50,7 +50,7 @@ export function Sidebar({ className: className }: { className?: string }) {
       },
     },
     {
-      label: "Musics",
+      label: "Music",
       component: <Music2 className="mr-2 h-4 w-4" />,
       onClick: () =>
         Router.push({

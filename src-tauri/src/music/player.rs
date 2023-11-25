@@ -79,7 +79,7 @@ impl Player for MusicPlayer {
                     album: String::new(),
                     genre: String::new(),
                 },
-                cover: Vec::new(),
+                cover: String::new(),
             },
             sink: Sink::try_new(&stream_handler).unwrap(),
             is_playing: false,

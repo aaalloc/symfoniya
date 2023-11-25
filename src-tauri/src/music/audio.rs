@@ -1,3 +1,4 @@
+use base64::{engine::general_purpose, Engine as _};
 use duration_str::parse;
 use file_format::{FileFormat, Kind};
 use lofty::{Accessor, AudioFile, Probe, Tag, TagType, TaggedFile, TaggedFileExt};
@@ -112,7 +113,7 @@ pub struct _Audio {
     pub format: String,
     pub status: AudioStatus,
     pub tag: _Tag,
-    pub cover: Vec<u8>,
+    pub cover: String, // base64 encoded
 }
 
 pub fn get_decoder(path: &String) -> Decoder<BufReader<File>> {
@@ -175,8 +176,8 @@ pub fn create_audio(path: PathBuf, format: FileFormat) -> _Audio {
     let picture = tag.pictures().get(0);
     info!("{:?}", picture);
     let cover = match picture {
-        Some(picture) => picture.data().to_vec(),
-        None => Vec::new(),
+        Some(picture) => general_purpose::STANDARD_NO_PAD.encode(picture.data()),
+        None => String::new(),
     };
     _Audio {
         path: path.as_os_str().to_str().unwrap().to_string(),

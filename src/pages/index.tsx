@@ -5,9 +5,9 @@ import { useEffect, useState } from "react"
 import { useContext } from "react"
 
 import { AppContext } from "@/components/AppContext"
-import { MusicsGrid } from "@/components/MusicsGrid"
-import { PlaylistCarousel } from "@/components/PlaylistCarousel"
 import { Audio } from "@/components/types/audio"
+import { MusicsGrid } from "@/components/ui/MusicsGrid"
+import { PlaylistCarousel } from "@/components/ui/PlaylistCarousel"
 
 const Home: NextPage = () => {
   const [history, setHistory] = useState<Audio[]>([])

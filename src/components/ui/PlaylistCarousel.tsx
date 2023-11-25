@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import "@egjs/react-flicking/dist/flicking.css"
 
 import Flicking from "@egjs/react-flicking"
@@ -5,10 +6,10 @@ import Image from "next/image"
 import Router from "next/router"
 import { useRef } from "react"
 
-import { byteToImage } from "@/lib/utils"
+import { b64imageWrap } from "@/lib/utils"
 
+import { Playlist } from "../types/playlist"
 import { CarouselControls } from "./CarouselControls"
-import { Playlist } from "./types/playlist"
 
 export const PlaylistCarousel = ({
   playlists,
@@ -75,13 +76,12 @@ export function PlaylistCard({
               delay-90 dark:hover:bg-gray-900 p-4 rounded-lg transition ease-in-out"
     >
       <Image
-        src={byteToImage(playlist.cover)}
+        src={b64imageWrap(playlist.cover)}
         //style={{ filter: "hue-rotate(100deg)" }}
-        className={`aspect-square rounded-lg ${
-          playlist.cover.length === 0
-            ? "dark:invert dark:relative mix-blend-mode-overlay"
-            : ""
-        }`}
+        className={`aspect-square rounded-lg ${playlist.cover.length === 0
+          ? "dark:invert dark:relative mix-blend-mode-overlay"
+          : ""
+          }`}
         height={208}
         width={208}
         alt={playlist.name}

@@ -14,7 +14,7 @@ use crate::{
 pub struct Playlist {
     pub name: String,
     pub count: i64,
-    pub cover: Vec<u8>,
+    pub cover: String,
 }
 
 #[tauri::command]

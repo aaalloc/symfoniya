@@ -5,7 +5,7 @@ interface Audio {
   path: string
   id: number
   duration: number
-  cover: number[] // byte array
+  cover: string // base64
 }
 
 interface AudioStatus {

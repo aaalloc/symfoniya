@@ -3,9 +3,9 @@ import Flicking from "@egjs/react-flicking"
 import { useContext, useRef } from "react"
 
 import { Audio } from "@/components/types/audio"
-import { MusicCard } from "@/pages/music"
+import MusicCard from "@/components/ui/MusicCard"
 
-import { AppContext } from "./AppContext"
+import { AppContext } from "../AppContext"
 import { CarouselControls } from "./CarouselControls"
 
 const itemsPerCol = 3
