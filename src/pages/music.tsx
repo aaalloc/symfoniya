@@ -84,6 +84,7 @@ export default function Music({ name }: { name: string }) {
             // needs to be lazy loaded
             return <MusicCard key={index} audio={value} context={context} name={name} />
           })} */}
+          {/* Not reponsive :( */}
           <List
             width={1200}
             height={500}
