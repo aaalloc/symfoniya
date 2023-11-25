@@ -1,88 +1,21 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { invoke } from "@tauri-apps/api/tauri"
 import { /*Book,*/ PenBox, Shuffle } from "lucide-react"
 import Image from "next/image"
 import { useContext, useEffect } from "react"
+import { List } from "react-virtualized"
 
-import { AppContext, appContext } from "@/components/AppContext"
-import CPlaylistSub, {
+import { AppContext } from "@/components/AppContext"
+import {
   fetchPlaylistCheckedState,
   setAudiosFromPlaylist,
 } from "@/components/contexts_menu/CPlaylistSub"
-import { MusicCardInfo } from "@/components/contexts_menu/MusicCardInfo"
-import { play, shuffle, update_after_play } from "@/components/player/Player"
-import { Audio } from "@/components/types/audio"
+import MusicCard from "@/components/MusicCard"
+import { shuffle } from "@/components/player/Player"
 import { Button } from "@/components/ui/button"
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSub,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu"
-import { b64imageWrap, cn, format_duration, isObjectEmpty } from "@/lib/utils"
-
-export const MusicCard = ({
-  audio,
-  context,
-  name,
-}: {
-  audio: Audio
-  context: appContext
-  name: string
-}) => {
-  return (
-    <ContextMenu key={audio.id}>
-      <ContextMenuTrigger>
-        <div
-          key={audio.id}
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises, @typescript-eslint/require-await
-          onClick={async () => {
-            if (name === "recent") {
-              return // TODO
-            }
-            await invoke("update_player", {
-              playlist: name,
-            })
-            context.setCurrentPlaylistListening(name)
-            await update_after_play(context, name, true)
-            await play(context, audio, true)
-          }}
-          id={`audio-${audio.id}`}
-          className="hover:cursor-pointer p-4 rounded-lg transition ease-in-out delay-90 dark:hover:bg-gray-900 hover:bg-gray-50 duration-150 flex items-center space-x-8 w-full"
-        >
-          <div className="shrink-0">
-            <Image
-              className="rounded-md"
-              src={b64imageWrap(audio.cover)}
-              height={56}
-              width={56}
-              alt=""
-            />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-lg font-semibold truncate">{audio.title}</p>
-            <p className="text-sm text-muted-foreground">{audio.artist}</p>
-          </div>
-          <p className="">{format_duration(audio.duration)}</p>
-        </div>
-      </ContextMenuTrigger>
-      <ContextMenuContent className="w-44">
-        <ContextMenuSub>
-          <CPlaylistSub value={audio} name={name} />
-        </ContextMenuSub>
-        <ContextMenuItem
-          onClick={(event) => {
-            event.preventDefault()
-          }}
-        >
-          <MusicCardInfo audio={audio} />
-        </ContextMenuItem>
-      </ContextMenuContent>
-    </ContextMenu>
-  )
-}
+import { b64imageWrap, cn, isObjectEmpty } from "@/lib/utils"
 
 export default function Music({ name }: { name: string }) {
   const context = useContext(AppContext)
@@ -118,7 +51,7 @@ export default function Music({ name }: { name: string }) {
         <div className="flex flex-col justify-center gap-2">
           <div className="flex flex-row gap-6">
             <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
-              {name === "all" ? "Musics" : name}
+              {name === "all" ? "Music" : name}
             </h1>
             {name !== "all" ? (
               <Button variant="ghost" size="icon">
@@ -145,15 +78,32 @@ export default function Music({ name }: { name: string }) {
         </div>
       </div>
       {/* 2/4 */}
-      <div className="h-2/4 overflow-y-auto">
+      <div className="h-2/4 overflow">
         <div className="container flex flex-col gap-2 items-stretch">
-          {context.audioList.map((value, index) => {
+          {/* {context.audioList.map((value, index) => {
             // needs to be lazy loaded
             return <MusicCard key={index} audio={value} context={context} name={name} />
-          })}
+          })} */}
+          <List
+            width={1200}
+            height={500}
+            rowCount={context.audioList.length}
+            rowHeight={100}
+            rowRenderer={rowRenderer}
+            tabIndex={0}
+          />
         </div>
       </div>
     </div>
   )
-  //console.log(playlistCheckedState)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function rowRenderer({ key, style }: any) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unused-vars
+    const index = key.split("-")[0]
+    return (
+      <div key={index} style={style}>
+        <MusicCard audio={context.audioList[index]} context={context} name={name} />
+      </div>
+    )
+  }
 }

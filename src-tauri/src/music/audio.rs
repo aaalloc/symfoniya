@@ -162,20 +162,6 @@ fn gen_tag(path: &PathBuf) -> TaggedFile {
     }
 }
 
-pub fn resize_image(image: &lofty::Picture) -> Vec<u8> {
-    let mut buf: Vec<u8> = Vec::new();
-    let img = image::load_from_memory(&image.data()).unwrap();
-    println!("{:?}, {:?}", img.height(), img.width());
-    let resized = img.resize_exact(150, 150, image::imageops::FilterType::Lanczos3);
-    resized
-        .write_to(
-            &mut std::io::Cursor::new(&mut buf),
-            image::ImageOutputFormat::Png,
-        )
-        .unwrap();
-    buf
-}
-
 pub fn create_audio(path: PathBuf, format: FileFormat) -> _Audio {
     let tagged_file = gen_tag(&path);
     let properties = tagged_file.properties();
@@ -190,7 +176,7 @@ pub fn create_audio(path: PathBuf, format: FileFormat) -> _Audio {
     let picture = tag.pictures().get(0);
     info!("{:?}", picture);
     let cover = match picture {
-        Some(picture) => general_purpose::STANDARD_NO_PAD.encode(&resize_image(picture)),
+        Some(picture) => general_purpose::STANDARD_NO_PAD.encode(picture.data()),
         None => String::new(),
     };
     _Audio {
