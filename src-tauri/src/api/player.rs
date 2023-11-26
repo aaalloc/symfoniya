@@ -111,6 +111,7 @@ pub async fn search_audio(
     let mut search_index: SearchIndex<usize> = SearchIndex::default();
 
     // this has to be done when the app starts !
+    // this create a problem when we switch between playlist and search
     player.playlists[&playlist]
         .iter()
         .enumerate()
