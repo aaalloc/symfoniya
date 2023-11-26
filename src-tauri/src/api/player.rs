@@ -4,6 +4,7 @@ use std::{
     sync::{Arc, Mutex},
 };
 
+use indicium::simple::SearchIndex;
 use log::{error, info};
 use tauri::{AppHandle, State};
 
@@ -94,4 +95,29 @@ pub async fn seek_to(
         Ok(_) => Ok(()),
         Err(e) => Err(e.to_string()),
     }
+}
+
+#[tauri::command]
+pub async fn search_audio(
+    query: String,
+    playlist: String,
+    player: State<'_, Arc<Mutex<MusicPlayer>>>,
+) -> Result<Vec<super::utils::Audio>, String> {
+    let player = player.lock().unwrap();
+    if query.is_empty() {
+        return Ok(super::utils::create_audio_list(player, &playlist));
+    }
+    let mut results = Vec::new();
+    let mut search_index: SearchIndex<usize> = SearchIndex::default();
+
+    player.playlists[&playlist]
+        .iter()
+        .enumerate()
+        .for_each(|(i, audio)| search_index.insert(&i, audio));
+
+    let search_results = search_index.search(&query);
+    for result in search_results {
+        results.push(super::utils::create_audio(&player.audios[*result], result));
+    }
+    Ok(results)
 }

@@ -63,8 +63,8 @@ export async function update_after_play(
   const playlist = isObjectEmpty(currentPlaylistListening as unknown as object)
     ? name
     : !fromMusicPage
-    ? currentPlaylistListening
-    : name
+      ? currentPlaylistListening
+      : name
   console.log(playlist)
   await invoke("update_player", {
     playlist: playlist,
@@ -202,7 +202,7 @@ export function Player() {
   }, [wupdate_status, status])
 
   useEffect(() => {
-    ;(() => {
+    ; (() => {
       if (!isObjectEmpty(audio)) {
         invoke("update_history")
           .then(() => {

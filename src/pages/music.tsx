@@ -6,30 +6,24 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-misused-promises */
+import { invoke } from "@tauri-apps/api/tauri"
 import { /*Book,*/ PenBox, Shuffle } from "lucide-react"
 import Image from "next/image"
 import { useContext, useEffect } from "react"
-
 // import { ViewportList } from 'react-viewport-list'
-// import { FixedSizeList as List } from "react-window"
-import { AppContext } from "@/components/AppContext"
+import { List } from "react-virtualized"
+
+import { AppContext, appContext } from "@/components/AppContext"
 import {
   fetchPlaylistCheckedState,
   setAudiosFromPlaylist,
 } from "@/components/contexts_menu/CPlaylistSub"
 import { shuffle } from "@/components/player/Player"
+import { Audio } from "@/components/types/audio"
 import { Button } from "@/components/ui/button"
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandMusicItem,
-  CommandMusicList,
-} from "@/components/ui/command"
+import { Input } from "@/components/ui/input"
 import MusicCard from "@/components/ui/MusicCard"
 import { b64imageWrap, cn, isObjectEmpty } from "@/lib/utils"
-
 
 
 export default function Music({ name }: { name: string }) {
@@ -89,45 +83,50 @@ export default function Music({ name }: { name: string }) {
           >
             <Shuffle className="mr-2 h-5 w-5" /> Shuffle
           </Button>
+
+          <Button onClick={() => {
+            // remove first element
+            context.setAudioList(context.audioList.slice(1))
+          }}>
+            test
+          </Button>
         </div>
       </div>
       {/* 2/4 */}
-      <Command className="container h-2/4 ">
-        <CommandInput placeholder="Search a music..." autoFocus={false} />
+      <div className="container h-2/4 ">
         {/* Not reponsive :( */}
-        <CommandMusicList>
-          <CommandEmpty>No music found.</CommandEmpty>
-          <CommandGroup>
-            {/* <List
-              width={1200}
-              height={800}
-              itemCount={context.audioList.length}
-              itemSize={100}
-            >
-              {rowRenderer(context, name)}
-            </List> */}
-            {context.audioList.map((value, index) => {
+        <div>
+          <Input type="search" placeholder="Search a music ..." onChange={(value) => {
+            const inputValue = value.target.value.toLowerCase();
+            invoke<Audio[]>("search_audio", { query: inputValue, playlist: name }).then((filteredAudioList) => {
+              context.setAudioList(filteredAudioList)
+            }).catch(console.error)
+          }} />
+          <List
+            width={1200}
+            height={800}
+            rowCount={context.audioList.length}
+            rowHeight={100}
+            rowRenderer={rowRenderer(context, name)}
+          />
+          {/* {context.audioList.map((value, index) => {
               // needs to be lazy loaded
-              return (
-                <CommandMusicItem key={index} value={value.title}>
-                  <MusicCard key={index} audio={value} context={context} name={name} />
-                </CommandMusicItem>
+              return (                  <MusicCard key={index} audio={value} context={context} name={name} />
               )
-            })}
-          </CommandGroup>
-        </CommandMusicList>
-      </Command>
+            })} */}
+        </div>
+      </div >
     </div>
   )
 }
 
-// const rowRenderer =
-//   (context: appContext, name: string) =>
-//     ({ index, style }: any) => {
+const rowRenderer =
+  (context: appContext, name: string) =>
+    ({ index, style }: any) => {
 
-//       return (
-//         <CommandMusicItem key={index} value={context.audioList[index].title} style={style}>
-//           <MusicCard audio={context.audioList[index]} context={context} name={name} />
-//         </CommandMusicItem>
-//       )
-//     }
+      return (
+        <div style={style}>
+          <MusicCard audio={context.audioList[index]} context={context} name={name} />
+        </div>
+      )
+    }

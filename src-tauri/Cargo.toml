@@ -33,6 +33,7 @@ futures = "0.3.29"
 youtube_dl = { version = "0.9.0", features = ["tokio"] }
 tokio = { version = "1.20.1", features = ["full"] }
 base64 = { version = "0.21.5" }
+indicium = "0.6.0"
 
 [features]
 # by default Tauri runs in production mode
