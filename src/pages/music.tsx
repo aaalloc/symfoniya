@@ -21,7 +21,7 @@ import {
 import { shuffle } from "@/components/player/Player"
 import { Audio } from "@/components/types/audio"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { SearchInput } from "@/components/ui/input"
 import MusicCard from "@/components/ui/MusicCard"
 import { b64imageWrap, cn, isObjectEmpty } from "@/lib/utils"
 
@@ -83,28 +83,22 @@ export default function Music({ name }: { name: string }) {
           >
             <Shuffle className="mr-2 h-5 w-5" /> Shuffle
           </Button>
-
-          <Button onClick={() => {
-            // remove first element
-            context.setAudioList(context.audioList.slice(1))
-          }}>
-            test
-          </Button>
         </div>
       </div>
       {/* 2/4 */}
       <div className="container h-2/4 ">
         {/* Not reponsive :( */}
-        <div>
-          <Input type="search" placeholder="Search a music ..." onChange={(value) => {
+        <div className="flex flex-col gap-y-4">
+          <SearchInput type="search" placeholder="Search a music..." onChange={(value) => {
             const inputValue = value.target.value.toLowerCase();
             invoke<Audio[]>("search_audio", { query: inputValue, playlist: name }).then((filteredAudioList) => {
               context.setAudioList(filteredAudioList)
             }).catch(console.error)
           }} />
+
           <List
             width={1200}
-            height={800}
+            height={480}
             rowCount={context.audioList.length}
             rowHeight={100}
             rowRenderer={rowRenderer(context, name)}

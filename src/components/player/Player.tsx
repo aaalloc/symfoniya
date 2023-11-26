@@ -171,6 +171,7 @@ export function Player() {
     total: 0,
     status: "stopped",
   } as AudioStatus)
+  // the audio should be retrieved from backend and the not the context
   const { audio } = useContext(AppContext)
   const wupdate_status = () => {
     void invoke("current_audio_status")

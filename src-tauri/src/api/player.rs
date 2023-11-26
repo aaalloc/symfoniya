@@ -110,6 +110,7 @@ pub async fn search_audio(
     let mut results = Vec::new();
     let mut search_index: SearchIndex<usize> = SearchIndex::default();
 
+    // this has to be done when the app starts !
     player.playlists[&playlist]
         .iter()
         .enumerate()
