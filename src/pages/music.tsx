@@ -1,3 +1,7 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable react/display-name */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
@@ -5,8 +9,9 @@
 import { /*Book,*/ PenBox, Shuffle } from "lucide-react"
 import Image from "next/image"
 import { useContext, useEffect } from "react"
-import { List } from "react-virtualized"
 
+// import { ViewportList } from 'react-viewport-list'
+// import { FixedSizeList as List } from "react-window"
 import { AppContext } from "@/components/AppContext"
 import {
   fetchPlaylistCheckedState,
@@ -14,12 +19,21 @@ import {
 } from "@/components/contexts_menu/CPlaylistSub"
 import { shuffle } from "@/components/player/Player"
 import { Button } from "@/components/ui/button"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandMusicItem,
+  CommandMusicList,
+} from "@/components/ui/command"
 import MusicCard from "@/components/ui/MusicCard"
 import { b64imageWrap, cn, isObjectEmpty } from "@/lib/utils"
 
+
+
 export default function Music({ name }: { name: string }) {
   const context = useContext(AppContext)
-
   useEffect(() => {
     setAudiosFromPlaylist(name, context.setAudioList)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -78,33 +92,42 @@ export default function Music({ name }: { name: string }) {
         </div>
       </div>
       {/* 2/4 */}
-      <div className="h-2/4 overflow">
-        <div className="container flex flex-col gap-2 items-stretch">
-          {/* {context.audioList.map((value, index) => {
-            // needs to be lazy loaded
-            return <MusicCard key={index} audio={value} context={context} name={name} />
-          })} */}
-          {/* Not reponsive :( */}
-          <List
-            width={1200}
-            height={500}
-            rowCount={context.audioList.length}
-            rowHeight={100}
-            rowRenderer={rowRenderer}
-            tabIndex={0}
-          />
-        </div>
-      </div>
+      <Command className="container h-2/4 ">
+        <CommandInput placeholder="Search a music..." autoFocus={false} />
+        {/* Not reponsive :( */}
+        <CommandMusicList>
+          <CommandEmpty>No music found.</CommandEmpty>
+          <CommandGroup>
+            {/* <List
+              width={1200}
+              height={800}
+              itemCount={context.audioList.length}
+              itemSize={100}
+            >
+              {rowRenderer(context, name)}
+            </List> */}
+            {context.audioList.map((value, index) => {
+              // needs to be lazy loaded
+              return (
+                <CommandMusicItem key={index} value={value.title}>
+                  <MusicCard key={index} audio={value} context={context} name={name} />
+                </CommandMusicItem>
+              )
+            })}
+          </CommandGroup>
+        </CommandMusicList>
+      </Command>
     </div>
   )
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function rowRenderer({ key, style }: any) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unused-vars
-    const index = key.split("-")[0]
-    return (
-      <div key={index} style={style}>
-        <MusicCard audio={context.audioList[index]} context={context} name={name} />
-      </div>
-    )
-  }
 }
+
+// const rowRenderer =
+//   (context: appContext, name: string) =>
+//     ({ index, style }: any) => {
+
+//       return (
+//         <CommandMusicItem key={index} value={context.audioList[index].title} style={style}>
+//           <MusicCard audio={context.audioList[index]} context={context} name={name} />
+//         </CommandMusicItem>
+//       )
+//     }
