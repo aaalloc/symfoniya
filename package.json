@@ -66,7 +66,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
-    "@prettier/plugin-xml": "^3.1.0",
+    "@prettier/plugin-xml": "^3.2.2",
     "@tauri-apps/cli": "^1.4.0",
     "@testing-library/dom": "^9.3.1",
     "@testing-library/jest-dom": "^5.16.5",
