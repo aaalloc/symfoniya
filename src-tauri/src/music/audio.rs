@@ -142,6 +142,19 @@ impl std::cmp::PartialEq for _Audio {
     }
 }
 
+struct AudioWrapper(_Audio);
+
+impl indicium::simple::Indexable for AudioWrapper {
+    fn strings(&self) -> Vec<String> {
+        vec![
+            self.0.path.clone(),
+            duration_to_string(self.0.duration),
+            self.0.format.clone(),
+            self.0.status.to_string(),
+        ]
+    }
+}
+
 fn gen_tag(path: &PathBuf) -> TaggedFile {
     let tagged_file = Probe::open(path);
     match tagged_file {

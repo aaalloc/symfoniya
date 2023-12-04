@@ -29,29 +29,25 @@ pub fn create_audio_list(player: MutexGuard<'_, MusicPlayer>, str: &str) -> Vec<
     let mut audios = Vec::new();
     if !str.is_empty() {
         for (id, audio) in player.playlists[str].iter().enumerate() {
-            audios.push(Audio {
-                path: audio.path.clone(),
-                title: audio.tag.title.clone(),
-                artist: audio.tag.artist.clone(),
-                album: audio.tag.album.clone(),
-                duration: audio.duration.as_secs(),
-                id,
-                cover: audio.cover.clone(),
-            });
+            audios.push(create_audio(audio, &id));
         }
     } else {
         for (id, audio) in player.audios.iter().enumerate() {
-            audios.push(Audio {
-                path: audio.path.clone(),
-                title: audio.tag.title.clone(),
-                artist: audio.tag.artist.clone(),
-                album: audio.tag.album.clone(),
-                duration: audio.duration.as_secs(),
-                id,
-                cover: audio.cover.clone(),
-            });
+            audios.push(create_audio(audio, &id));
         }
     }
 
     audios
+}
+
+pub fn create_audio(audio: &crate::music::audio::_Audio, id: &usize) -> Audio {
+    Audio {
+        path: audio.path.clone(),
+        title: audio.tag.title.clone(),
+        artist: audio.tag.artist.clone(),
+        album: audio.tag.album.clone(),
+        duration: audio.duration.as_secs(),
+        id: *id,
+        cover: audio.cover.clone(),
+    }
 }

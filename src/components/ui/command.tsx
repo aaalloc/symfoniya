@@ -60,7 +60,19 @@ const CommandList = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.List
     ref={ref}
-    className={cn("max-h-[300px] overflow-y-auto overflow-x-hidden", className)}
+    className={cn("overflow-y-auto overflow-x-hidden", className)}
+    {...props}
+  />
+))
+
+// eslint-disable-next-line react/display-name
+const CommandMusicList = React.forwardRef<
+  React.ElementRef<typeof CommandPrimitive.List>,
+  React.ComponentPropsWithoutRef<typeof CommandPrimitive.List>
+>(({ className, ...props }, ref) => (
+  <CommandPrimitive.List
+    ref={ref}
+    className={cn("overflow-x-hidden", className)}
     {...props}
   />
 ))
@@ -118,6 +130,14 @@ const CommandItem = React.forwardRef<
   />
 ))
 
+// eslint-disable-next-line react/display-name
+const CommandMusicItem = React.forwardRef<
+  React.ElementRef<typeof CommandPrimitive.Item>,
+  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
+>(({ className, ...props }, ref) => (
+  <CommandPrimitive.Item ref={ref} className={cn("", className)} {...props} />
+))
+
 CommandItem.displayName = CommandPrimitive.Item.displayName
 
 const CommandShortcut = ({
@@ -141,6 +161,8 @@ export {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandMusicItem,
+  CommandMusicList,
   CommandSeparator,
   CommandShortcut,
 }

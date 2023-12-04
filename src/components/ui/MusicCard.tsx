@@ -47,7 +47,7 @@ export default function MusicCard({
                         await play(context, audio, true)
                     }}
                     id={`audio-${audio.id}`}
-                    className="hover:cursor-pointer p-4 rounded-lg transition ease-in-out delay-90 dark:hover:bg-gray-900 hover:bg-gray-50 duration-150 flex items-center space-x-8 w-full"
+                    className="hover:cursor-pointer p-4 rounded-lg transition ease-in-out delay-90 dark:hover:bg-gray-900 hover:bg-gray-50 duration-150 flex items-center space-x-6 w-full"
                 >
                     <div className="shrink-0">
                         <Image

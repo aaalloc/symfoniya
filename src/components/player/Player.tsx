@@ -63,8 +63,8 @@ export async function update_after_play(
   const playlist = isObjectEmpty(currentPlaylistListening as unknown as object)
     ? name
     : !fromMusicPage
-    ? currentPlaylistListening
-    : name
+      ? currentPlaylistListening
+      : name
   console.log(playlist)
   await invoke("update_player", {
     playlist: playlist,
@@ -171,6 +171,7 @@ export function Player() {
     total: 0,
     status: "stopped",
   } as AudioStatus)
+  // the audio should be retrieved from backend and the not the context
   const { audio } = useContext(AppContext)
   const wupdate_status = () => {
     void invoke("current_audio_status")
@@ -202,7 +203,7 @@ export function Player() {
   }, [wupdate_status, status])
 
   useEffect(() => {
-    ;(() => {
+    ; (() => {
       if (!isObjectEmpty(audio)) {
         invoke("update_history")
           .then(() => {
