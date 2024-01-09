@@ -12,8 +12,12 @@ const LOG_TARGETS: [LogTarget; 2] = [LogTarget::Stdout, LogTarget::LogDir];
 use std::sync::Arc;
 mod db;
 mod music;
-use crate::{api::*, music::player::Player};
+use crate::{
+    api::*,
+    music::{player::Player, ytdlp_wrapper},
+};
 use db::{database, state::DbState};
+use log::info;
 use music::{
     async_process::{async_process_model, AsyncProcInputTx},
     player::MusicPlayer,
@@ -99,11 +103,44 @@ fn main() {
             music::ytdlp_wrapper::download_audio_from_links,
         ])
         .setup(|app| {
+            // init database
             let handle = app.handle();
             let app_state: State<DbState> = handle.state();
             let db =
                 database::initialize_database(&handle).expect("Database initialize should succeed");
             *app_state.db.lock().unwrap() = Some(db);
+
+            // check if ytdlp is installed
+            let app_dir = handle
+                .path_resolver()
+                .app_data_dir()
+                .expect("The app data directory should exist.");
+            match music::ytdlp_wrapper::check_ytdl_bin(app_dir.as_os_str()) {
+                Ok(res) => match res {
+                    ytdlp_wrapper::YtDlpBin::InPath => {}
+                    music::ytdlp_wrapper::YtDlpBin::InAppDir => {
+                        tauri::async_runtime::spawn(async move {
+                            let mut str = ytdlp_wrapper::YT_DLP_BIN_PATH.write().await;
+                            *str = format!("{}/{}", app_dir.to_str().unwrap(), str);
+                        });
+                    }
+                },
+                Err(_) => {
+                    info!(
+                        "yt-dlp not found, downloading it at {:?}",
+                        app_dir.as_os_str()
+                    );
+                    tauri::async_runtime::spawn(async move {
+                        let path = youtube_dl::download_yt_dlp(app_dir.as_os_str())
+                            .await
+                            .unwrap();
+                        assert!(path.is_file(), "downloaded file should exist");
+                        info!("yt-dlp downloaded at {:?}", path);
+                        let mut str = ytdlp_wrapper::YT_DLP_BIN_PATH.write().await;
+                        *str = path.to_str().unwrap().to_string();
+                    });
+                }
+            }
 
             tauri::async_runtime::spawn(async move {
                 async_process_model(async_process_input_rx, async_process_output_tx).await
