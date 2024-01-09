@@ -110,6 +110,7 @@ dependencies = [
  "env_logger",
  "file-format",
  "futures",
+ "lazy_static",
  "lofty",
  "log",
  "rand 0.8.5",

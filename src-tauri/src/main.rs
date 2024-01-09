@@ -12,7 +12,10 @@ const LOG_TARGETS: [LogTarget; 2] = [LogTarget::Stdout, LogTarget::LogDir];
 use std::sync::Arc;
 mod db;
 mod music;
-use crate::{api::*, music::player::Player};
+use crate::{
+    api::*,
+    music::{player::Player, ytdlp_wrapper},
+};
 use db::{database, state::DbState};
 use log::info;
 use music::{
@@ -108,13 +111,13 @@ fn main() {
             *app_state.db.lock().unwrap() = Some(db);
 
             // check if ytdlp is installed
-            match music::ytdlp_wrapper::check_ytdl_bin() {
+            let app_dir = handle
+                .path_resolver()
+                .app_data_dir()
+                .expect("The app data directory should exist.");
+            match music::ytdlp_wrapper::check_ytdl_bin(app_dir.as_os_str()) {
                 Ok(_) => {}
                 Err(_) => {
-                    let app_dir = handle
-                        .path_resolver()
-                        .app_data_dir()
-                        .expect("The app data directory should exist.");
                     info!(
                         "yt-dlp not found, downloading it at {:?}",
                         app_dir.as_os_str()
@@ -124,6 +127,9 @@ fn main() {
                             .await
                             .unwrap();
                         assert!(path.is_file(), "downloaded file should exist");
+                        info!("yt-dlp downloaded at {:?}", path);
+                        let mut str = ytdlp_wrapper::YT_DLP_BIN_PATH.write().await;
+                        *str = path.to_str().unwrap().to_string();
                     });
                 }
             }

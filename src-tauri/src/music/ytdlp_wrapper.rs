@@ -1,4 +1,7 @@
-use std::process::Command;
+use lazy_static::lazy_static;
+use log::info;
+use std::{ffi::OsStr, process::Command};
+use tokio::sync::RwLock;
 
 use futures::StreamExt;
 use youtube_dl::{Error, YoutubeDl, YoutubeDlOutput};
@@ -10,6 +13,10 @@ pub enum ResultFromDownload {
     Result(MusicItem),
     Awaiting(TotalItem),
     Error(ErrorItem),
+}
+
+lazy_static! {
+    pub static ref YT_DLP_BIN_PATH: RwLock<String> = RwLock::new("yt-dlp".to_string());
 }
 
 #[derive(serde::Serialize, Clone)]
@@ -36,9 +43,10 @@ impl std::fmt::Display for MusicItem {
     }
 }
 
-fn retrieve_possible_links(url: &str) -> Result<Vec<MusicItem>, Error> {
+fn retrieve_possible_links(url: &str, yt_dlp_path: &str) -> Result<Vec<MusicItem>, Error> {
     let mut links: Vec<MusicItem> = Vec::new();
     let retrieved = YoutubeDl::new(url)
+        .youtube_dl_path(yt_dlp_path)
         .socket_timeout("15")
         .flat_playlist(true)
         .run();
@@ -66,7 +74,9 @@ fn retrieve_possible_links(url: &str) -> Result<Vec<MusicItem>, Error> {
 }
 
 async fn download_audio(url: &str, path: &str) -> Result<YoutubeDlOutput, Error> {
+    let yt_dlp_path = YT_DLP_BIN_PATH.read().await;
     YoutubeDl::new(url)
+    .youtube_dl_path(yt_dlp_path.as_str())
         .socket_timeout("15")
         .extract_audio(true)
         .extra_arg("-x")
@@ -86,13 +96,32 @@ async fn download_audio(url: &str, path: &str) -> Result<YoutubeDlOutput, Error>
         .run_async().await
 }
 
-pub fn check_ytdl_bin() -> Result<bool, String> {
+pub fn check_ytdl_bin(app_dir_path: &OsStr) -> Result<bool, String> {
     // we check if user has yt-dlp installed
+    info!("Checking yt-dlp binary in PATH and at {:?}", app_dir_path);
     match Command::new("yt-dlp").arg("--version").output() {
-        Ok(_) => Ok(true),
+        Ok(_) => {
+            info!("yt-dlp found in PATH");
+            Ok(true)
+        }
         Err(e) => {
             if e.kind() == std::io::ErrorKind::NotFound {
-                Err("yt-dlp not found".to_string())
+                match Command::new(format!("{}/yt-dlp", app_dir_path.to_str().unwrap()))
+                    .arg("--version")
+                    .output()
+                {
+                    Ok(_) => {
+                        info!("yt-dlp found at {:?}", app_dir_path);
+                        Ok(true)
+                    }
+                    Err(e) => {
+                        if e.kind() == std::io::ErrorKind::NotFound {
+                            Err("yt-dlp not found".to_string())
+                        } else {
+                            Err(e.to_string())
+                        }
+                    }
+                }
             } else {
                 Err(e.to_string())
             }
@@ -106,7 +135,8 @@ pub async fn download_audio_from_links(
     path: String,
     state: tauri::State<'_, AsyncProcInputTx>,
 ) -> Result<(), String> {
-    let res_links = retrieve_possible_links(&url);
+    let yt_dlp_path = YT_DLP_BIN_PATH.read().await;
+    let res_links = retrieve_possible_links(&url, yt_dlp_path.as_str());
     let links = match res_links {
         Ok(links) => links,
         Err(e) => {
