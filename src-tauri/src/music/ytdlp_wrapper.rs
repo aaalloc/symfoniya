@@ -16,7 +16,16 @@ pub enum ResultFromDownload {
 }
 
 lazy_static! {
-    pub static ref YT_DLP_BIN_PATH: RwLock<String> = RwLock::new("yt-dlp".to_string());
+    pub static ref YT_DLP_BIN_PATH: RwLock<String> = RwLock::new({
+        #[cfg(target_os = "windows")]
+        {
+            "yt-dlp.exe".to_string()
+        }
+        #[cfg(not(target_os = "windows"))]
+        {
+            "yt-dlp".to_string()
+        }
+    });
 }
 
 #[derive(serde::Serialize, Clone)]
@@ -75,6 +84,7 @@ fn retrieve_possible_links(url: &str, yt_dlp_path: &str) -> Result<Vec<MusicItem
 
 async fn download_audio(url: &str, path: &str) -> Result<YoutubeDlOutput, Error> {
     let yt_dlp_path = YT_DLP_BIN_PATH.read().await;
+
     YoutubeDl::new(url)
     .youtube_dl_path(yt_dlp_path.as_str())
         .socket_timeout("15")
@@ -96,23 +106,37 @@ async fn download_audio(url: &str, path: &str) -> Result<YoutubeDlOutput, Error>
         .run_async().await
 }
 
-pub fn check_ytdl_bin(app_dir_path: &OsStr) -> Result<bool, String> {
+pub enum YtDlpBin {
+    InPath,
+    InAppDir,
+}
+
+pub fn check_ytdl_bin(app_dir_path: &OsStr) -> Result<YtDlpBin, String> {
     // we check if user has yt-dlp installed
     info!("Checking yt-dlp binary in PATH and at {:?}", app_dir_path);
     match Command::new("yt-dlp").arg("--version").output() {
         Ok(_) => {
             info!("yt-dlp found in PATH");
-            Ok(true)
+            Ok(YtDlpBin::InPath)
         }
         Err(e) => {
             if e.kind() == std::io::ErrorKind::NotFound {
-                match Command::new(format!("{}/yt-dlp", app_dir_path.to_str().unwrap()))
-                    .arg("--version")
-                    .output()
+                let rt = tokio::runtime::Runtime::new().unwrap();
+                let yt_dlp_path: String = rt.block_on(async {
+                    let yt_dlp_path = YT_DLP_BIN_PATH.read().await;
+                    yt_dlp_path.clone()
+                });
+                match Command::new(format!(
+                    "{}/{}",
+                    app_dir_path.to_str().unwrap(),
+                    yt_dlp_path.as_str()
+                ))
+                .arg("--version")
+                .output()
                 {
                     Ok(_) => {
                         info!("yt-dlp found at {:?}", app_dir_path);
-                        Ok(true)
+                        Ok(YtDlpBin::InAppDir)
                     }
                     Err(e) => {
                         if e.kind() == std::io::ErrorKind::NotFound {

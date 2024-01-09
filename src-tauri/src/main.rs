@@ -116,7 +116,15 @@ fn main() {
                 .app_data_dir()
                 .expect("The app data directory should exist.");
             match music::ytdlp_wrapper::check_ytdl_bin(app_dir.as_os_str()) {
-                Ok(_) => {}
+                Ok(res) => match res {
+                    ytdlp_wrapper::YtDlpBin::InPath => {}
+                    music::ytdlp_wrapper::YtDlpBin::InAppDir => {
+                        tauri::async_runtime::spawn(async move {
+                            let mut str = ytdlp_wrapper::YT_DLP_BIN_PATH.write().await;
+                            *str = format!("{}/{}", app_dir.to_str().unwrap(), str);
+                        });
+                    }
+                },
                 Err(_) => {
                     info!(
                         "yt-dlp not found, downloading it at {:?}",
