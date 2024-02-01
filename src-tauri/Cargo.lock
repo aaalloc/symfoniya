@@ -3248,8 +3248,8 @@ dependencies = [
 
 [[package]]
 name = "rodio"
-version = "0.17.2"
-source = "git+https://github.com/dvdsk/rodio?branch=seek_runtime_err#57f2a3ca3673cd3bb44cf26533a198140d1320e3"
+version = "0.17.3"
+source = "git+https://github.com/dvdsk/rodio?branch=seek_runtime_err#fb44f71dc960dc2662c9f7fc6e398ae85e0a6300"
 dependencies = [
  "claxon",
  "cpal",
