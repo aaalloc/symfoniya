@@ -147,8 +147,8 @@ dependencies:
     specifier: github:tauri-apps/tauri-plugin-log#v1
     version: github.com/tauri-apps/tauri-plugin-log/3b3ff84b49516ae2ac70ff76c75e6e7b93e8a841
   zod:
-    specifier: ^3.21.4
-    version: 3.21.4
+    specifier: ^3.22.4
+    version: 3.22.4
 
 devDependencies:
   '@prettier/plugin-xml':
@@ -6845,7 +6845,7 @@ packages:
       recast: 0.23.3
       ts-morph: 18.0.0
       tsconfig-paths: 4.2.0
-      zod: 3.21.4
+      zod: 3.22.4
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -7489,6 +7489,10 @@ packages:
 
   /zod@3.21.4:
     resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
+    dev: false
+
+  /zod@3.22.4:
+    resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: false
 
   github.com/tauri-apps/tauri-plugin-log/3b3ff84b49516ae2ac70ff76c75e6e7b93e8a841:

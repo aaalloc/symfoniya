@@ -63,7 +63,7 @@
     "tailwind-merge": "^1.13.2",
     "tailwindcss-animate": "^1.0.6",
     "tauri-plugin-log-api": "github:tauri-apps/tauri-plugin-log#v1",
-    "zod": "^3.21.4"
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@prettier/plugin-xml": "^3.1.0",
