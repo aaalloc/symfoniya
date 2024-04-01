@@ -6,6 +6,7 @@ use crate::{database, db::state::DbAccess, music::audio::*, update_status};
 use rand::prelude::*;
 use std::time::Instant;
 use tauri::AppHandle;
+
 pub struct MusicPlayer {
     pub total_time: Duration,
     pub audios: Vec<_Audio>,
@@ -44,10 +45,6 @@ pub trait Player {
     fn get_index(&self) -> usize;
     fn write_to_db(&self, app_handle: AppHandle);
 }
-
-//unsafe impl Send for MusicPlayer {}
-
-//unsafe impl Sync for MusicPlayer {}
 
 impl std::fmt::Display for MusicPlayer {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {

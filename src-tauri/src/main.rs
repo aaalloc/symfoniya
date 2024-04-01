@@ -30,15 +30,68 @@ use tauri_plugin_log::{fern::colors::ColoredLevelConfig, LogTarget};
 use tokio::sync::mpsc;
 mod api;
 
-fn main() {
+#[async_std::main]
+async fn main() -> mpris_server::zbus::Result<()> {
     let (_stream, _stream_handle) = OutputStream::try_default().unwrap();
     // leak the stream to keep it alive, otherwise it will be dropped and no more audio !!!!
     // this is not a good thing but I think it is a good workaround for now ...
     let _str = Box::leak(Box::new(_stream));
     let arc_player = Arc::new(std::sync::Mutex::new(MusicPlayer::new(_stream_handle)));
+    let arc_player_ref: &Arc<std::sync::Mutex<MusicPlayer>> = unsafe {
+        std::mem::transmute::<&Arc<std::sync::Mutex<_>>, &'static Arc<std::sync::Mutex<_>>>(
+            &arc_player,
+        )
+    };
 
     let (async_process_input_tx, async_process_input_rx) = mpsc::channel(1);
     let (async_process_output_tx, mut async_process_output_rx) = mpsc::channel(1);
+
+    println!("mpris player started");
+
+    let _handle = std::thread::spawn(move || {
+        let task = async {
+            let mprisplayer = mpris_server::Player::builder("com.symfoniya")
+                .can_play(true)
+                .can_pause(true)
+                .can_go_previous(true)
+                .can_go_next(true)
+                .build()
+                .await
+                .unwrap();
+            // // set callbacks
+            // Handle `PlayPause` method call
+            mprisplayer.connect_play_pause(|_player| {
+                println!("PlayPause");
+                match _player.playback_status() {
+                    mpris_server::PlaybackStatus::Playing => {
+                        arc_player_ref.lock().unwrap().pause();
+                    }
+                    mpris_server::PlaybackStatus::Paused => {
+                        arc_player_ref.lock().unwrap().play();
+                    }
+                    mpris_server::PlaybackStatus::Stopped => {
+                        arc_player_ref.lock().unwrap().play();
+                    }
+                }
+            });
+
+            // Handle `Previous` method call
+            mprisplayer.connect_previous(|_player| {
+                println!("Previous");
+                arc_player_ref.lock().unwrap().previous();
+            });
+
+            // Handle `Next` method call
+            mprisplayer.connect_next(|_player| {
+                println!("Next");
+                arc_player_ref.lock().unwrap().next();
+                // drop lock
+            });
+
+            mprisplayer.run().await;
+        };
+        async_std::task::block_on(task);
+    });
 
     tauri::Builder::default()
         .system_tray(
@@ -154,6 +207,8 @@ fn main() {
                 }
             });
 
+            // create async_std process
+
             Ok(())
         })
         .on_window_event(|event| {
@@ -164,4 +219,6 @@ fn main() {
         })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+
+    Ok(())
 }
